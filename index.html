@@ -2103,11 +2103,11 @@
       }
       function ensureStockfish() {
         if(stockfishReadyPromise)return stockfishReadyPromise;
-        if(matchActive&&aiThinking)$("statusText").textContent=isPersian?"در حال بارگیری موتور کامل Stockfish (حدود ۹۵ مگابایت)…":"Loading the full Stockfish engine (about 95 MB)…";
+        if(matchActive&&aiThinking)$("statusText").textContent=isPersian?"در حال بارگیری موتور Stockfish…":"Loading the Stockfish engine…";
         stockfishReadyPromise=new Promise((resolve,reject)=>{
           stockfishReadyResolve=resolve;stockfishReadyReject=reject;
           try {
-            stockfishWorker=new Worker(new URL("./assets/stockfish/stockfish-19-single.js",document.baseURI));
+            stockfishWorker=new Worker(new URL("./assets/stockfish/stockfish-19-lite-single.js",document.baseURI));
             stockfishWorker.onmessage=event=>{
               const line=typeof event.data==="string"?event.data:event.data?.line;
               if(typeof line!=="string")return;
@@ -2156,9 +2156,9 @@
               error.code="ENGINE_WORKER_FAILED";failStockfishWorker(error);
             };
             stockfishReadyTimer=setTimeout(()=>{
-              const error=new Error("Stockfish did not finish loading within 3 minutes.");
+              const error=new Error("Stockfish did not finish loading within 30 seconds.");
               error.code="ENGINE_LOAD_TIMEOUT";failStockfishWorker(error);
-            },180000);
+            },30000);
             stockfishWorker.postMessage("uci");
           } catch(error) {
             error.code="ENGINE_WORKER_FAILED";failStockfishWorker(error);
@@ -2240,6 +2240,7 @@
       let mode = "ai", humanColor = "w", aiThinking = false, gameOver = false;
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
       const stockfishSearchCache=new Map();
+      window.addEventListener("load",()=>{setTimeout(()=>{ensureStockfish().catch(error=>console.warn("Stockfish preload failed; it will be retried when needed.",error));},200);});
       let clocks = { w: 0, b: 0 }, clockOn = false, clockStamp = Date.now(), toastTimer;
       let aiTimer = null, analysisShown = false, resultRecorded = false, lastGameResult = "", audioContext = null, audioResumePromise = null, effectsBus = null, uiBus = null, musicVolume = .75, musicStyle = "electric-1", musicEnabled = true, effectsEnabled = true, uiSoundsEnabled = true, musicHasStarted = false, musicRequest = 0;
       let matchActive = false, boardAnimating = false, trainingReturn = "lobby", currentLesson = 0, quizAnswered = false, gameStartedAt=new Date();
@@ -4807,10 +4808,17 @@
         if(bookMove)return bookMove;
         const depth=rating<700?6:rating<1000?8:rating<1400?10:rating<1700?12:14;
         const movetime=rating<700?450:rating<1000?700:rating<1400?1000:rating<1700?1400:1800;
-        const result=await stockfishSearch(position,{rating,style:$("style").value,depth,movetime,signal});
-        const move=uciMove(position,result.best);
-        if(!move)throw new Error(`Stockfish returned an illegal move: ${result.best}`);
-        return move;
+        try {
+          const result=await stockfishSearch(position,{rating,style:$("style").value,depth,movetime,signal});
+          const move=uciMove(position,result.best);
+          if(!move)throw new Error(`Stockfish returned an illegal move: ${result.best}`);
+          return move;
+        } catch(error) {
+          if(error.name==="AbortError"||signal?.aborted)throw error;
+          console.error(error);
+          showToast(isPersian?"استاک‌فیش در دسترس نیست؛ موتور داخلی بازی را ادامه می‌دهد.":"Stockfish is unavailable; the built-in engine will continue.");
+          return chooseFallbackMove(position,rating);
+        }
       }
       function scheduleAI() {
         if(gameOver||mode!=="ai"||state.turn===humanColor) return;
