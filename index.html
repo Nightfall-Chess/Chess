@@ -1448,7 +1448,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=8">
 </head>
 <body>
   <main class="app">
@@ -1468,15 +1468,34 @@
 
     <section class="lobby" id="lobby" data-page="play" aria-labelledby="lobbyTitle">
       <div class="lobby-hero">
-        <div class="lobby-kicker">Nightfall Chess</div>
-        <h1 id="lobbyTitle">Play chess.</h1>
-        <p class="lobby-intro">Choose an opponent and make your first move.</p>
+        <div class="lobby-hero-copy">
+          <div class="lobby-kicker">MOONLIT STUDY · NIGHTFALL CHESS</div>
+          <h1 id="lobbyTitle">Your next move awaits.</h1>
+          <p class="lobby-intro">A quieter kind of competition. Settle in, find your rhythm, and let the game unfold.</p>
+          <div class="lobby-hero-actions">
+            <button class="primary-button" id="heroPlayButton" type="button">Play now <span aria-hidden="true">↗</span></button>
+            <button class="subtle-button" id="heroAcademyButton" type="button">Explore the Academy</button>
+          </div>
+        </div>
+        <div class="hero-scene" aria-hidden="true">
+          <div class="hero-moon"></div>
+          <div class="hero-orbit hero-orbit-back"></div>
+          <div class="hero-orbit hero-orbit-front"></div>
+          <div class="hero-board-wrap"><div class="hero-board" id="heroBoardPreview"></div></div>
+          <div class="hero-scene-caption"><span>THE OPENING MOVE</span><span>01 — 08</span></div>
+        </div>
       </div>
       <nav class="lobby-navigation" aria-label="Main menu">
         <button class="lobby-nav-button active" type="button" data-lobby-page="play" aria-current="page">Play</button>
         <button class="lobby-nav-button" type="button" data-lobby-page="puzzles">Puzzles</button>
         <button class="lobby-nav-button" type="button" data-lobby-page="progress">Progress</button>
       </nav>
+      <section class="home-shortcuts" aria-label="Quick access">
+        <button class="home-shortcut" id="homeAiButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">♟</span><span><strong>Play against AI</strong><small>Choose your challenge</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
+        <button class="home-shortcut" id="homeFriendButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">♙</span><span><strong>Play a friend locally</strong><small>One board, two players</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
+        <button class="home-shortcut" id="homeAcademyButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">♧</span><span><strong>Explore the Academy</strong><small>Practice at your own pace.</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
+        <button class="home-shortcut" id="homeOpeningsButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">⌘</span><span><strong>Opening explorer</strong><small>Review openings from real master games.</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
+      </section>
       <div class="lobby-grid">
         <section class="lobby-card">
           <div class="card-heading"><span class="card-title">Choose your game</span><span class="eyebrow">01 / PLAY</span></div>
@@ -1686,7 +1705,7 @@
           <p class="training-callout">Chess mastery takes sustained practice. These lessons give you a solid path; keep playing, reviewing, and learning beyond them.</p>
         </article>
       </div>
-      <details class="card quick-reviews">
+      <details class="card quick-reviews" id="openingExplorer">
         <summary>⚡ Fast opening reviews · 1 minute each</summary>
         <label class="opening-search-label" for="openingSearch">Find an opening</label>
         <input class="opening-search" id="openingSearch" type="search" placeholder="Search 33 opening plans" autocomplete="off">
@@ -1924,6 +1943,13 @@
       }
       const faText = {
         "Nightfall Chess":"شطرنج شبانه","A quieter kind of competition":"رقابتی آرام و هوشمندانه",
+        "MOONLIT STUDY · NIGHTFALL CHESS":"مطالعه زیر نور ماه · شطرنج شبانه","Your next move awaits.":"حرکت بعدی در انتظار شماست.",
+        "A quieter kind of competition. Settle in, find your rhythm, and let the game unfold.":"رقابتی آرام و هوشمندانه. آسوده بنشینید، ریتم خود را پیدا کنید و بگذارید بازی پیش برود.",
+        "Play now":"شروع بازی","Explore the Academy":"ورود به آکادمی","Play against AI":"بازی با هوش مصنوعی",
+        "Play a friend locally":"بازی محلی با دوست","Choose your challenge":"حریف خود را انتخاب کنید","One board, two players":"یک صفحه، دو بازیکن",
+        "Practice at your own pace.":"با آرامش و گام‌به‌گام تمرین کنید.","Opening explorer":"کاوش گشایش‌ها",
+        "Review openings from real master games.":"گشایش‌ها را از بازی‌های واقعی استادان مرور کنید.","MOONLIT STUDY":"مطالعه زیر نور ماه",
+        "THE OPENING MOVE":"حرکت آغازین","01 — 08":"۰۱ — ۰۸",
         "Export PGN":"دریافت فایل PGN","First position":"نخستین وضعیت","Previous move":"حرکت پیشین","Next move":"حرکت بعدی","Final position":"وضعیت پایانی","Initial position":"وضعیت آغازین","Review position":"وضعیت مرور","King's Pawn Game":"بازی پیادهٔ شاه","King’s Pawn Game":"بازی پیادهٔ شاه",
         "Stockfish is calculating a move…":"موتور Stockfish در حال محاسبهٔ حرکت است…","Stockfish is analyzing the moves…":"موتور Stockfish در حال تحلیل حرکت‌هاست…","Loading Stockfish Lite (about 1.8 MB)…":"در حال بارگیری نسخهٔ سبک Stockfish (حدود ۱٫۸ مگابایت)…",
         "Brilliant":"درخشان","Great":"عالی","Best":"بهترین","Excellent":"بسیار خوب","Good":"خوب","Book":"کتابی","Inaccuracy":"نادقیق","Mistake":"اشتباه","Blunder":"اشتباه فاحش","Unavailable":"در دسترس نیست","Analyzing":"در حال تحلیل",
@@ -4943,6 +4969,17 @@
           board.append(square);
         }
       }
+      function renderHeroPreview() {
+        const board=$("heroBoardPreview");
+        board.replaceChildren();
+        const position=initialBoard();
+        for(let row=0;row<8;row++)for(let col=0;col<8;col++) {
+          const square=document.createElement("span"),piece=position[row][col];
+          square.className=`hero-board-square ${(row+col)%2===0?"light":"dark"}`;
+          if(piece)appendPiece(square,piece,"hero-preview-piece");
+          board.append(square);
+        }
+      }
       function updateThemeOptionSelection(container,theme) {
         for(const button of container.querySelectorAll("button[data-theme-value]")) {
           const selected=button.dataset.themeValue===theme;
@@ -4957,6 +4994,7 @@
           :"none");
         updateThemeOptionSelection($("boardThemeOptions"),boardTheme);
         updateThemeOptionSelection($("pieceThemeOptions"),pieceTheme);
+        renderHeroPreview();
         renderThemePreview();
         renderBoard();renderPuzzle();renderQuickReview();
         if(currentLesson>=CORE_LESSON_COUNT)renderOpeningScenarioBoard(currentLesson-CORE_LESSON_COUNT);
@@ -5840,6 +5878,23 @@
       $("localFriendButton").addEventListener("click",startLocalFriendGame);
       $("lobbyAiMode").addEventListener("click",()=>setMode("ai"));
       $("lobbyFriendMode").addEventListener("click",()=>setMode("friend"));
+      $("heroPlayButton").addEventListener("click",()=>$("launchButton").click());
+      $("heroAcademyButton").addEventListener("click",openTraining);
+      $("homeAiButton").addEventListener("click",()=>{
+        setMode("ai");
+        document.querySelector("#lobby .lobby-grid").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+      });
+      $("homeFriendButton").addEventListener("click",()=>{
+        setMode("friend");
+        document.querySelector("#lobby .lobby-grid").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+      });
+      $("homeAcademyButton").addEventListener("click",openTraining);
+      $("homeOpeningsButton").addEventListener("click",()=>{
+        openTraining();
+        $("openingExplorer").open=true;
+        $("openingExplorer").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+        $("openingSearch").focus({preventScroll:true});
+      });
       $("lobbyStrength").addEventListener("input",()=>{
         $("strength").value=$("lobbyStrength").value;updateAiRating();
       });

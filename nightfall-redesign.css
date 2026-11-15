@@ -252,7 +252,7 @@ input[type="range"] { accent-color: var(--accent); }
   gap: 0;
   margin-top: -6px;
 }
-#lobby[data-page="play"] .lobby-dashboard > :not(.profile-stats) { display: none !important; }
+#lobby[data-page="play"] .lobby-dashboard > :not(.profile-stats):not(#profilePerformance):not(#profileRecentGames):not(#profileLearning) { display: none !important; }
 #lobby[data-page="play"] .profile-stats {
   width: min(100%, 590px);
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -523,10 +523,230 @@ input[type="range"] { accent-color: var(--accent); }
   .online-head > div:last-child { justify-content: flex-start; }
 }
 
-html[lang="fa"] .lobby-hero::after { right: auto; left: clamp(24px, 8vw, 96px); transform: translateY(-48%) rotate(7deg); }
+html[lang="fa"] .lobby-hero::after { display: none; }
 html[lang="fa"] .settings-nav-button { text-align: right; }
 html[lang="fa"] #gameScreen.layout > .side-panel { border-right: 1px solid #b7a3ff2b; border-left: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+.lobby { max-width: 1060px; gap: 14px; }
+.lobby-hero {
+  min-height: 340px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(230px, .88fr);
+  align-items: center;
+  gap: 12px;
+  padding: clamp(26px, 5vw, 48px);
+  border-color: #b7a3ff32;
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 82% 55%, #9a83ff20 0, transparent 20rem),
+    radial-gradient(ellipse at 4% 2%, #d8bd830c 0, transparent 23rem),
+    linear-gradient(118deg, #171a29 0%, #111522 56%, #141522 100%);
+  box-shadow: inset 0 1px #ffffff12, 0 28px 80px #0005;
+}
+.lobby-hero::before {
+  inset: auto 5% -215px auto;
+  width: 470px;
+  height: 470px;
+  border-color: #b7a3ff15;
+  box-shadow: 0 0 0 36px #b7a3ff05, 0 0 0 82px #b7a3ff03;
+}
+.lobby-hero::after { display: none; }
+.lobby-hero-copy { position: relative; z-index: 2; max-width: 470px; }
+.lobby-kicker { color: #e2c991; letter-spacing: .2em; }
+.lobby h1 { max-width: 480px; margin: 15px 0 9px; font-size: clamp(38px, 5vw, 58px); line-height: 1.03; }
+.lobby-intro { max-width: 390px; color: #b6b8c8; font-size: 13px; }
+.lobby-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 24px; }
+.lobby-hero-actions .primary-button { min-width: 150px; min-height: 48px; }
+.lobby-hero-actions .primary-button span { display: inline-block; margin-inline-start: 14px; font-size: 17px; }
+.lobby-hero-actions .subtle-button { min-height: 46px; padding-inline: 16px; }
+.hero-scene { position: relative; display: grid; min-width: 0; min-height: 300px; place-items: center; perspective: 900px; }
+.hero-moon {
+  position: absolute;
+  top: 12%;
+  inset-inline-end: 19%;
+  width: 118px;
+  aspect-ratio: 1;
+  border: 1px solid #fff4d12b;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 33%, #fff8df55, #b9a2ff20 57%, transparent 72%);
+  box-shadow: 0 0 52px #b5a2ff24, 0 0 100px #9b7c6020;
+  filter: blur(.2px);
+}
+.hero-orbit { position: absolute; width: min(94%, 340px); aspect-ratio: 1; border: 1px solid #c5b6ff12; border-radius: 50%; pointer-events: none; }
+.hero-orbit-back { transform: rotateX(67deg) rotateZ(-15deg) scale(1.05); }
+.hero-orbit-front { width: min(76%, 275px); transform: rotateX(67deg) rotateZ(27deg) scale(1.15); border-color: #d8bd8319; }
+.hero-board-wrap {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 270px);
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #d5c9ff55;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #d6cbff2b, #d8bd8311 50%, #0c0f1a);
+  box-shadow: 0 23px 48px #0009, 0 0 50px #9884ff20, inset 0 1px #fff5;
+  transform: perspective(900px) rotateX(8deg) rotateZ(-3deg);
+  animation: hero-board-drift 9s ease-in-out infinite;
+}
+.hero-board {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 1px solid #080a1260;
+  border-radius: 5px;
+  background: #10131d;
+}
+.hero-board-square { display: grid; min-width: 0; aspect-ratio: 1; place-items: center; }
+.hero-board-square.light { background: var(--light-square); }
+.hero-board-square.dark { background: var(--dark-square); }
+.hero-board-square .piece-image { width: 90%; height: 90%; object-fit: contain; filter: drop-shadow(0 2px 2px #12142670); }
+.hero-scene-caption {
+  position: absolute;
+  z-index: 2;
+  inset-inline: 3%;
+  bottom: 1px;
+  display: flex;
+  justify-content: space-between;
+  color: #c1bba8a6;
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: .19em;
+}
+.home-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  width: min(100%, 860px);
+  margin: 0 auto;
+}
+#lobby[data-page="puzzles"] .home-shortcuts,
+#lobby[data-page="progress"] .home-shortcuts { display: none; }
+.home-shortcut {
+  display: grid;
+  grid-template-columns: 35px minmax(0, 1fr) 12px;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 69px;
+  padding: 10px 11px;
+  border: 1px solid #ffffff13;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #161a28, #10131d);
+  color: var(--text);
+  text-align: start;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, transform .2s, box-shadow .2s;
+}
+.home-shortcut:hover { border-color: #b7a3ff55; background: linear-gradient(145deg, #242239, #131724); box-shadow: 0 10px 28px #0004; transform: translateY(-2px); }
+.home-shortcut-icon { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid #d8bd8330; border-radius: 10px; background: #d8bd830c; color: var(--gold); font-size: 17px; }
+.home-shortcut > span:nth-child(2) { display: grid; gap: 4px; min-width: 0; }
+.home-shortcut strong { overflow: hidden; color: #e9e6f4; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.home-shortcut small { overflow: hidden; color: #989caf; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.home-shortcut-arrow { align-self: start; color: #b8a8e8; font-size: 12px; }
+.lobby-grid, .lobby-dashboard { max-width: 860px; }
+.lobby-grid .lobby-card { border-radius: 18px; }
+#lobby[data-page="play"] .lobby-dashboard {
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  align-items: stretch;
+  gap: 12px;
+  margin-top: 0;
+}
+#lobby[data-page="play"] .profile-stats { grid-column: 1 / -1; width: 100%; }
+#lobby[data-page="play"] #profilePerformance,
+#lobby[data-page="play"] #profileRecentGames { grid-column: auto; min-width: 0; padding: 16px; }
+#lobby[data-page="play"] #profileLearning { grid-column: 1 / -1; padding: 15px 17px; }
+#lobby[data-page="play"] .profile-stat { padding: 13px 15px; }
+.profile-stat { border-radius: 13px; }
+.profile-performance, .profile-recent-games, .profile-learning { border-radius: 15px; }
+.profile-recent-games .card-heading { margin-bottom: 12px; }
+.profile-recent-games .profile-chart-empty { margin-top: 0; }
+.recent-game-row { transition: border-color .18s, background .18s, transform .18s; }
+.recent-game-row:hover { border-color: #b7a3ff35; background: #151927; transform: translateX(2px); }
+
+.app > header { border-color: #c5c6e01a; }
+.brand-mark { border-radius: 12px; }
+.header-actions .sound-toggle { border-radius: 9px; }
+.settings-head, .online-head, .training-head { box-shadow: inset 0 1px #ffffff0b, 0 20px 55px #0003; }
+.settings-nav, .lesson-list { background: linear-gradient(145deg, #141927ed, #10131dec); }
+.settings-nav-button.active { box-shadow: inset 2px 0 var(--accent), inset 0 1px #ffffff0a; }
+.theme-preview-board { border-color: #aaa1c266; background: linear-gradient(145deg, #242438, #151722); }
+.theme-option-list { scrollbar-width: thin; }
+.theme-option:hover { border-color: #b7a3ff45; transform: translateY(-1px); }
+.lesson-item { transition: border-color .18s, background .18s, transform .18s; }
+.lesson-item.active { box-shadow: inset 2px 0 var(--accent), 0 7px 20px #0002; }
+.opening-category { transition: border-color .18s, background .18s, color .18s; }
+.lesson-animation { border-color: #aeb8e01b; border-radius: 14px; background: linear-gradient(145deg, #171b29, #10131d); }
+.lesson-animation-board { border-color: #8d83b4; border-radius: 8px; box-shadow: 0 10px 24px #0007, 0 0 20px #9b7cff12; }
+.lesson-animation-board .light, .training-square.light { fill: var(--light-square); background: var(--light-square); }
+.lesson-animation-board .dark, .training-square.dark { fill: var(--dark-square); background: var(--dark-square); }
+.lesson-demo-piece.white { fill: #f4f1ff; stroke: #353149; filter: drop-shadow(0 .035px .025px #090a12); }
+.lesson-demo-piece.black { fill: #302c41; stroke: #f2edff; filter: drop-shadow(0 .035px .025px #090a12); }
+.lesson-demo-coordinate { fill: #72768b; }
+.lesson-demo-arrow { stroke: var(--gold); }
+.lesson-demo-target { fill: #b7a3ff33; stroke: var(--accent); }
+.training-board-wrap { border-color: #9c8bd533; border-radius: 14px; background: linear-gradient(145deg, #171b29, #10131d); }
+.training-board { border-color: #8178a5; background: var(--dark-square); box-shadow: 0 16px 38px #0008, 0 0 0 1px #b7a3ff19; }
+.training-square.selected { box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 14px #d8bd8355; }
+.training-square.target::after { border-color: #212434; background: var(--gold); box-shadow: 0 0 0 3px #f4eddd88, 0 2px 6px #10131d99; }
+.training-square.solved::before { border-color: var(--accent); background: #b7a3ff55; }
+.opening-scenarios { border-color: #aeb8e01b; border-radius: 14px; background: #0c101a; }
+.opening-scenario-tab:hover, .opening-scenario-tab[aria-selected="true"] { border-color: #b7a3ff58; background: #b7a3ff14; color: #e2dbff; }
+.opening-scenario-copy { border-color: var(--accent); border-radius: 0 9px 9px 0; background: #b7a3ff0c; color: #d4d0e3; }
+.scenario-board-wrap { border-color: #ffffff14; border-radius: 12px; background: #0c101a; }
+#gameScreen .board-frame { border-radius: 15px; }
+#gameScreen .clock, #gameScreen .player { transition: border-color .2s, background .2s, box-shadow .2s; }
+#gameScreen .clock.active { box-shadow: 0 0 0 1px #b7a3ff20, 0 0 26px #9f83ff21; }
+.analysis-dialog { border-color: #b7a3ff43; }
+.analysis-stat { transition: border-color .18s, background .18s; }
+.analysis-row { transition: background .16s, color .16s; }
+.analysis-board { border-color: #8980aa; border-radius: 9px; background: #0c101a; box-shadow: 0 16px 38px #0007, 0 0 0 1px #b7a3ff15; }
+#analysisBoard .square.light { background-color: var(--light-square); }
+#analysisBoard .square.dark { background-color: var(--dark-square); }
+@keyframes hero-board-drift { 50% { transform: perspective(900px) rotateX(8deg) rotateZ(-3deg) translateY(-5px); } }
+
+@media (max-width: 760px) {
+  .lobby { gap: 10px; }
+  .lobby-hero { min-height: 0; grid-template-columns: minmax(0, 1.1fr) minmax(175px, .9fr); padding: 26px 24px; }
+  .hero-scene { min-height: 300px; }
+  .hero-board-wrap { width: min(100%, 220px); }
+  .home-shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 540px) {
+  .lobby-hero { grid-template-columns: minmax(0, 1fr); gap: 4px; padding: 22px 18px 14px; }
+  .lobby-hero-copy { max-width: none; }
+  .lobby h1 { max-width: 330px; margin-top: 11px; font-size: clamp(36px, 10vw, 48px); }
+  .lobby-intro { max-width: 360px; }
+  .lobby-hero-actions { margin-top: 17px; }
+  .hero-scene { min-height: 210px; }
+  .hero-board-wrap { width: min(56vw, 184px); }
+  .hero-moon { top: 0; inset-inline-end: 28%; width: 82px; }
+  .hero-scene-caption { inset-inline: 10%; bottom: 0; }
+  .home-shortcut { grid-template-columns: 30px minmax(0, 1fr) 9px; gap: 8px; min-height: 72px; }
+  .home-shortcut strong, .home-shortcut small { display: -webkit-box; overflow: hidden; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  #lobby[data-page="play"] .lobby-dashboard { grid-template-columns: minmax(0, 1fr); }
+  #lobby[data-page="play"] .profile-stats,
+  #lobby[data-page="play"] #profilePerformance,
+  #lobby[data-page="play"] #profileRecentGames,
+  #lobby[data-page="play"] #profileLearning { grid-column: 1; }
+}
+@media (max-width: 380px) {
+  .home-shortcuts { gap: 6px; }
+  .home-shortcut { grid-template-columns: 29px minmax(0, 1fr) 9px; gap: 7px; min-height: 64px; padding: 8px; }
+  .home-shortcut-icon { width: 29px; height: 29px; }
+  .home-shortcut strong { font-size: 9px; }
+  .home-shortcut small { font-size: 8px; }
+  .lobby-hero-actions .subtle-button { padding-inline: 10px; font-size: 10px; }
+}
+html[lang="fa"] .lobby-hero { direction: rtl; }
+html[lang="fa"] .lobby-hero::before { right: auto; left: 5%; }
+html[lang="fa"] .hero-board-wrap { transform: perspective(900px) rotateX(8deg) rotateZ(3deg); }
+html[lang="fa"] .settings-nav-button.active, html[lang="fa"] .lesson-item.active { box-shadow: inset -2px 0 var(--accent), 0 7px 20px #0002; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-board-wrap { animation: none; }
+  .home-shortcut:hover, .recent-game-row:hover, .lesson-item:hover { transform: none; }
 }
