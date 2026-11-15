@@ -4237,7 +4237,7 @@
           .sort((a,b)=>Number(b.favorite===true)-Number(a.favorite===true)||Date.parse(b.finishedAt)-Date.parse(a.finishedAt));
         $("recentGamesEmpty").textContent=recentGames.length
           ?(isPersian?"بازی‌ای با این فیلترها پیدا نشد.":"No games match these filters.")
-          :(isPersian?"بازی‌های پایان‌یافته پس از ذخیره اینجا نمایش داده می‌شوند.":"Completed games will be saved here.");
+          :(isPersian?"بایگانی این مرورگر خالی است. بازی‌های کامل‌شده روی همین دستگاه ذخیره می‌شوند و بین مرورگرها همگام نمی‌شوند.":"This browser’s archive is empty. Completed games are saved on this device and don’t sync across browsers.");
         $("recentGamesEmpty").hidden=filtered.length>0;
         $("recentGameList").innerHTML=filtered.map(record=>{
           const outcome=isPersian?({win:"برد",draw:"مساوی",loss:"باخت"}[record.outcome]):({win:"Win",draw:"Draw",loss:"Loss"}[record.outcome]);
