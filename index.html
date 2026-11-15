@@ -74,7 +74,7 @@
     .clock { min-width: 76px; padding: 9px 12px; border: 1px solid #343b35; border-radius: 9px; background: #202522; color: #dfe3dd; font-size: 17px; font-variant-numeric: tabular-nums; text-align: center; transition: background .2s, color .2s, border-color .2s; }
     .clock.active { border-color: #627744; background: #293222; color: var(--accent); box-shadow: 0 0 16px #c8f16914; }
     .board-frame { position: relative; width: var(--board-size); max-width: 100%; margin: 8px auto; padding: 8px; border: 1px solid #3b443b; border-radius: 15px; background: linear-gradient(145deg, #252c26, #161a17); box-shadow: 0 28px 85px #0007, 0 0 0 1px #ffffff08; overflow: hidden; }
-    .board { display: grid; grid-template: repeat(8, minmax(0, 1fr)) / repeat(8, minmax(0, 1fr)); aspect-ratio: 1; user-select: none; touch-action: manipulation; }
+    .board { display: grid; grid-template: repeat(8, minmax(0, 1fr)) / repeat(8, minmax(0, 1fr)); aspect-ratio: 1; user-select: none; touch-action: none; }
     .square { position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; border: 0; padding: 0; aspect-ratio: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .square.light { background: var(--light-square); }
     .square.dark { background: var(--dark-square); }
@@ -96,6 +96,8 @@
     .piece.black, .black-piece { color: #18221b; -webkit-text-stroke-color: #f3f6e8; text-shadow: 0 1px 0 #f3f6e8, 0 2px 3px #101710, 0 0 3px #f6f9e9; filter: drop-shadow(0 2px 2px #101510cc); }
     .board.animating { pointer-events: none; }
     .piece.moving { z-index: 4; pointer-events: none; }
+    .piece.dragging { opacity: .18; cursor: grabbing; }
+    .piece-drag-ghost { position: fixed !important; z-index: 1000 !important; pointer-events: none !important; transform: none !important; cursor: grabbing !important; }
     .coordinate { position: absolute; z-index: 3; left: 4px; bottom: 3px; color: #29352a; font-size: 10px; font-weight: 700; pointer-events: none; }
     .square.dark .coordinate { color: #e4e9d7; }
     .rank-coordinate { top: 3px; bottom: auto; }
@@ -108,6 +110,9 @@
     .board-tools button:hover { color: var(--text); background: var(--panel-raised); }
     .board-tools button:disabled { opacity: .38; cursor: default; }
     .board-tools #cancelPremoveButton { width: auto; min-width: 88px; padding: 0 9px; font-size: 10px; }
+    .board-tools #resignButton { width: auto; min-width: 62px; padding: 0 9px; border-color: #8d4945; color: #ffaaa3; font-size: 10px; }
+    .board-tools #resignButton:hover { border-color: #c35f58; background: #482724; color: #fff0ee; }
+    .board-tools #resignButton:disabled { opacity: .38; }
     .side-panel { display: flex; flex-direction: column; gap: 14px; padding-top: 6px; }
     .card { padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(145deg, #1d211f, #171a19); }
     .card-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
@@ -137,10 +142,11 @@
     .move-current { color: var(--accent); }
     .board-move-button { display: flex; align-items: center; gap: 6px; width: 100%; padding: 2px 3px; border: 0; border-radius: 4px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
     .move-quality { margin-left: auto; padding: 1px 5px; border-radius: 5px; background: #ffffff0b; color: var(--muted); font-size: 9px; font-weight: 600; white-space: nowrap; }
-    .move-quality.best, .move-quality.excellent, .move-quality.good { background: #96ce5420; color: #c9e69a; }
+    .move-quality.best, .move-quality.excellent, .move-quality.good, .move-quality.great, .move-quality.brilliant, .move-quality.book { background: #96ce5420; color: #c9e69a; }
     .move-quality.mid { background: #edbb5b20; color: #f0c66f; }
     .move-quality.bad { background: #e66c6420; color: #ff9188; }
     .move-quality.pending { animation: quality-pulse 1.2s ease-in-out infinite alternate; }
+    .move-evaluation { color: #aab4aa; font-size: 9px; font-variant-numeric: tabular-nums; white-space: nowrap; }
     @keyframes quality-pulse { to { opacity: .45; } }
     .board-move-button:hover, .board-move-button[aria-current="true"] { background: #c8f1691c; color: var(--accent); }
     .empty-moves { padding: 9px 3px; color: #778078; line-height: 1.5; }
@@ -250,6 +256,7 @@
     .analysis-tips strong { color: var(--text); }
     .analysis-stat { padding: 6px 9px; border-radius: 8px; background: #222725; color: #d3dbd1; font-size: 10px; }
     .analysis-stat b { margin-right: 4px; color: var(--accent); }
+    .analysis-stat.analysis-error b { color: #ff9a89; }
     .analysis-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; overflow: auto; }
     .analysis-color-list { display: grid; align-content: start; gap: 3px; }
     .analysis-color-title { padding: 6px; color: var(--muted); font-size: 10px; text-transform: uppercase; }
@@ -258,8 +265,10 @@
     .analysis-row:hover, .analysis-row[aria-current="true"] { background: #c8f16914; }
     .analysis-row .ply { color: #717b73; font-variant-numeric: tabular-nums; }
     .grade { width: max-content; padding: 4px 7px; border-radius: 6px; background: #273124; color: #c9ef81; font-size: 9px; font-weight: 700; }
+    .grade.great, .grade.brilliant, .grade.book { background: #273124; color: #c9ef81; }
     .grade.bad { background: #392522; color: #ff9a89; }
     .grade.mid { background: #3a3420; color: #f0cf75; }
+    .grade.pending { background: #222725; color: var(--muted); }
     .analysis-move { color: #d8ded7; }
     .analysis-best { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; font-weight: 400; }
     .analysis-close { flex: 0 0 34px; }
@@ -458,6 +467,9 @@
       .card { padding: 15px; }
       :root { --board-size: min(500px, max(220px, calc(100dvh - 310px)), calc(100vw - 20px)); }
       .board-frame { padding: 5px; border-radius: 12px; }
+      .board-status { flex-wrap: wrap; justify-content: center; gap: 6px; padding: 6px; }
+      .status-copy { min-width: 100%; justify-content: center; }
+      .board-tools { flex-wrap: wrap; justify-content: center; }
       .piece { font-size: clamp(24px, calc(var(--board-size) / 8.5), 56px); }
       .lobby-grid { grid-template-columns: 1fr; }
       .skill-prompt { grid-template-columns: 1fr; }
@@ -1436,6 +1448,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
+  <link rel="stylesheet" href="./nightfall-redesign.css">
 </head>
 <body>
   <main class="app">
@@ -1518,6 +1531,28 @@
           <div class="profile-stat"><strong id="profileWinRate">0%</strong><span>Win rate</span></div>
           <div class="profile-stat"><strong id="profileScore">400</strong><span>Chess score</span></div>
         </div>
+        <section class="card profile-performance" id="profilePerformance" aria-labelledby="profilePerformanceTitle">
+          <div class="card-heading"><span class="card-title" id="profilePerformanceTitle">Game results</span><span class="eyebrow">RECORDED ON THIS DEVICE</span></div>
+          <div class="profile-outcome-chart" id="profileOutcomeChart" role="img" aria-label="Game result distribution">
+            <span class="outcome-win" id="outcomeWins"></span><span class="outcome-draw" id="outcomeDraws"></span><span class="outcome-loss" id="outcomeLosses"></span>
+          </div>
+          <div class="profile-outcome-legend">
+            <span><i class="outcome-key outcome-win"></i><span id="outcomeWinsLabel">Wins: 0</span></span>
+            <span><i class="outcome-key outcome-draw"></i><span id="outcomeDrawsLabel">Draws: 0</span></span>
+            <span><i class="outcome-key outcome-loss"></i><span id="outcomeLossesLabel">Losses: 0</span></span>
+          </div>
+          <p class="profile-chart-empty" id="profileChartEmpty">Finish a game to see your recorded results here.</p>
+        </section>
+        <section class="card profile-recent-games" id="profileRecentGames" aria-labelledby="profileRecentGamesTitle">
+          <div class="card-heading"><span class="card-title" id="profileRecentGamesTitle">Recent games</span><span class="eyebrow">LATEST RESULTS</span></div>
+          <ol class="recent-game-list" id="recentGameList"></ol>
+          <p class="profile-chart-empty" id="recentGamesEmpty">Completed games will appear here.</p>
+        </section>
+        <section class="card profile-learning" id="profileLearning" aria-labelledby="profileLearningTitle">
+          <div class="card-heading"><span class="card-title" id="profileLearningTitle">Academy progress</span><span class="eyebrow" id="profileLessonCount">0 / 49 lessons</span></div>
+          <div class="profile-learning-track" role="progressbar" id="profileLessonProgress" aria-label="Completed Academy lessons" aria-valuemin="0" aria-valuemax="49" aria-valuenow="0"><span id="profileLessonFill"></span></div>
+          <p class="note" id="profileLearningCopy">Completed lessons are saved on this device.</p>
+        </section>
         <section class="lobby-card" id="puzzleSection" hidden>
           <div class="puzzle-heading"><div><h2>♞ Chess puzzles</h2><p class="puzzle-copy" id="puzzleProgress">Loading the Lichess puzzle collection…</p></div><span class="puzzle-rating" id="puzzleRating">Rating 400</span></div>
           <div class="puzzle-progress-track" role="progressbar" aria-label="Puzzle collection progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="puzzle-progress-fill" id="puzzleProgressFill"></div></div>
@@ -1583,8 +1618,8 @@
           </section>
           <section class="card settings-panel" data-settings-content="gameplay" hidden>
             <div class="card-heading"><span class="card-title">Gameplay</span><span class="eyebrow">PERSONALIZE YOUR GAME</span></div>
-            <label class="gameplay-option"><input id="moveAnnotationsSetting" type="checkbox"><span>Show move quality (best, mistake, blunder)</span></label>
-            <p class="note">Move quality is estimated with Stockfish after each move. Analysis may take a moment.</p>
+            <label class="gameplay-option"><input id="moveAnnotationsSetting" type="checkbox"><span>Show Stockfish move analysis in the move list</span></label>
+            <p class="note">Every move is analyzed asynchronously. The move list shows its classification and evaluation when Stockfish finishes.</p>
           </section>
           <section class="card settings-panel" data-settings-content="appearance" hidden>
             <div class="card-heading"><span class="card-title">Board & pieces</span><span class="eyebrow">LIVE PREVIEW</span></div>
@@ -1655,6 +1690,12 @@
         <summary>⚡ Fast opening reviews · 1 minute each</summary>
         <label class="opening-search-label" for="openingSearch">Find an opening</label>
         <input class="opening-search" id="openingSearch" type="search" placeholder="Search 33 opening plans" autocomplete="off">
+        <div class="opening-categories" id="openingCategories" role="group" aria-label="Filter openings by first move">
+          <button type="button" class="opening-category active" data-opening-category="all" aria-pressed="true">All openings</button>
+          <button type="button" class="opening-category" data-opening-category="e4" aria-pressed="false">1. e4</button>
+          <button type="button" class="opening-category" data-opening-category="d4" aria-pressed="false">1. d4</button>
+          <button type="button" class="opening-category" data-opening-category="flank" aria-pressed="false">Flank</button>
+        </div>
         <div class="quick-review-list" id="quickReviewList"></div>
         <div class="quick-review-content" id="quickReviewContent" aria-live="polite">
           <div class="quick-review-plan"></div>
@@ -1687,6 +1728,7 @@
             <button type="button" id="redoButton" aria-label="Redo move" title="Redo move">↷</button>
             <button type="button" class="assist-button" id="hintButton" hidden>Hint</button>
             <button type="button" class="assist-button" id="suggestButton" hidden>Suggest</button>
+            <button type="button" class="resign-button" id="resignButton" hidden>Resign</button>
             <button type="button" class="exit-match-button" id="exitMatchButton" hidden>Exit match</button>
             <button type="button" id="cancelPremoveButton" hidden>Cancel premove</button>
             <button type="button" id="resetButton" aria-label="Start another game" title="Start another game" hidden>⟲</button>
@@ -1775,6 +1817,13 @@
       <h2 id="exitMatchTitle">Exit this match?</h2>
       <p id="exitMatchCopy">Your current game will end. Your completed-game record will not change.</p>
       <div class="confirm-actions"><button class="subtle-button" id="cancelExitMatch" type="button">Keep playing</button><button class="primary-button danger-button" id="confirmExitMatch" type="button">Exit match</button></div>
+    </section>
+  </div>
+  <div class="confirm-backdrop" id="resignBackdrop" role="dialog" aria-modal="true" aria-labelledby="resignTitle" hidden>
+    <section class="confirm-dialog">
+      <h2 id="resignTitle">Resign this game?</h2>
+      <p id="resignCopy">Your opponent will win. This result will be saved and the game review will open.</p>
+      <div class="confirm-actions"><button class="subtle-button" id="cancelResign" type="button">Keep playing</button><button class="primary-button danger-button" id="confirmResign" type="button">Resign</button></div>
     </section>
   </div>
   <div class="promotion-backdrop" id="promotionBackdrop" role="dialog" aria-modal="true" aria-label="Choose promotion piece">
@@ -1877,8 +1926,8 @@
         "Nightfall Chess":"شطرنج شبانه","A quieter kind of competition":"رقابتی آرام و هوشمندانه",
         "Export PGN":"دریافت فایل PGN","First position":"نخستین وضعیت","Previous move":"حرکت پیشین","Next move":"حرکت بعدی","Final position":"وضعیت پایانی","Initial position":"وضعیت آغازین","Review position":"وضعیت مرور","King's Pawn Game":"بازی پیادهٔ شاه","King’s Pawn Game":"بازی پیادهٔ شاه",
         "Stockfish is calculating a move…":"موتور Stockfish در حال محاسبهٔ حرکت است…","Stockfish is analyzing the moves…":"موتور Stockfish در حال تحلیل حرکت‌هاست…","Loading Stockfish Lite (about 1.8 MB)…":"در حال بارگیری نسخهٔ سبک Stockfish (حدود ۱٫۸ مگابایت)…",
-        "Best":"بهترین","Excellent":"عالی","Good":"خوب","Inaccuracy":"نادقیق","Mistake":"اشتباه","Blunder":"اشتباه فاحش","Unavailable":"در دسترس نیست","Analyzing":"در حال تحلیل",
-        "Show move quality (best, mistake, blunder)":"نمایش کیفیت حرکت (بهترین، اشتباه، اشتباه فاحش)","Move quality is estimated with Stockfish after each move. Analysis may take a moment.":"کیفیت حرکت پس از هر نوبت با Stockfish برآورد می‌شود. تحلیل ممکن است کمی زمان ببرد.",
+        "Brilliant":"درخشان","Great":"عالی","Best":"بهترین","Excellent":"بسیار خوب","Good":"خوب","Book":"کتابی","Inaccuracy":"نادقیق","Mistake":"اشتباه","Blunder":"اشتباه فاحش","Unavailable":"در دسترس نیست","Analyzing":"در حال تحلیل",
+        "Show Stockfish move analysis in the move list":"نمایش تحلیل Stockfish در فهرست حرکت‌ها","Every move is analyzed asynchronously. The move list shows its classification and evaluation when Stockfish finishes.":"همهٔ حرکت‌ها به‌صورت غیرهم‌زمان تحلیل می‌شوند. پس از پایان Stockfish، طبقه‌بندی و ارزیابی آن‌ها نمایش داده می‌شود.",
         "Accuracy estimate based on Stockfish win-chance changes":"برآورد دقت بر پایهٔ تغییر شانس برد در ارزیابی Stockfish","Engine evaluation":"ارزیابی موتور","ECO":"رده‌بندی ECO",
         "♧ Online":"♧ آنلاین","PLAY TOGETHER":"باهم بازی کنید","Online with friends":"بازی آنلاین با دوستان",
         "Create a room and share its invite code, or enter a code your friend sent you.":"اتاقی بسازید و کد دعوتش را بفرستید یا کدی را که دوستتان فرستاده وارد کنید.",
@@ -1899,10 +1948,11 @@
         "Sharing is not supported here. The invite link was copied instead.":"اشتراک‌گذاری در اینجا پشتیبانی نمی‌شود؛ پیوند دعوت کپی شد.",
         "Could not share the invite:":"اشتراک دعوت انجام نشد:",
         "Allow takebacks":"اجازهٔ برگرداندن حرکت","Allow hints":"اجازهٔ راهنما","Allow move suggestions":"اجازهٔ پیشنهاد حرکت",
-        "3 minutes":"۳ دقیقه","Menu":"منو","Close menu":"بستن منو","Hint":"راهنما","Suggest":"پیشنهاد","Exit match":"خروج از بازی","Exit puzzle":"خروج از معما","Cancel premove":"لغو پیش‌حرکت",
+        "3 minutes":"۳ دقیقه","Menu":"منو","Close menu":"بستن منو","Hint":"راهنما","Suggest":"پیشنهاد","Resign":"تسلیم","Exit match":"خروج از بازی","Exit puzzle":"خروج از معما","Cancel premove":"لغو پیش‌حرکت",
         "Exit this match?":"از این بازی خارج می‌شوید؟",
         "Your current game will end. Your completed-game record will not change.":"بازی فعلی پایان می‌یابد و در آمار بازی‌های کامل‌شده تغییری ثبت نمی‌شود.",
         "Keep playing":"ادامهٔ بازی","Show a hint":"نمایش راهنما","Suggest a move":"پیشنهاد حرکت",
+        "Resign this game?":"از این بازی تسلیم می‌شوید؟","Your opponent will win. This result will be saved and the game review will open.":"حریفتان برنده می‌شود. نتیجه ذخیره و مرور بازی باز خواهد شد.","Confirm resignation":"تأیید تسلیم","Resignation confirmed":"تسلیم تأیید شد",
         "Thinking…":"در حال فکر…","The engine is finding a useful move…":"موتور در حال یافتن حرکتی مفید است…",
         "Engine assistance is unavailable.":"راهنمای موتور در دسترس نیست.",
         "Choose a legal move before asking for a suggestion.":"برای دریافت پیشنهاد، ابتدا نوبت خود را بررسی کنید.",
@@ -2447,7 +2497,7 @@
       let clocks = { w: 0, b: 0 }, clockOn = false, clockStamp = Date.now(), toastTimer;
       let aiTimer = null, analysisShown = false, resultRecorded = false, lastGameResult = "", audioContext = null, audioResumePromise = null, effectsBus = null, uiBus = null, musicVolume = .75, musicStyle = "electric-1", musicEnabled = true, effectsEnabled = true, uiSoundsEnabled = true, musicHasStarted = false, musicRequest = 0,musicIslandTimer=null;
       let matchActive = false, boardAnimating = false, trainingReturn = "lobby", currentLesson = 0, quizAnswered = false, gameStartedAt=new Date();
-      const gameplaySettings={takebacks:true,hints:true,suggestions:true,moveAnnotations:false};
+      const gameplaySettings={takebacks:true,hints:true,suggestions:true,moveAnnotations:true};
       let aiRequestVersion=0,assistanceGeneration=0,moveSuggestion=null,roomInviteCode="",aiSearchController=null;
       function syncGameplaySettings(source="lobby") {
         const ids=source==="lobby"
@@ -2477,7 +2527,7 @@
             }
           }
         } catch(error) {
-          Object.assign(gameplaySettings,{takebacks:true,hints:true,suggestions:true,moveAnnotations:false});
+          Object.assign(gameplaySettings,{takebacks:true,hints:true,suggestions:true,moveAnnotations:true});
           showToast(`Game options could not be loaded: ${error.message}`);
         }
         $("lobbyTakebacks").checked=$("takebacksSetting").checked=gameplaySettings.takebacks;
@@ -2489,46 +2539,35 @@
         gameplaySettings.moveAnnotations=$("moveAnnotationsSetting").checked;
         try{localStorage.setItem("nightfall-chess-gameplay-v1",JSON.stringify(gameplaySettings));}
         catch(error){showToast(`Move quality setting could not be saved: ${error.message}`);}
-        if(gameplaySettings.moveAnnotations) {
-          history.forEach((entry,index)=>scheduleMoveQuality(entry,index));
-        }
+        history.forEach((entry,index)=>scheduleMoveAnalysis(entry,index,0));
         renderMoves();
       }
-      function moveQuality(loss) {
-        if(loss<=20)return {label:"Best",quality:"best"};
-        if(loss<=50)return {label:"Excellent",quality:"excellent"};
-        if(loss<=100)return {label:"Good",quality:"good"};
-        if(loss<=200)return {label:"Inaccuracy",quality:"mid"};
-        if(loss<=400)return {label:"Mistake",quality:"bad"};
-        return {label:"Blunder",quality:"bad"};
-      }
-      function scheduleMoveQuality(entry,index) {
-        if(!gameplaySettings.moveAnnotations||entry.moveQuality||entry.qualityPending||puzzleMode)return;
-        entry.qualityPending=true;
-        renderMoves();
-        window.setTimeout(async()=>{
-          if(!gameplaySettings.moveAnnotations||history[index]!==entry) {
-            entry.qualityPending=false;
-            return;
-          }
-          try {
-            const [best,played]=await Promise.all([
-              stockfishSearch(entry.before,{rating:2000,depth:10,movetime:450,unrestricted:true}),
-              stockfishSearch(entry.after,{rating:2000,depth:10,movetime:450,unrestricted:true})
-            ]);
-            if(!gameplaySettings.moveAnnotations||history[index]!==entry)return;
-            const loss=Math.max(0,engineScore(best.info)+engineScore(played.info));
-            entry.moveQuality={...moveQuality(loss),loss};
-          } catch(error) {
+      function scheduleMoveAnalysis(entry,index,delay=650) {
+        if(puzzleMode||entry.analysis||entry.analysisPromise||entry.analysisTimer)return;
+        entry.analysisStatus="pending";
+        entry.analysisTimer=window.setTimeout(()=>{
+          entry.analysisTimer=null;
+          if(!history.includes(entry)||puzzleMode)return;
+          void analyzeMoveEntry(entry).then(()=>{
+            if(history.includes(entry)||redoStack.includes(entry))renderMoves();
+          }).catch(error=>{
             if(error.name==="AbortError")return;
-            entry.moveQualityError=error.message;
-            console.error("Move quality analysis failed.",error);
-            showToast(`Move quality analysis failed: ${error.message}`);
-          } finally {
-            entry.qualityPending=false;
-            if(history[index]===entry)renderMoves();
+            entry.analysisStatus="error";
+            entry.analysisError=error.message;
+            console.error(`Stockfish analysis failed for ${entry.san}.`,error);
+            showToast(`Move analysis failed: ${error.message}`);
+            if(history.includes(entry))renderMoves();
+          });
+        },delay);
+      }
+      function suspendLiveMoveAnalysis() {
+        for(const entry of history) {
+          if(entry.analysisTimer) {
+            clearTimeout(entry.analysisTimer);
+            entry.analysisTimer=null;
           }
-        },350);
+          entry.analysisController?.abort();
+        }
       }
       function cancelAIRequest() {
         aiRequestVersion++;
@@ -2635,7 +2674,9 @@
         dailyStreak:0,bestDailyStreak:0,dailyDate:"",dailyGames:0,dailyPuzzles:0,lastStreakDate:"",
         puzzlesSolved:0,puzzleStreak:0,bestPuzzleStreak:0
       });
+      const recentGamesStorageKey="nightfall-chess-recent-games-v1";
       let profileStats=emptyProfileStats();
+      let recentGames=[];
       let playerProfile={username:"Player",avatarData:""},pendingProfileAvatar=null;
       let boardTheme="sage",pieceTheme="symbols",settingsReturnScreen="lobby",settingsPausedMatch=false;
       let currentPuzzle=null,puzzleState=null,puzzleSelected=null,puzzleTargets=[],puzzleHintText="",puzzleHintSquare=null,puzzleMode=false,puzzleSolved=false,puzzleCursor=0,puzzleColor="w",puzzleReturnMode="ai",puzzleReplyTimer=null,puzzleWrongAttempts=0;
@@ -2777,20 +2818,56 @@
           }
         }
       }
-      let quickReviewIndex=0, quickReviewPly=0, reviewPreviewIndex=null, analysisPositionIndex=null, lessonAnimationTimer=0, reviewStudySide="w";
+      let quickReviewIndex=0, quickReviewPly=0, reviewPreviewIndex=null, analysisPositionIndex=null, lessonAnimationTimer=0, reviewStudySide="w",quickReviewCategory="all";
       let pieceLabIndex=0, pieceLabState=null, pieceLabSelected=false, pieceLabTargets=[], pieceLabSolved=false;
       const iconByName={pawn:"♙",knight:"♘",bishop:"♗",rook:"♖",queen:"♕",king:"♔"};
       function pieceIcon(name) { return iconByName[name.toLowerCase()]||"♟"; }
+      function quickReviewOpeningCategory(review) {
+        return review.moves[0]==="e2e4"?"e4":review.moves[0]==="d2d4"?"d4":"flank";
+      }
+      const quickReviewEcoCache=new WeakMap();
+      function quickReviewEco(review) {
+        if(!openingDatabaseByPosition.size)return "";
+        if(quickReviewEcoCache.has(review))return quickReviewEcoCache.get(review);
+        const line=review.moves.slice(0,review.coreMoveCount||review.moves.length);
+        let best=null;
+        for(const records of openingDatabaseByPosition.values())for(const entry of records) {
+          if(entry.m.length>line.length||entry.m.length<2||!entry.m.every((move,index)=>move===line[index]))continue;
+          if(!best||entry.m.length>best.m.length||entry.m.length===best.m.length&&entry.e.localeCompare(best.e)<0)best=entry;
+        }
+        const eco=best?.e||"";
+        quickReviewEcoCache.set(review,eco);
+        return eco;
+      }
       function renderQuickReviews(filter="") {
         const query=filter.trim().toLowerCase();
-        const matches=quickReviews.map((review,index)=>({review,index})).filter(({review})=>review.title.toLowerCase().includes(query)||(faText[review.title]||"").toLowerCase().includes(query));
-        $("quickReviewList").innerHTML=matches.length?matches.map(({review,index})=>`<button class="quick-review-button${index===quickReviewIndex?" active":""}" type="button" data-review="${index}" aria-pressed="${index===quickReviewIndex}"><span aria-hidden="true">${review.icon}</span> ${isPersian?(faText[review.title]||review.title):review.title} · ${isPersian?"۲۰ حرکت":"20 moves"}</button>`).join(""):`<div class="empty-moves">${isPersian?"گشایشی با این نام پیدا نشد.":"No openings match that search."}</div>`;
+        const categoryNames=isPersian?{all:"همهٔ گشایش‌ها",e4:"۱. e4",d4:"۱. d4",flank:"گشایش‌های کناری"}:{all:"All openings",e4:"1. e4",d4:"1. d4",flank:"Flank"};
+        $("openingCategories").querySelectorAll("[data-opening-category]").forEach(button=>{button.textContent=categoryNames[button.dataset.openingCategory];});
+        const matches=quickReviews.map((review,index)=>({review,index})).filter(({review})=>(quickReviewCategory==="all"||quickReviewOpeningCategory(review)===quickReviewCategory)&&(review.title.toLowerCase().includes(query)||(faText[review.title]||"").toLowerCase().includes(query)));
+        if(matches.length&&!matches.some(({index})=>index===quickReviewIndex)) {
+          quickReviewIndex=matches[0].index;quickReviewPly=0;reviewStudySide=openingSideFor(matches[0].review);
+        }
+        $("quickReviewList").innerHTML=matches.length?matches.map(({review,index})=>{
+          const eco=quickReviewEco(review),title=isPersian?(faText[review.title]||review.title):review.title;
+          const categoryLabel=isPersian?({e4:"۱. e4",d4:"۱. d4",flank:"کناری"}[quickReviewOpeningCategory(review)]):({e4:"1. e4",d4:"1. d4",flank:"Flank"}[quickReviewOpeningCategory(review)]);
+          return `<button class="quick-review-button${index===quickReviewIndex?" active":""}" type="button" data-review="${index}" aria-pressed="${index===quickReviewIndex}"><span class="opening-card-icon" aria-hidden="true">${review.icon}</span><span class="opening-card-copy"><strong>${title}</strong><small>${eco?`${isPersian?ecoCodeInPersian(eco):eco} · `:""}${categoryLabel}</small></span><span class="opening-card-moves">${isPersian?"۲۰ حرکت":"20 plies"}</span></button>`;
+        }).join(""):`<div class="empty-moves">${isPersian?"گشایشی با این نام پیدا نشد.":"No openings match that search."}</div>`;
         $("quickReviewList").querySelectorAll("[data-review]").forEach(button=>button.addEventListener("click",()=>{
           const index=Number(button.dataset.review),review=quickReviews[index];
           $("quickReviewList").querySelectorAll("[data-review]").forEach(item=>{const active=item===button;item.classList.toggle("active",active);item.setAttribute("aria-pressed",String(active));});
           quickReviewIndex=index;quickReviewPly=0;reviewStudySide=openingSideFor(review);renderQuickReviews($("openingSearch").value);renderQuickReview();
         }));
         if(!$("openingSearch").dataset.bound){$("openingSearch").addEventListener("input",()=>renderQuickReviews($("openingSearch").value));$("openingSearch").dataset.bound="true";}
+        if(!$("openingCategories").dataset.bound) {
+          $("openingCategories").addEventListener("click",event=>{
+            const button=event.target instanceof Element?event.target.closest("[data-opening-category]"):null;
+            if(!button)return;
+            quickReviewCategory=button.dataset.openingCategory;
+            $("openingCategories").querySelectorAll("[data-opening-category]").forEach(item=>{const active=item.dataset.openingCategory===quickReviewCategory;item.classList.toggle("active",active);item.setAttribute("aria-pressed",String(active));});
+            renderQuickReviews($("openingSearch").value);
+          });
+          $("openingCategories").dataset.bound="true";
+        }
         renderQuickReview();
       }
       function renderQuickReview() {
@@ -3481,17 +3558,17 @@
             return false;
           }
         }
+        if(!puzzleMode&&mode==="ai"&&state.turn===humanColor)suspendLiveMoveAnalysis();
         moveSuggestion=null;assistanceGeneration++;$("boardHelp").textContent="";
         if(puzzleMode){puzzleHintSquare=null;puzzleHintText="";}
         const before=copyState(state), after=applyMove(state,m), san=notation(m,before,after);
-        const entry={before,after:copyState(after),move:m,san};
+        const entry={before,after:copyState(after),move:m,san,ply:history.length,prefix:history.map(previous=>moveToUci(previous.move))};
         history.push(entry); redoStack=[]; state=after; selected=null; legalTargets=[];
         recognizeOpening();
         reviewPreviewIndex=null;
         const check=inCheck(after,after.turn),checkmate=check&&!legalMoves(after).length;
         playMoveSound(!!before.board[m.to[0]][m.to[1]]||m.enPassant,check,checkmate);
         render();
-        if(gameplaySettings.moveAnnotations)scheduleMoveQuality(entry,history.length-1);
         if(puzzleMode) {
           puzzleCursor++;
           $("puzzleGameFeedback").textContent="";
@@ -3500,6 +3577,7 @@
           animateMove(m,before);
           return true;
         }
+        if(mode!=="ai"||state.turn===humanColor||checkmate)history.forEach((played,index)=>scheduleMoveAnalysis(played,index));
         animateMove(m,before);
         evaluateEnd();
         if(!boardAnimating&&!tryExecutePremove()&&mode==="ai"&&!gameOver&&state.turn!==humanColor)scheduleAI();
@@ -3820,6 +3898,56 @@
         $("skillSetup").hidden=true;$("puzzleSection").hidden=false;
         saveProfile();renderProfileStats();switchLobbyPage("puzzles");void nextPuzzle();
       }
+      function isRecentGameRecord(record) {
+        return Boolean(record&&typeof record==="object"&&!Array.isArray(record)
+          &&typeof record.finishedAt==="string"&&Number.isFinite(Date.parse(record.finishedAt))
+          &&["win","draw","loss"].includes(record.outcome)&&["ai","friend"].includes(record.mode)
+          &&(record.mode==="ai"?Number.isSafeInteger(record.rating)&&record.rating>=400&&record.rating<=2000:record.rating===null)
+          &&["w","b"].includes(record.color)&&Number.isSafeInteger(record.plies)&&record.plies>=0
+          &&typeof record.opening==="string"&&record.opening.length<=120);
+      }
+      function loadRecentGames() {
+        try {
+          const saved=localStorage.getItem(recentGamesStorageKey);
+          if(!saved){recentGames=[];return;}
+          const parsed=JSON.parse(saved);
+          if(!Array.isArray(parsed)||parsed.length>10||parsed.some(record=>!isRecentGameRecord(record)))throw new Error("Saved recent-game history is invalid.");
+          recentGames=parsed;
+        } catch(error) {
+          console.error(error);
+          showToast(`Recent games could not be loaded: ${error.message}`);
+        }
+      }
+      function renderRecentGames() {
+        $("profileRecentGamesTitle").textContent=isPersian?"بازی‌های اخیر":"Recent games";
+        $("recentGamesEmpty").textContent=isPersian?"بازی‌های پایان‌یافته اینجا نمایش داده می‌شوند.":"Completed games will appear here.";
+        $("recentGamesEmpty").hidden=recentGames.length>0;
+        $("recentGameList").innerHTML=recentGames.map(record=>{
+          const outcome=isPersian?({win:"برد",draw:"مساوی",loss:"باخت"}[record.outcome]):({win:"Win",draw:"Draw",loss:"Loss"}[record.outcome]);
+          const opponent=record.mode==="ai"
+            ?(isPersian?`هوش مصنوعی · ${record.rating}`:`AI · ${record.rating}`)
+            :(isPersian?"بازی محلی با دوست":"Local friend");
+          const date=new Date(record.finishedAt).toLocaleDateString(isPersian?"fa-IR":undefined,{month:"short",day:"numeric"});
+          const moveCount=Math.ceil(record.plies/2),moves=isPersian?`${String(moveCount).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])} حرکت`:`${moveCount} ${moveCount===1?"move":"moves"}`;
+          const opening=record.opening?(isPersian?openingNameInPersian(record.opening):record.opening):"";
+          return `<li class="recent-game-row"><span class="recent-game-outcome ${record.outcome}">${outcome}</span><span class="recent-game-details"><strong>${opponent}</strong><small>${date} · ${moves}${opening?` · ${escapeHtml(opening)}`:""}</small></span></li>`;
+        }).join("");
+      }
+      function recordRecentGame(outcome) {
+        const record={
+          finishedAt:new Date().toISOString(),
+          outcome,
+          mode:mode==="ai"?"ai":"friend",
+          rating:mode==="ai"?Number($("strength").value):null,
+          color:mode==="ai"?humanColor:"w",
+          plies:history.length,
+          opening:openingIdentity?.name||""
+        };
+        recentGames=[record,...recentGames].slice(0,10);
+        try{localStorage.setItem(recentGamesStorageKey,JSON.stringify(recentGames));}
+        catch(error){console.error(error);showToast(`Recent game could not be saved: ${error.message}`);}
+        renderRecentGames();
+      }
       function recordGameResult(result,winnerColor) {
         if(resultRecorded)return;
         resultRecorded=true;
@@ -3837,25 +3965,42 @@
         } else {
           profileStats.losses++;profileStats.winStreak=0;
         }
+        recordRecentGame(isDraw?"draw":won?"win":"loss");
         markDailyActivity("game");
       }
       function renderProfileStats() {
         normalizeDailyProgress();
+        const numbers=value=>isPersian?String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):value;
         const winRate=profileStats.games?Math.round(profileStats.wins/profileStats.games*100):0;
         $("profileGames").textContent=profileStats.games;
         $("profileWins").textContent=profileStats.wins;
         $("profileWinRate").textContent=`${winRate}%`;
         $("profileScore").textContent=profileStats.rating;
+        const outcomeTotal=profileStats.wins+profileStats.draws+profileStats.losses;
+        for(const [id,value] of [["outcomeWins",profileStats.wins],["outcomeDraws",profileStats.draws],["outcomeLosses",profileStats.losses]])$(id).style.width=`${outcomeTotal?value/outcomeTotal*100:0}%`;
+        $("outcomeWinsLabel").textContent=isPersian?`برد: ${numbers(profileStats.wins)}`:`Wins: ${profileStats.wins}`;
+        $("outcomeDrawsLabel").textContent=isPersian?`مساوی: ${numbers(profileStats.draws)}`:`Draws: ${profileStats.draws}`;
+        $("outcomeLossesLabel").textContent=isPersian?`باخت: ${numbers(profileStats.losses)}`:`Losses: ${profileStats.losses}`;
+        $("profilePerformanceTitle").textContent=isPersian?"نتایج بازی":"Game results";
+        $("profileOutcomeChart").setAttribute("aria-label",isPersian?`نتایج ثبت‌شده: ${numbers(profileStats.wins)} برد، ${numbers(profileStats.draws)} مساوی، ${numbers(profileStats.losses)} باخت`:`Recorded results: ${profileStats.wins} wins, ${profileStats.draws} draws, ${profileStats.losses} losses`);
+        $("profileChartEmpty").hidden=outcomeTotal>0;
+        $("profileChartEmpty").textContent=isPersian?"پس از پایان یک بازی، نتیجهٔ ثبت‌شدهٔ آن را اینجا می‌بینید.":"Finish a game to see your recorded results here.";
+        $("profileLearningTitle").textContent=isPersian?"پیشرفت آکادمی":"Academy progress";
+        $("profileLessonCount").textContent=isPersian?`${numbers(completedLessons.size)} از ${numbers(lessons.length)} درس`:`${completedLessons.size} / ${lessons.length} lessons`;
+        $("profileLessonProgress").setAttribute("aria-valuemax",String(lessons.length));
+        $("profileLessonProgress").setAttribute("aria-valuenow",String(completedLessons.size));
+        $("profileLessonFill").style.width=`${lessons.length?completedLessons.size/lessons.length*100:0}%`;
+        $("profileLearningCopy").textContent=isPersian?"درس‌های تکمیل‌شده روی این دستگاه ذخیره می‌شوند.":"Completed lessons are saved on this device.";
         $("dailyStreak").textContent=isPersian?String(profileStats.dailyStreak).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):profileStats.dailyStreak;
         $("dailyGameCheck").classList.toggle("done",profileStats.dailyGames>0);
         $("dailyPuzzleCheck").classList.toggle("done",profileStats.dailyPuzzles>0);
         $("dailyStreakHint").textContent=isPersian?"برای حفظ رشته، هر روز یک بازی و یک معما انجام دهید.":"Play one game and solve one puzzle each day to keep your streak.";
         $("skillSetup").hidden=profileStats.skillAnswered;
         $("puzzleSection").hidden=!profileStats.skillAnswered;
-        const numbers=value=>isPersian?String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):value;
         $("profileMoreContent").innerHTML=isPersian
           ?`امتیاز شطرنج: <strong>${numbers(profileStats.rating)}</strong><br>رشتهٔ روزانه: <strong>${numbers(profileStats.dailyStreak)}</strong> · بهترین: <strong>${numbers(profileStats.bestDailyStreak)}</strong><br>معماهای حل‌شده: <strong>${numbers(profileStats.puzzlesSolved)}</strong> · رشتهٔ معما: <strong>${numbers(profileStats.puzzleStreak)}</strong><br>مساوی: <strong>${numbers(profileStats.draws)}</strong> · باخت: <strong>${numbers(profileStats.losses)}</strong><br>بهترین رشتهٔ برد: <strong>${numbers(profileStats.bestWinStreak)}</strong><br>درس‌های کامل‌شده: <strong>${numbers(completedLessons.size)} از ${numbers(lessons.length)}</strong><br>درجهٔ هوش مصنوعی: <strong>${$("lobbyStrength").value}</strong>`
           :`Chess score: <strong>${profileStats.rating}</strong><br>Daily streak: <strong>${profileStats.dailyStreak}</strong> · Best: <strong>${profileStats.bestDailyStreak}</strong><br>Puzzles solved: <strong>${profileStats.puzzlesSolved}</strong> · Puzzle streak: <strong>${profileStats.puzzleStreak}</strong><br>Draws: <strong>${profileStats.draws}</strong> · Losses: <strong>${profileStats.losses}</strong><br>Best win streak: <strong>${profileStats.bestWinStreak}</strong><br>Lessons completed: <strong>${completedLessons.size} / ${lessons.length}</strong><br>AI level: <strong>${$("lobbyStrength").value}</strong>`;
+        renderRecentGames();
         if($("puzzleGameStreak"))$("puzzleGameStreak").textContent=String(profileStats.puzzleStreak);
       }
       function loadProfileStats() {
@@ -4097,7 +4242,7 @@
           }
           piece.classList.add("moving");
           const isAiMove=mode==="ai"&&before.turn!==humanColor;
-          animations.push({piece,animation:piece.animate([{transform:`translate(${dx}px, ${dy}px) translateY(-2%)`},{transform:"translateY(-2%)"}],{duration:isAiMove?1500:480,easing:"cubic-bezier(.16,.76,.32,1)"})});
+          animations.push({piece,animation:piece.animate([{transform:`translate(${dx}px, ${dy}px) translateY(-2%)`},{transform:"translateY(-2%)"}],{duration:isAiMove?560:420,easing:"cubic-bezier(.22,.74,.28,1)"})});
         }
         if(!animations.length) {
           animateMoveImpact(move,before);
@@ -4208,9 +4353,9 @@
         const colorMoves=color=>history.map((entry,index)=>({entry,index})).filter(({entry})=>entry.before.turn===color);
         list.innerHTML=["w","b"].map(color=>`<div class="move-color-list"><div class="move-color-title">${color==="w"?"♙ White":"♟ Black"}</div>${colorMoves(color).map(({entry,index})=>{
           const quality=gameplaySettings.moveAnnotations
-            ?entry.moveQuality?`<span class="move-quality ${entry.moveQuality.quality}" title="${Math.round(entry.moveQuality.loss)} cp lost">${isPersian?(faText[entry.moveQuality.label]||entry.moveQuality.label):entry.moveQuality.label}</span>`
-              :entry.moveQualityError?`<span class="move-quality bad" title="${escapeHtml(entry.moveQualityError)}">${isPersian?"ناموفق":"Unavailable"}</span>`
-                :entry.qualityPending?`<span class="move-quality pending" aria-label="${isPersian?"در حال تحلیل":"Analyzing"}">…</span>`:""
+            ?entry.analysis?`<span class="move-quality ${entry.analysis.quality}" title="${Math.round(entry.analysis.loss)} cp lost">${isPersian?(faText[entry.analysis.label]||entry.analysis.label):entry.analysis.label}</span><span class="move-evaluation" title="${isPersian?"ارزیابی Stockfish":"Stockfish evaluation"}">${entry.analysis.evaluationText}</span>`
+              :entry.analysisError?`<span class="move-quality bad" title="${escapeHtml(entry.analysisError)}">${isPersian?"ناموفق":"Unavailable"}</span>`
+              :entry.analysisStatus?`<span class="move-quality pending" aria-label="${isPersian?"در حال تحلیل":"Analyzing"}">…</span>`:""
             :"";
           return `<div class="move-row"><span class="move-number">${isPersian?String(Math.floor(index/2)+1).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):Math.floor(index/2)+1}.</span><button class="board-move-button${index===history.length-1?" move-current":""}" type="button" data-ply="${index}" aria-label="${isPersian?`نمایش حرکت ${color==="w"?"سفید":"سیاه"} شمارهٔ ${String(Math.floor(index/2)+1).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])}: ${entry.san}`:`Show ${color==="w"?"White":"Black"} move ${Math.floor(index/2)+1}: ${entry.san}`}"${gameOver?"":" disabled"}>${entry.san}${quality}</button></div>`;
         }).join("")}</div>`).join("");
@@ -4229,6 +4374,8 @@
         $("suggestButton").hidden=!matchActive||gameOver||!gameplaySettings.suggestions;
         $("hintButton").disabled=aiThinking||(mode==="ai"&&state.turn!==humanColor)||boardAnimating;
         $("suggestButton").disabled=aiThinking||(mode==="ai"&&state.turn!==humanColor)||boardAnimating;
+        $("resignButton").hidden=!matchActive||puzzleMode;
+        $("resignButton").disabled=boardAnimating;
         $("exitMatchButton").hidden=!matchActive&&!puzzleMode;
         $("exitMatchButton").textContent=isPersian?(puzzleMode?"خروج از معما":"خروج از بازی"):(puzzleMode?"Exit puzzle":"Exit match");
         $("exitMatchButton").disabled=boardAnimating;
@@ -4446,6 +4593,62 @@
         return true;
       }
       function selectSquare(r,c) { selected=[r,c]; legalTargets=legalMoves(state).filter(m=>same(m.from,selected)); renderBoard(); }
+      let pieceDrag=null,suppressBoardClickUntil=0;
+      function clearPieceDrag(drag) {
+        drag.pieceElement.classList.remove("dragging");
+        drag.ghost?.remove();
+        if($("board").hasPointerCapture(drag.pointerId))$("board").releasePointerCapture(drag.pointerId);
+      }
+      function beginPieceDrag(event) {
+        if(!event.isPrimary||event.button!==0||puzzleMode||!matchActive||gameOver||boardAnimating||aiThinking
+          ||(mode==="ai"&&state.turn!==humanColor))return;
+        const square=event.target instanceof Element?event.target.closest(".square"):null;
+        if(!square||!$("board").contains(square))return;
+        const from=[Number(square.dataset.row),Number(square.dataset.col)],piece=state.board[from[0]][from[1]];
+        if(!piece||colorOf(piece)!==state.turn||!legalMoves(state).some(move=>same(move.from,from)))return;
+        const pieceElement=square.querySelector(".piece");
+        if(!pieceElement)return;
+        pieceDrag={pointerId:event.pointerId,from,piece,pieceElement,startX:event.clientX,startY:event.clientY,moved:false,ghost:null};
+      }
+      function movePieceDrag(event) {
+        const drag=pieceDrag;
+        if(!drag||drag.pointerId!==event.pointerId)return;
+        if(!drag.moved&&Math.hypot(event.clientX-drag.startX,event.clientY-drag.startY)<6)return;
+        event.preventDefault();
+        if(!drag.moved) {
+          drag.moved=true;
+          $("board").setPointerCapture(event.pointerId);
+          const bounds=drag.pieceElement.getBoundingClientRect();
+          drag.ghost=drag.pieceElement.cloneNode(true);
+          drag.ghost.classList.add("piece-drag-ghost");
+          drag.ghost.style.width=`${bounds.width}px`;
+          drag.ghost.style.height=`${bounds.height}px`;
+          document.body.append(drag.ghost);
+          drag.pieceElement.classList.add("dragging");
+        }
+        drag.ghost.style.left=`${event.clientX-drag.ghost.offsetWidth/2}px`;
+        drag.ghost.style.top=`${event.clientY-drag.ghost.offsetHeight/2}px`;
+      }
+      function endPieceDrag(event) {
+        const drag=pieceDrag;
+        if(!drag||drag.pointerId!==event.pointerId)return;
+        pieceDrag=null;
+        const moved=drag.moved;
+        const target=moved?document.elementFromPoint(event.clientX,event.clientY)?.closest(".square"):null;
+        clearPieceDrag(drag);
+        if(!moved)return;
+        event.preventDefault();
+        suppressBoardClickUntil=Date.now()+500;
+        if(!target||!$("board").contains(target))return;
+        const to=[Number(target.dataset.row),Number(target.dataset.col)];
+        const move=legalMoves(state).find(candidate=>same(candidate.from,drag.from)&&same(candidate.to,to));
+        if(!move) {
+          selected=null;legalTargets=[];renderBoard();
+          return;
+        }
+        if(move.promotion)askPromotion(move);
+        else saveMove(move);
+      }
       function askPromotion(m) {
         const box=$("promotionOptions"); box.replaceChildren();
         for(const piece of ["q","r","b","n"]) { const button=document.createElement("button");button.type="button";button.textContent=symbols[state.turn==="w"?piece.toUpperCase():piece];button.setAttribute("aria-label",pieceName(piece));button.addEventListener("click",()=>{$("promotionBackdrop").classList.remove("open");saveMove({...m,promoteTo:piece});});box.append(button); }
@@ -4796,7 +4999,7 @@
         $("lobby").hidden=true;$("onlineScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=true;$("trainingScreen").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;$("trainingTop").hidden=true;
         $("trainingBack").textContent=trainingReturn==="game"?"← Back to game":trainingReturn==="online"?"← Back to online":"← Back to menu";
-        renderLesson();
+        renderLesson();renderQuickReviews($("openingSearch").value);
       }
       function closeTraining() {
         window.clearTimeout(lessonAnimationTimer);lessonAnimationTimer=0;
@@ -4912,10 +5115,35 @@
         matchActive=false;gameOver=true;
         showLobby();
       }
+      function requestResignation() {
+        if(!matchActive||gameOver||puzzleMode)return;
+        $("resignTitle").textContent=isPersian?"از این بازی تسلیم می‌شوید؟":"Resign this game?";
+        $("resignCopy").textContent=isPersian?"حریفتان برنده می‌شود. نتیجه ذخیره و مرور بازی باز خواهد شد.":"Your opponent will win. This result will be saved and the game review will open.";
+        $("confirmResign").textContent=isPersian?"تسلیم":"Resign";
+        $("resignBackdrop").hidden=false;
+        $("cancelResign").focus();
+      }
+      function confirmResignation() {
+        $("resignBackdrop").hidden=true;
+        if(!matchActive||gameOver||puzzleMode)return;
+        const resigningColor=mode==="ai"?humanColor:state.turn;
+        const winnerColor=resigningColor==="w"?"b":"w";
+        const winner=winnerColor==="w"?"White":"Black";
+        const result=`${winner} wins by resignation`;
+        cancelAIRequest();stopClock();analysisGeneration++;assistanceGeneration++;moveSuggestion=null;
+        premove=null;selected=null;legalTargets=[];gameOver=true;matchActive=false;lastGameResult=result;
+        recordGameResult(result,winnerColor);
+        $("statusText").textContent=isPersian?`${winnerColor==="w"?"سفید":"سیاه"} با تسلیم برنده شد`:result;
+        $("statusDot").classList.remove("warning");
+        $("newGameCard").hidden=false;$("newGameTop").hidden=false;$("resetButton").hidden=false;
+        $("reviewGameButton").hidden=!history.length;$("exportPgnButton").hidden=!history.length;$("goMenuButton").hidden=false;
+        analysisShown=true;render();showToast(isPersian?"تسلیم تأیید شد":result);playEndSound();
+        window.setTimeout(()=>{if(gameOver&&lastGameResult===result)void showAnalysis(result);},180);
+      }
       function startGame() {
         if(matchActive){showToast("Finish the current game before starting another");return;}
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;puzzleSolved=false;clearTimeout(puzzleReplyTimer);puzzleReplyTimer=null;
-        cancelAIRequest();stopClock();
+        cancelAIRequest();suspendLiveMoveAnalysis();stopClock();
         $("lobby").hidden=true;$("onlineScreen").hidden=true;$("trainingScreen").hidden=true;$("gameScreen").hidden=false;$("newGameTop").hidden=true;$("flipButton").hidden=false;
         $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("resetButton").hidden=true;
         $("analysisBackdrop").classList.remove("open");
@@ -4955,7 +5183,7 @@
         rebuildOpeningIdentity();
         if(replayingPuzzle){puzzleCursor=history.length;if(puzzleCursor>=currentPuzzle.solutionMoves.length)completePuzzle();}
         selected=null;legalTargets=[];gameOver=false;matchActive=!replayingPuzzle;reviewPreviewIndex=null;render();if(!replayingPuzzle)evaluateEnd();
-        if(!replayingPuzzle&&gameplaySettings.moveAnnotations)history.forEach((entry,index)=>scheduleMoveQuality(entry,index));
+        if(!replayingPuzzle&&(mode!=="ai"||gameOver||state.turn===humanColor))history.forEach((entry,index)=>scheduleMoveAnalysis(entry,index,0));
         if(puzzleMode)schedulePuzzleReply();else if(!replayingPuzzle&&mode==="ai"&&!gameOver&&state.turn!==humanColor)scheduleAI();
       }
       const values={p:100,n:320,b:330,r:500,q:900,k:0};
@@ -5117,12 +5345,83 @@
         [392,493.88,587.33].forEach((note,index)=>tone(note,.38,"sine",.024,index*.2));
       }
       function classifyCentipawnLoss(loss) {
-        if(loss<=10)return {label:"Best",quality:""};
-        if(loss<=25)return {label:"Excellent",quality:""};
-        if(loss<=50)return {label:"Good",quality:""};
+        if(loss<=10)return {label:"Best",quality:"best"};
+        if(loss<=25)return {label:"Excellent",quality:"excellent"};
+        if(loss<=50)return {label:"Good",quality:"good"};
         if(loss<=100)return {label:"Inaccuracy",quality:"mid"};
         if(loss<=200)return {label:"Mistake",quality:"bad"};
         return {label:"Blunder",quality:"bad"};
+      }
+      let openingMoveLinesCache=null;
+      function isOpeningBookMove(entry) {
+        if(!openingDatabaseByPosition.size)return false;
+        if(!openingMoveLinesCache) {
+          const uniqueLines=new Map();
+          for(const records of openingDatabaseByPosition.values()) {
+            for(const record of records)uniqueLines.set(record.m.join(" "),record.m);
+          }
+          openingMoveLinesCache=[...uniqueLines.values()];
+        }
+        const move=moveToUci(entry.move),prefix=entry.prefix||[];
+        return openingMoveLinesCache.some(line=>line.length>entry.ply&&line[entry.ply]===move&&prefix.every((played,index)=>line[index]===played));
+      }
+      function isEngineBackedSacrifice(entry,after,actualScore,loss) {
+        if(loss>10||actualScore<100||entry.before.board[entry.move.to[0]][entry.move.to[1]])return false;
+        const movedPiece=entry.after.board[entry.move.to[0]][entry.move.to[1]];
+        if(!movedPiece||movedPiece.toLowerCase()==="p")return false;
+        const reply=uciMove(entry.after,after.info.pv?.[0]);
+        return Boolean(reply&&same(reply.to,entry.move.to));
+      }
+      function analyzeMoveEntry(entry) {
+        if(entry.analysis)return Promise.resolve(entry.analysis);
+        if(entry.analysisPromise)return entry.analysisPromise;
+        const controller=new AbortController();
+        entry.analysisController=controller;
+        entry.analysisStatus="analyzing";
+        delete entry.analysisError;
+        const promise=(async()=>{
+          const [root,after]=await Promise.all([
+            analyzePosition(entry.before,controller.signal),
+            analyzePosition(entry.after,controller.signal)
+          ]).catch(error=>{controller.abort();throw error;});
+          if(controller.signal.aborted)throw stockfishAbortError();
+          const bestScore=engineScore(root.info),opponentScore=engineScore(after.info);
+          if(bestScore===null||opponentScore===null)throw new Error(`Stockfish returned no evaluation for ${entry.san}.`);
+          const actualScore=-opponentScore;
+          const loss=Math.max(0,bestScore-actualScore);
+          const bestMove=uciMove(entry.before,root.best);
+          if(!bestMove)throw new Error(`Stockfish returned no legal alternative for ${entry.san}.`);
+          const secondScore=engineScore(root.lines?.[1]);
+          const margin=secondScore===null?0:bestScore-secondScore;
+          const playedBest=moveToUci(entry.move)===root.best;
+          let classification=classifyCentipawnLoss(loss);
+          if(loss<=15&&isOpeningBookMove(entry))classification={label:"Book",quality:"book"};
+          else if(playedBest&&isEngineBackedSacrifice(entry,after,actualScore,loss))classification={label:"Brilliant",quality:"brilliant"};
+          else if(playedBest&&loss<=10&&(margin>=150||(root.info.scoreType==="mate"&&root.info.score>0)))classification={label:"Great",quality:"great"};
+          const mover=entry.before.turn;
+          const analysis={
+            ...classification,
+            loss,
+            accuracy:Math.max(0,Math.min(100,100-Math.max(0,winChance(bestScore)-winChance(actualScore)))),
+            bestMove,
+            bestSan:notation(bestMove,entry.before,applyMove(entry.before,bestMove)),
+            bestUci:root.best,
+            afterInfo:after.info,
+            afterTurn:entry.after.turn,
+            evaluationText:engineEvaluationText(after.info,entry.after.turn),
+            whiteEval:actualScore*(mover==="w"?1:-1),
+            rootWhiteEval:bestScore*(mover==="w"?1:-1)
+          };
+          entry.analysis=analysis;
+          entry.analysisStatus="complete";
+          return analysis;
+        })();
+        entry.analysisPromise=promise;
+        return promise.finally(()=>{
+          if(entry.analysisPromise===promise)entry.analysisPromise=null;
+          if(entry.analysisController===controller)entry.analysisController=null;
+          if(!entry.analysis&&entry.analysisStatus==="analyzing")entry.analysisStatus="pending";
+        });
       }
       function winChance(centipawns) {
         const score=Math.max(-10000,Math.min(10000,centipawns));
@@ -5140,12 +5439,14 @@
         }).join(" ");
         svg.innerHTML=`<line x1="0" y1="${center}" x2="${width}" y2="${center}" class="evaluation-zero"/><line x1="0" y1="${pad}" x2="${width}" y2="${pad}" class="evaluation-grid"/><line x1="0" y1="${height-pad}" x2="${width}" y2="${height-pad}" class="evaluation-grid"/><polyline points="${points}" class="evaluation-line"/>`;
       }
-      function renderGameAnalysis(grades,result) {
+      function renderGameAnalysis(grades,result,progress=null) {
         const digit=value=>isPersian?String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):value;
-        const labels=["Best","Excellent","Good","Inaccuracy","Mistake","Blunder"];
+        const labels=["Brilliant","Great","Best","Excellent","Good","Book","Inaccuracy","Mistake","Blunder"];
         const counts=grades.reduce((total,grade)=>{total[grade.label]=(total[grade.label]||0)+1;return total;},{});
         $("analysisResult").textContent=isPersian?translateFa(result):result;
         const badges=labels.filter(label=>counts[label]).map(label=>`<span class="analysis-stat"><b>${digit(counts[label])}</b>${isPersian?(faText[label]||label):label}</span>`);
+        if(progress)badges.unshift(`<span class="analysis-stat"><b>${digit(progress.completed)} / ${digit(progress.total)}</b>${isPersian?"حرکت تحلیل‌شده":"moves analyzed"}</span>`);
+        if(progress?.failures)badges.push(`<span class="analysis-stat analysis-error"><b>${digit(progress.failures)}</b>${isPersian?"تحلیل ناموفق":"analysis errors"}</span>`);
         for(const color of ["w","b"]) {
           const own=grades.filter(grade=>grade.entry.before.turn===color);
           const accuracy=own.length?Math.round(own.reduce((sum,grade)=>sum+grade.accuracy,0)/own.length):null;
@@ -5157,32 +5458,39 @@
         }
         $("analysisSummary").innerHTML=badges.join("")||`<span class="analysis-stat">${isPersian?"حرکتی برای مرور نیست":"No moves to review"}</span>`;
         renderEvaluationGraph(grades);
-        const turningPoint=grades.find(grade=>grade.label==="Blunder"||grade.label==="Mistake"||grade.label==="Inaccuracy");
+        const turningPoint=grades.filter(grade=>grade.label==="Blunder"||grade.label==="Mistake"||grade.label==="Inaccuracy").sort((a,b)=>b.loss-a.loss)[0];
         const tip=turningPoint
           ?(isPersian?`<strong>پیشنهاد موتور:</strong> در حرکت ${digit(Math.floor(turningPoint.index/2)+1)}، ${turningPoint.bestSan} به‌جای ${turningPoint.entry.san} ارزیابی بهتری داشت.`:`<strong>Engine suggestion:</strong> On move ${Math.floor(turningPoint.index/2)+1}, ${turningPoint.bestSan} kept a better evaluation than ${turningPoint.entry.san}.`)
           :(isPersian?"<strong>تحلیل موتور:</strong> حرکت‌های بازی با موتور Stockfish بررسی شده‌اند.":"<strong>Engine review:</strong> Every played position was checked with Stockfish.");
         $("analysisTips").innerHTML=tip;
         $("analysisList").innerHTML=["w","b"].map(color=>{
           const colorName=isPersian?(color==="w"?"سفید":"سیاه"):(color==="w"?"White":"Black");
-          const rows=grades.filter(grade=>grade.entry.before.turn===color).map(grade=>{
-            const moveNumber=Math.floor(grade.index/2)+1,evalText=engineEvaluationText(grade.afterInfo,grade.afterTurn);
-            const bestLabel=isPersian?`بهترین گزینه: ${grade.bestSan} · ارزیابی موتور: ${evalText}`:`Best alternative: ${grade.bestSan} · engine evaluation: ${evalText}`;
+          const rows=history.map((entry,index)=>({entry,index,grade:grades.find(item=>item.entry===entry)})).filter(item=>item.entry.before.turn===color).map(({entry,index,grade})=>{
+            const moveNumber=Math.floor(index/2)+1;
+            if(!grade) {
+              const status=entry.analysisError
+                ?`<small class="analysis-best">${escapeHtml(entry.analysisError)}</small>`
+                :`<small class="analysis-best">${isPersian?"در حال تحلیل":"Stockfish analysis pending"}</small>`;
+              return `<button class="analysis-row" type="button" data-index="${index}" aria-current="false"><span class="ply">${digit(moveNumber)}.</span><span class="grade ${entry.analysisError?"bad":"pending"}">${entry.analysisError?(isPersian?"ناموفق":"Unavailable"):(isPersian?"در حال تحلیل":"Analyzing")}</span><span class="analysis-move">${entry.san}${status}</span></button>`;
+            }
+            const evalText=grade.evaluationText;
+            const bestLabel=isPersian?`بهترین گزینه: ${grade.bestSan} · ارزیابی موتور: ${evalText}`:`Best alternative: ${grade.bestSan} · Stockfish evaluation: ${evalText}`;
             const explanation=grade.loss<=10
               ?isPersian?"این حرکت با بهترین انتخاب موتور در این عمق جست‌وجو مطابقت دارد.":"The played move matches the engine's top choice at this search depth."
               :grade.loss<5000
                 ?isPersian?`موتور ${grade.bestSan} را ترجیح می‌دهد؛ حرکت بازی‌شده حدود ${digit(Math.round(grade.loss))} سانتی‌پیاده از ارزیابی بهتر فاصله داشت.`:`Stockfish preferred ${grade.bestSan}; the played move gave up about ${Math.round(grade.loss)} centipawns.`
                 :isPersian?`موتور ${grade.bestSan} را به‌عنوان گزینهٔ قاطعانه بهتر پیشنهاد می‌کند.`:`Stockfish found ${grade.bestSan} to be a decisive improvement.`;
-            return `<button class="analysis-row" type="button" data-index="${grade.index}" aria-current="false" aria-label="${isPersian?`نمایش حرکت ${digit(moveNumber)} ${colorName}: ${grade.entry.san}`:`Show move ${moveNumber}, ${colorName}: ${grade.entry.san}`}"><span class="ply">${digit(moveNumber)}.</span><span class="grade ${grade.quality}">${isPersian?(faText[grade.label]||grade.label):grade.label}</span><span class="analysis-move">${grade.entry.san}<small class="analysis-best">${bestLabel}</small><small class="analysis-best">${explanation}</small></span></button>`;
+            return `<button class="analysis-row" type="button" data-index="${index}" aria-current="false" aria-label="${isPersian?`نمایش حرکت ${digit(moveNumber)} ${colorName}: ${entry.san}`:`Show move ${moveNumber}, ${colorName}: ${entry.san}`}"><span class="ply">${digit(moveNumber)}.</span><span class="grade ${grade.quality}">${isPersian?(faText[grade.label]||grade.label):grade.label}</span><span class="analysis-move">${entry.san}<small class="analysis-best">${isPersian?`ارزیابی: ${evalText}`:`Evaluation: ${evalText}`}</small><small class="analysis-best">${bestLabel}</small><small class="analysis-best">${explanation}</small></span></button>`;
           }).join("");
           return `<div class="analysis-color-list"><div class="analysis-color-title">${color==="w"?"♙":"♟"} ${colorName}</div>${rows}</div>`;
         }).join("");
         $("analysisList").querySelectorAll("[data-index]").forEach(button=>button.addEventListener("click",()=>showReviewPosition(Number(button.dataset.index))));
       }
-      async function analyzePosition(position) {
+      async function analyzePosition(position,signal) {
         const legal=legalMoves(position);
-        if(!legal.length)return {best:"(none)",info:{scoreType:inCheck(position,position.turn)?"mate":"cp",score:0}};
-        if(position.halfmove>=100||isInsufficient(position))return {best:"(none)",info:{scoreType:"cp",score:0}};
-        return stockfishSearch(position,{rating:2000,depth:16,movetime:700,unrestricted:true});
+        if(!legal.length)return {best:"(none)",info:{scoreType:inCheck(position,position.turn)?"mate":"cp",score:0,pv:[]},lines:[]};
+        if(position.halfmove>=100||isInsufficient(position))return {best:"(none)",info:{scoreType:"cp",score:0,pv:[]},lines:[]};
+        return stockfishSearch(position,{rating:2000,depth:16,movetime:700,unrestricted:true,multiPV:3,signal});
       }
       async function showAnalysis(result) {
         const generation=++analysisGeneration;
@@ -5200,35 +5508,29 @@
           return;
         }
         const analyzed=[];
-        try {
-          for(let index=0;index<entries.length;index++) {
-            const entry=entries[index],mover=entry.before.turn;
-            const root=await analyzePosition(entry.before);
-            const after=await analyzePosition(entry.after);
+        let failures=0;
+        for(let index=0;index<entries.length;index++) {
+          const entry=entries[index];
+          try {
+            const analysis=await analyzeMoveEntry(entry);
+            analyzed.push({entry,index,...analysis});
+          } catch(error) {
             if(generation!==analysisGeneration)return;
-            const rootScore=engineScore(root.info);
-            let actualScore=engineScore(after.info);
-            if(rootScore===null||actualScore===null)throw new Error(`Stockfish did not return an evaluation for move ${index+1}.`);
-            if(entry.after.turn!==mover)actualScore=-actualScore;
-            const bestMove=uciMove(entry.before,root.best);
-            if(!bestMove)throw new Error(`Stockfish did not return a legal suggestion for move ${index+1}.`);
-            const bestAfter=applyMove(entry.before,bestMove);
-            const loss=Math.max(0,rootScore-actualScore);
-            const accuracy=Math.max(0,Math.min(100,100-Math.max(0,winChance(rootScore)-winChance(actualScore))));
-            const classification=classifyCentipawnLoss(loss);
-            const whiteEval=actualScore*(entry.after.turn==="w"?1:-1);
-            const rootWhiteEval=rootScore*(entry.before.turn==="w"?1:-1);
-            analyzed.push({entry,index,...classification,loss,accuracy,bestMove,bestSan:notation(bestMove,entry.before,bestAfter),whiteEval,rootWhiteEval,afterInfo:after.info,afterTurn:entry.after.turn});
-            $("analysisSummary").textContent=isPersian?`تحلیل ${digitPersian(index+1)} از ${digitPersian(entries.length)} حرکت…`:`Analyzing move ${index+1} of ${entries.length}…`;
+            if(error.name==="AbortError") {
+              entry.analysisStatus="pending";
+            } else {
+              failures++;
+              entry.analysisStatus="error";entry.analysisError=error.message;
+              console.error(`Stockfish analysis failed for ${entry.san}.`,error);
+              if(!entry.analysisErrorNotified) {
+                showToast(`Move analysis failed: ${error.message}`);
+                entry.analysisErrorNotified=true;
+              }
+            }
           }
           if(generation!==analysisGeneration)return;
           engineAnalysisGrades=analyzed;
-          renderGameAnalysis(analyzed,result);
-        } catch(error) {
-          if(generation!==analysisGeneration)return;
-          $("analysisSummary").textContent=isPersian?"تحلیل کامل نشد.":"Analysis could not be completed.";
-          $("analysisTips").textContent=error.message;
-          showToast(error.message);
+          renderGameAnalysis(analyzed,result,{completed:index+1,total:entries.length,failures});
         }
       }
       function exportPgn() {
@@ -5398,19 +5700,17 @@
         return move;
       }
       function scheduleAI() {
-        if(gameOver||mode!=="ai"||state.turn===humanColor) return;
+        if(gameOver||boardAnimating||mode!=="ai"||state.turn===humanColor)return;
+        suspendLiveMoveAnalysis();
         aiThinking=true;$("statusText").textContent="Thinking…";
         $("undoButton").disabled=true;$("redoButton").disabled=true;
-        const request=++aiRequestVersion,position=copyState(state),fen=stateToFen(position),controller=new AbortController(),thinkStartedAt=performance.now();
+        const request=++aiRequestVersion,position=copyState(state),fen=stateToFen(position),controller=new AbortController();
         aiSearchController=controller;
         aiTimer=setTimeout(async()=>{
           aiTimer=null;
           if(request!==aiRequestVersion||gameOver||mode!=="ai"||state.turn===humanColor)return;
           try {
             const move=await chooseAIMove(position,controller.signal);
-            const rating=Number($("strength").value);
-            const naturalThinkTime=(rating<700?1000:rating<1000?1100:rating<1400?1250:1400)+Math.random()*(rating<700?1000:rating<1400?1300:1500);
-            await new Promise(resolve=>setTimeout(resolve,Math.max(0,naturalThinkTime-(performance.now()-thinkStartedAt))));
             if(request!==aiRequestVersion||gameOver||mode!=="ai"||state.turn===humanColor||stateToFen(state)!==fen)return;
             if(!move)throw new Error("The chess engine returned no legal move.");
             saveMove(move);
@@ -5423,7 +5723,7 @@
             if(aiSearchController===controller)aiSearchController=null;
             if(request===aiRequestVersion){aiThinking=false;render();}
           }
-        },350);
+        },100);
       }
       function formatTime(seconds) { const s=Math.max(0,Math.floor(seconds));return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; }
       function stopClock() { if(window.clockInterval){clearInterval(window.clockInterval);window.clockInterval=null;} }
@@ -5470,7 +5770,12 @@
         pendingProfileAvatar="";$("profileImage").value="";renderProfileAvatar($("profileAvatarPreview"),"");savePlayerProfile();
       });
       populateThemeOptions();
+      $("board").addEventListener("pointerdown",beginPieceDrag);
+      document.addEventListener("pointermove",movePieceDrag,{passive:false});
+      document.addEventListener("pointerup",endPieceDrag);
+      document.addEventListener("pointercancel",endPieceDrag);
       $("board").addEventListener("click",event=>{
+        if(Date.now()<suppressBoardClickUntil)return;
         const square=event.target instanceof Element?event.target.closest(".square"):null;
         if(square&&$("board").contains(square))clickSquare(Number(square.dataset.row),Number(square.dataset.col));
       });
@@ -5497,10 +5802,15 @@
       $("hintButton").addEventListener("click",()=>void showMoveAssistance("hint"));
       $("suggestButton").addEventListener("click",()=>void showMoveAssistance("suggestion"));
       $("exitMatchButton").addEventListener("click",requestExitMatch);
+      $("resignButton").addEventListener("click",requestResignation);
       $("cancelExitMatch").addEventListener("click",()=>$("exitMatchBackdrop").hidden=true);
       $("confirmExitMatch").addEventListener("click",confirmExitMatch);
       $("exitMatchBackdrop").addEventListener("click",event=>{if(event.target===$("exitMatchBackdrop"))$("exitMatchBackdrop").hidden=true;});
+      $("cancelResign").addEventListener("click",()=>$("resignBackdrop").hidden=true);
+      $("confirmResign").addEventListener("click",confirmResignation);
+      $("resignBackdrop").addEventListener("click",event=>{if(event.target===$("resignBackdrop"))$("resignBackdrop").hidden=true;});
       document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("exitMatchBackdrop").hidden)$("exitMatchBackdrop").hidden=true;});
+      document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("resignBackdrop").hidden)$("resignBackdrop").hidden=true;});
       document.addEventListener("keydown",event=>{
         if(!$("analysisBackdrop").classList.contains("open")||event.altKey||event.ctrlKey||event.metaKey)return;
         if(event.target instanceof Element&&event.target.closest("input,textarea,select,[contenteditable='true']"))return;
@@ -5591,8 +5901,9 @@
         const previousOpening=openingIdentity;
         recognizeOpening();
         if(openingIdentity!==previousOpening&&!$("gameScreen").hidden)render();
+        if(!$("trainingScreen").hidden)renderQuickReviews($("openingSearch").value);
       }).catch(error=>{console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);});
-      ensureTwentyMoveLines();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();
+      ensureTwentyMoveLines();loadRecentGames();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();
       reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
       $("setSkillButton").addEventListener("click",setPlayerSkill);
       $("puzzleHintButton").addEventListener("click",showPuzzleHint);
