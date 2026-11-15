@@ -8,9 +8,6 @@
   <link rel="icon" type="image/svg+xml" href="./chess-icon.svg">
   <link rel="apple-touch-icon" href="./chess-icon.svg">
   <title>شطرنج شبانه</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       color-scheme: dark;
@@ -22,8 +19,8 @@
       --muted: #929b94;
       --accent: #c8f169;
       --accent-ink: #1b2310;
-      --light-square: #d7ddc9;
-      --dark-square: #72816d;
+      --light-square: #d9dece;
+      --dark-square: #71806d;
       --danger: #ed8279;
       --board-size: min(660px, max(220px, calc(100dvh - 360px)), calc(100vw - 40px));
       --font-persian: "Vazirmatn";
@@ -69,6 +66,7 @@
     .player { display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 8px 12px; border: 1px solid #252b27; border-radius: 13px; background: linear-gradient(110deg, #1c211d, #151917); transition: border-color .2s, background .2s; }
     .player.active-turn { border-color: #53663d; background: linear-gradient(110deg, #252e20, #191d19); box-shadow: inset 0 0 0 1px #c8f1690d; }
     .avatar { display: grid; place-items: center; flex: 0 0 40px; height: 40px; border: 1px solid #414a42; border-radius: 13px; background: #292e2a; color: #dce1d8; font-size: 19px; }
+    .avatar img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
     .player-info { min-width: 0; flex: 1; }
     .player-name { overflow: hidden; color: var(--text); font-size: 13px; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
     .player-detail { margin-top: 3px; color: var(--muted); font-size: 11px; }
@@ -78,8 +76,8 @@
     .board-frame { position: relative; width: var(--board-size); max-width: 100%; margin: 8px auto; padding: 8px; border: 1px solid #3b443b; border-radius: 15px; background: linear-gradient(145deg, #252c26, #161a17); box-shadow: 0 28px 85px #0007, 0 0 0 1px #ffffff08; overflow: hidden; }
     .board { display: grid; grid-template: repeat(8, minmax(0, 1fr)) / repeat(8, minmax(0, 1fr)); aspect-ratio: 1; user-select: none; touch-action: manipulation; }
     .square { position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; border: 0; padding: 0; aspect-ratio: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-    .square.light { background: #d9dece; }
-    .square.dark { background: #71806d; }
+    .square.light { background: var(--light-square); }
+    .square.dark { background: var(--dark-square); }
     .square:not(.last-move):not(.selected):hover { filter: brightness(1.09); }
     .square:focus-visible { z-index: 4; outline: 3px solid #f4ffc5; outline-offset: -4px; }
     .square.last-move::before, .square.selected::before { content: ""; position: absolute; inset: 0; background: #d3ef6b; opacity: .43; pointer-events: none; }
@@ -401,8 +399,8 @@
     .quick-board-wrap { margin-top: 11px; padding: 9px; border: 1px solid var(--line); border-radius: 9px; background: #0f1210; }
     .quick-board { position: relative; display: grid; grid-template-columns: repeat(8, 1fr); width: min(100%, 400px); margin: auto; overflow: hidden; border: 2px solid #829276; border-radius: 6px; box-shadow: 0 10px 24px #0008; container-type: inline-size; }
     .quick-square { display: grid; place-items: center; aspect-ratio: 1; font-family: "Segoe UI Symbol", "Apple Symbols", serif; font-size: clamp(20px, 11.5cqw, 54px); line-height: 1; }
-    .quick-square.light { background: #d7ddc9; color: #202820; }
-    .quick-square.dark { background: #72816d; color: #172019; }
+    .quick-square.light { background: var(--light-square); color: #202820; }
+    .quick-square.dark { background: var(--dark-square); color: #172019; }
     .quick-square.white-piece { color: #fffef4; -webkit-text-stroke: .9px #354735; text-shadow: 0 1px 2px #35473599; }
     .quick-square.black-piece { color: #18221b; -webkit-text-stroke: .9px #f4f4e3; text-shadow: 0 1px 2px #f4f4e3aa; }
     .quick-square.last-step { box-shadow: inset 0 0 0 3px #c8f169bb; }
@@ -1263,40 +1261,6 @@
       .analysis-content-column .analysis-list { max-height: 32vh; overflow: auto; }
     }
 
-    /* Board colors and piece styles, picked in the lobby */
-    .square.light { background: var(--sq-light, #d9dece); }
-    .square.dark { background: var(--sq-dark, #71806d); }
-    [data-pieces="classic"], [data-pieces="svg"] { --pw: #fffef4; --pws: #26372a; --pb: #18221b; --pbs: #f3f6e8; --pwt: 0 1px 0 #fff, 0 2px 3px #253428e8, 0 0 2px #111a12; --pbt: 0 1px 0 #f3f6e8, 0 2px 3px #101710, 0 0 3px #f6f9e9; }
-    [data-pieces="ivory"] { --pw: #f7edd3; --pws: #4a3019; --pb: #2a1b10; --pbs: #d7b98c; --pwt: 0 1px 0 #fff8e4, 0 2px 3px #3b2410cc; --pbt: 0 1px 0 #d7b98c88, 0 2px 3px #000c; }
-    [data-pieces="gold"] { --pw: #eef2f6; --pws: #596370; --pb: #d2a02a; --pbs: #4a3200; --pwt: 0 1px 0 #fff, 0 2px 3px #2a3340cc; --pbt: 0 1px 0 #ffe9a3, 0 2px 3px #3a2800cc; }
-    [data-pieces="flat"] { --pw: #ffffff; --pws: #1c1f1d; --pb: #1c1f1d; --pbs: #000; --pwt: none; --pbt: none; --pf: none; }
-    [data-pieces="wood"] { --pw: #ecc995; --pws: #5d3a1a; --pb: #5b3a22; --pbs: #c99f6c; --pwt: 0 1px 0 #fbe6c3, 0 2px 3px #3a210ccc; --pbt: 0 1px 0 #c99f6c88, 0 2px 3px #000b; }
-    [data-pieces="glass"] { --pw: #e9f6ff; --pws: #7fb7e6; --pb: #1c2c44; --pbs: #8fc2f0; --pwt: 0 0 6px #bfe3ff, 0 2px 3px #1c3a5acc; --pbt: 0 0 6px #6aa8e0aa, 0 2px 3px #000b; }
-    [data-pieces="neon"] { --pw: #8ff6ff; --pws: #00a8c0; --pb: #ff7ad9; --pbs: #b0007f; --pwt: 0 0 8px #3fe8ff, 0 0 2px #fff; --pbt: 0 0 8px #ff3fc8, 0 0 2px #fff; }
-    [data-pieces="royal"] { --pw: #f5f0ff; --pws: #4b2e83; --pb: #4b2e83; --pbs: #f1e6ff; --pwt: 0 1px 0 #fff, 0 2px 3px #2a1650cc; --pbt: 0 1px 0 #d9c4ff88, 0 2px 3px #12082acc; }
-    [data-pieces] .piece.white, [data-pieces] .white-piece { color: var(--pw); -webkit-text-stroke-color: var(--pws); text-shadow: var(--pwt); filter: var(--pf, drop-shadow(0 2px 2px #101510aa)); }
-    [data-pieces] .piece.black, [data-pieces] .black-piece { color: var(--pb); -webkit-text-stroke-color: var(--pbs); text-shadow: var(--pbt); filter: var(--pf, drop-shadow(0 2px 2px #101510cc)); }
-    .theme-picker { display: grid; gap: 8px; margin-top: 12px; }
-    .theme-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 5px; margin-top: 5px; }
-    .theme-chip { display: grid; justify-items: center; gap: 4px; min-width: 0; padding: 4px 3px; border: 1px solid #ffffff14; border-radius: 8px; background: #ffffff06; color: #cbd4c8; font: inherit; font-size: 10px; cursor: pointer; }
-    .theme-chip:hover { border-color: #ffffff30; }
-    .theme-chip[aria-checked="true"] { border-color: var(--accent); background: #c4f58a14; color: var(--accent); }
-    .theme-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .theme-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .board-swatch, .piece-swatch { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 5px; overflow: hidden; }
-    .piece-swatch { width: 44px; }
-    .piece-swatch .piece { font-size: 20px; transform: none; cursor: inherit; }
-    .piece-swatch.image-swatch img { width: 22px; height: 22px; object-fit: contain; pointer-events: none; }
-    .svg-piece { color: transparent !important; -webkit-text-stroke: 0 !important; text-shadow: none !important; background-position: center !important; background-repeat: no-repeat !important; background-size: contain !important; filter: drop-shadow(0 2px 2px #0008) !important; }
-    .square > .svg-piece { width: 92%; height: 92%; overflow: hidden; }
-    .captured-piece.svg-piece { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: middle; overflow: hidden; }
-    #promotionOptions button.svg-piece { background-size: 78% !important; }
-    .theme-group-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; }
-    .piece-colors { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-    .piece-colors .subtle-button { min-height: 28px; padding: 3px 10px; font-size: 11px; }
-    .color-field { display: flex; align-items: center; gap: 8px; color: #cbd4c8; font-size: 12px; }
-    .color-field input { width: 34px; height: 28px; padding: 0; border: 1px solid #ffffff2a; border-radius: 6px; background: none; cursor: pointer; }
-
     /* Game screen: a large board, with the side panel turned into a slide-in menu */
     #gameScreen { --board-size: min(calc(100dvh - 280px), calc(100vw - 28px), 940px); }
     #gameScreen:not([hidden]) { animation-fill-mode: backwards; }
@@ -1322,21 +1286,138 @@
     .game-menu-backdrop { position: fixed; inset: 0; z-index: 14; background: #0009; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
     #gameScreen.menu-open .game-menu-backdrop { opacity: 1; pointer-events: auto; }
     .toast { z-index: 16; }
-    #gameScreen:has(#puzzleGameCard:not([hidden])) { --board-size: min(calc(100dvh - 418px), calc(100vw - 28px), 800px); }
+    #gameScreen:has(#puzzleGameCard:not([hidden])) { --board-size: min(800px, max(200px, calc(100dvh - 495px)), calc(100vw - 28px)); }
     #gameScreen .play-area > #puzzleGameCard { margin-top: 6px; padding: 8px 14px 10px; }
     #puzzleGameCard .card-heading { margin-bottom: 2px; }
     #puzzleGameCard .puzzle-copy { min-height: 0; margin: 2px 0; }
     #puzzleGameCard .puzzle-status { min-height: 20px; margin: 0 0 4px; line-height: 1.5; }
     #puzzleGameCard .puzzle-actions .subtle-button { min-height: 32px; padding: 4px 12px; font-size: 12px; }
+    html[data-board-theme="arctic"] { --light-square: #e8edf8; --dark-square: #b7c1d9; }
+    html[data-board-theme="walnut"] { --light-square: #ead9bc; --dark-square: #a87550; }
+    .piece-image { position: relative; z-index: 2; display: block; width: 84%; height: 84%; object-fit: contain; transform: translateY(-2%); pointer-events: none; user-select: none; }
+    .puzzle-hint-source { box-shadow: inset 0 0 0 4px #d5f17b; }
+    .puzzle-progress-track { height: 7px; overflow: hidden; border-radius: 999px; background: #101311; }
+    .puzzle-progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9dca4d, var(--accent)); transition: width .25s ease; }
+    .puzzle-game-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin: 8px 0; }
+    .puzzle-game-meta > span { display: flex; align-items: baseline; justify-content: center; gap: 6px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: #141816; }
+    .puzzle-game-meta strong { color: var(--text); font-size: 13px; font-variant-numeric: tabular-nums; }
+    .puzzle-game-meta small { color: var(--muted); font-size: 8px; letter-spacing: .08em; }
+    .lobby-navigation { display: flex; gap: 7px; margin: 18px 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+    .lobby-nav-button, .settings-nav-button { border: 0; border-radius: 8px; padding: 9px 14px; background: transparent; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
+    .lobby-nav-button.active, .settings-nav-button.active { background: #262d23; color: var(--accent); }
+    #lobby[data-page="play"] .lobby-dashboard { display: none; }
+    #lobby[data-page="puzzles"] .lobby-grid, #lobby[data-page="progress"] .lobby-grid { display: none; }
+    #lobby[data-page="puzzles"] .lobby-dashboard > :not(.skill-prompt):not(#puzzleSection) { display: none; }
+    #lobby[data-page="progress"] .lobby-dashboard > .skill-prompt, #lobby[data-page="progress"] .lobby-dashboard > #puzzleSection { display: none; }
+    .settings-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+    .settings-head h1 { margin: 3px 0; font-size: clamp(26px, 4vw, 36px); letter-spacing: -.04em; }
+    .settings-head p { margin: 0; color: var(--muted); font-size: 12px; }
+    .settings-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); align-items: start; gap: 16px; }
+    .settings-nav { position: sticky; top: 16px; display: grid; gap: 4px; padding: 8px; }
+    .settings-nav-button { text-align: left; }
+    .settings-content { min-width: 0; }
+    .settings-panel { padding: clamp(16px, 3vw, 24px); }
+    .settings-panel .card-heading { margin-bottom: 18px; }
+    .profile-editor { display: grid; grid-template-columns: 94px minmax(0, 1fr); align-items: start; gap: 18px; }
+    .profile-editor-avatar { display: grid; place-items: center; width: 88px; height: 88px; overflow: hidden; border: 1px solid #485347; border-radius: 50%; background: #242b24; color: var(--accent); font-size: 42px; }
+    .profile-editor-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-editor-fields { display: grid; gap: 8px; }
+    .profile-editor-fields .field, .theme-settings-grid .field { margin: 0; }
+    .profile-editor input[type="file"] { width: 100%; max-width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: #131615; color: var(--muted); font-size: 11px; }
+    .settings-actions, .settings-audio-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+    .settings-audio-controls .field { min-width: min(230px, 100%); margin: 0; }
+    .settings-audio-controls .music-volume-control { width: 100%; min-height: 38px; }
+    .settings-audio-controls .music-volume-control input { flex: 1; width: auto; }
+    .theme-settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .theme-preview-wrap { margin-top: 20px; }
+    .theme-preview-label { margin-bottom: 8px; color: var(--muted); font-size: 11px; }
+    .theme-preview-board { display: grid; grid-template-columns: repeat(8, 1fr); width: min(100%, 290px); overflow: hidden; border: 5px solid #272d28; border-radius: 11px; }
+    .theme-preview-square { display: grid; place-items: center; aspect-ratio: 1; background: var(--light-square); }
+    .theme-preview-square:nth-child(16n + 1), .theme-preview-square:nth-child(16n + 3), .theme-preview-square:nth-child(16n + 5), .theme-preview-square:nth-child(16n + 7),
+    .theme-preview-square:nth-child(16n + 10), .theme-preview-square:nth-child(16n + 12), .theme-preview-square:nth-child(16n + 14), .theme-preview-square:nth-child(16n + 16) { background: var(--dark-square); }
+    .theme-preview-square .piece-image { width: 84%; height: 84%; }
+    html[data-board-theme^="chess-"] .board,
+    html[data-board-theme^="chess-"] .puzzle-board,
+    html[data-board-theme^="chess-"] .quick-board,
+    html[data-board-theme^="chess-"] .scenario-board,
+    html[data-board-theme^="chess-"] .training-board,
+    html[data-board-theme^="chess-"] .theme-preview-board {
+      background-image: var(--board-texture);
+      background-position: center;
+      background-size: 100% 100%;
+    }
+    html[data-board-theme^="chess-"] .square.light,
+    html[data-board-theme^="chess-"] .square.dark,
+    html[data-board-theme^="chess-"] .quick-square.light,
+    html[data-board-theme^="chess-"] .quick-square.dark,
+    html[data-board-theme^="chess-"] .training-square.light,
+    html[data-board-theme^="chess-"] .training-square.dark,
+    html[data-board-theme^="chess-"] .theme-preview-square {
+      background: transparent;
+    }
+    .music-island { position: fixed; z-index: 50; top: 18px; left: 50%; display: flex; align-items: center; gap: 9px; max-width: calc(100vw - 24px); padding: 11px 17px; overflow: hidden; border: 1px solid #454d47; border-radius: 999px; background: #171b18ed; box-shadow: 0 12px 35px #0009; color: var(--text); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; opacity: 0; pointer-events: none; transform: translate(-50%, -18px) scale(.96); transition: opacity .22s ease, transform .22s ease; backdrop-filter: blur(14px); }
+    .music-island.visible { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    .music-island-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: music-pulse 1.3s ease-in-out infinite; }
+    @keyframes music-pulse { 50% { opacity: .4; transform: scale(.75); } }
+    .settings-panel .note { margin: 14px 0 0; }
     @media (max-width: 520px) {
       #gameScreen { --board-size: min(calc(100dvh - 355px), calc(100vw - 24px)); }
-      #gameScreen:has(#puzzleGameCard:not([hidden])) { --board-size: min(calc(100dvh - 500px), calc(100vw - 24px)); }
+      #gameScreen:has(#puzzleGameCard:not([hidden])) { --board-size: min(800px, max(180px, calc(100dvh - 565px)), calc(100vw - 24px)); }
       #gameScreen .board-status { flex-wrap: wrap; }
-      #gameScreen .board-tools { flex: 1 1 100%; justify-content: flex-start; width: auto; }
-      #gameScreen .board-tools button, #gameScreen .board-tools .assist-button, #gameScreen .board-tools .exit-match-button { width: auto; min-width: 34px; height: 30px; padding: 0 10px; font-size: 12px; }
+      #gameScreen .board-tools { flex: 1 1 100%; justify-content: flex-start; }
+    }
+    @media (max-width: 680px) {
+      .settings-layout { grid-template-columns: minmax(0, 1fr); }
+      .settings-nav { position: static; display: flex; overflow-x: auto; }
+      .settings-nav-button { flex: 0 0 auto; }
+    }
+    @media (max-width: 450px) {
+      .theme-settings-grid { grid-template-columns: minmax(0, 1fr); }
+      .profile-editor { grid-template-columns: 1fr; }
+      .profile-editor-avatar { width: 72px; height: 72px; }
+      .puzzle-game-meta > span { display: grid; gap: 1px; justify-items: center; }
     }
     @media (prefers-reduced-motion: reduce) {
-      #gameScreen.layout > .side-panel, .game-menu-backdrop { transition: none; }
+      #gameScreen.layout > .side-panel, .game-menu-backdrop, .music-island, .puzzle-progress-fill { transition: none; }
+      .music-island-dot { animation: none; }
+    }
+    #lobby {
+      width: min(100%, 980px);
+      max-width: 980px;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    #lobby .lobby-hero, #lobby .lobby-navigation,
+    #lobby .lobby-grid, #lobby .lobby-dashboard {
+      grid-column: 1;
+      grid-row: auto;
+    }
+    #lobby .lobby-hero {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    #lobby .lobby-navigation {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    #lobby .lobby-grid, #lobby .lobby-dashboard {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    @media (min-width: 1000px) {
+      #lobby[data-page="play"] .lobby-settings { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 12px; }
+      #lobby[data-page="play"] .ai-rating-field { grid-column: span 2; }
+      #lobby[data-page="play"] .gameplay-options { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 760px) {
+      #lobby { gap: 10px; margin-top: 8px; }
+      #lobby .lobby-navigation { overflow-x: auto; margin: 0; }
+      #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
 </head>
@@ -1350,28 +1431,23 @@
       <div class="header-actions">
         <button class="sound-toggle" id="trainingTop" type="button">♟ Training</button>
         <button class="sound-toggle" id="onlineTop" type="button">♧ Online</button>
-        <details class="audio-menu">
-          <summary class="sound-toggle">⚙ Settings</summary>
-          <div class="audio-popover">
-            <label class="music-track-control settings-language"><span>Language</span><select id="languageSelect" aria-label="Language"><option value="en">English</option><option value="fa">فارسی</option></select></label>
-            <button class="sound-toggle" id="musicToggle" type="button" aria-pressed="true">♫ Music on</button>
-            <label class="music-track-control" title="Music track"><span aria-hidden="true">♫</span><select id="musicTrack" aria-label="Music track"><option value="electric-1">Electric Melody 1</option><option value="electric-2">Electric Melody 2</option><option value="warm-1">Warm Overdrive Sustain 1</option><option value="warm-2">Warm Overdrive Sustain 2</option></select></label>
-            <label class="music-volume-control" title="Music volume"><span aria-hidden="true">♫</span><input id="musicVolume" type="range" min="0" max="100" step="1" value="75" aria-label="Music volume"><output id="musicVolumeValue" for="musicVolume">75%</output></label>
-            <button class="sound-toggle" id="effectsToggle" type="button" aria-pressed="true">♬ Effects on</button>
-            <button class="sound-toggle" id="uiSoundsToggle" type="button" aria-pressed="true">♩ UI sounds on</button>
-          </div>
-        </details>
+        <button class="sound-toggle" id="settingsTop" type="button">⚙ Settings</button>
         <button class="subtle-button" id="newGameTop" type="button" hidden>＋ <span>New game</span></button>
         <button class="icon-button" id="flipButton" type="button" aria-label="Flip board" title="Flip board" hidden>↻</button>
       </div>
     </header>
 
-    <section class="lobby" id="lobby" aria-labelledby="lobbyTitle">
+    <section class="lobby" id="lobby" data-page="play" aria-labelledby="lobbyTitle">
       <div class="lobby-hero">
         <div class="lobby-kicker">Nightfall Chess</div>
         <h1 id="lobbyTitle">Play chess.</h1>
         <p class="lobby-intro">Choose an opponent and make your first move.</p>
       </div>
+      <nav class="lobby-navigation" aria-label="Main menu">
+        <button class="lobby-nav-button active" type="button" data-lobby-page="play" aria-current="page">Play</button>
+        <button class="lobby-nav-button" type="button" data-lobby-page="puzzles">Puzzles</button>
+        <button class="lobby-nav-button" type="button" data-lobby-page="progress">Progress</button>
+      </nav>
       <div class="lobby-grid">
         <section class="lobby-card">
           <div class="card-heading"><span class="card-title">Choose your game</span><span class="eyebrow">01 / PLAY</span></div>
@@ -1414,19 +1490,6 @@
             <label class="gameplay-option"><input id="lobbyHints" type="checkbox" checked><span>Allow hints</span></label>
             <label class="gameplay-option"><input id="lobbySuggestions" type="checkbox" checked><span>Allow move suggestions</span></label>
           </div>
-          <div class="theme-picker" aria-label="Board and pieces">
-            <div class="theme-group"><span class="field-label" id="boardThemeLabel">Board</span><div class="theme-options" id="boardThemeOptions" role="radiogroup" aria-labelledby="boardThemeLabel"></div></div>
-            <div class="theme-group">
-              <div class="theme-group-head"><span class="field-label" id="pieceThemeLabel">Pieces</span>
-                <div class="piece-colors" aria-label="Piece colors">
-                  <label class="color-field"><span>White pieces</span><input type="color" id="whitePieceColor" value="#ffffff"></label>
-                  <label class="color-field"><span>Black pieces</span><input type="color" id="blackPieceColor" value="#1c1f1d"></label>
-                  <button type="button" class="subtle-button" id="resetPieceColors">Reset colors</button>
-                </div>
-              </div>
-              <div class="theme-options" id="pieceThemeOptions" role="radiogroup" aria-labelledby="pieceThemeLabel"></div>
-            </div>
-          </div>
           <button class="primary-button" id="launchButton" type="button">Start game</button>
           <details class="profile-more">
             <summary>More player info</summary>
@@ -1451,10 +1514,11 @@
           <div class="profile-stat"><strong id="profileScore">400</strong><span>Chess score</span></div>
         </div>
         <section class="lobby-card" id="puzzleSection" hidden>
-          <div class="puzzle-heading"><div><h2>♞ Chess puzzles</h2><p class="puzzle-copy" id="puzzleProgress">Choose a level to unlock beginner-friendly, rating-matched tactics.</p></div><span class="puzzle-rating" id="puzzleRating">Score 400</span></div>
+          <div class="puzzle-heading"><div><h2>♞ Chess puzzles</h2><p class="puzzle-copy" id="puzzleProgress">Loading the Lichess puzzle collection…</p></div><span class="puzzle-rating" id="puzzleRating">Rating 400</span></div>
+          <div class="puzzle-progress-track" role="progressbar" aria-label="Puzzle collection progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="puzzle-progress-fill" id="puzzleProgressFill"></div></div>
           <div class="puzzle-area">
             <div class="quick-board puzzle-board" id="puzzleBoard" role="grid" aria-label="Chess puzzle preview"></div>
-            <div><div class="puzzle-status" id="puzzlePrompt" aria-live="polite"></div><div class="puzzle-copy" id="puzzleHint"></div><div class="puzzle-status" id="puzzleFeedback" aria-live="polite"></div><div class="puzzle-actions"><button class="primary-button" id="puzzlePlayButton" type="button">Play on the chessboard</button><button class="subtle-button" id="puzzleHintButton" type="button">Show hint</button><button class="subtle-button" id="nextPuzzleButton" type="button">Next puzzle</button></div><p class="note puzzle-attribution">Real rated positions from the <a href="https://database.lichess.org/#puzzles" target="_blank" rel="noreferrer">Lichess puzzle database</a> (CC0) · <a href="https://huggingface.co/datasets/Lichess/chess-puzzles" target="_blank" rel="noreferrer">dataset source</a>.</p></div>
+            <div><div class="puzzle-status" id="puzzlePrompt" aria-live="polite"></div><div class="puzzle-copy" id="puzzleHint"></div><div class="puzzle-status" id="puzzleFeedback" aria-live="polite"></div><div class="puzzle-actions"><button class="primary-button" id="puzzlePlayButton" type="button">Solve puzzle</button><button class="subtle-button" id="puzzleHintButton" type="button">Show hint</button><button class="subtle-button" id="nextPuzzleButton" type="button" disabled>Next puzzle</button><button class="subtle-button" id="puzzleRetryButton" type="button" hidden>Retry loading</button></div><p class="note puzzle-attribution">Real rated positions from the <a href="https://database.lichess.org/#puzzles" target="_blank" rel="noreferrer">Lichess puzzle database</a> (CC0) · <a href="https://huggingface.co/datasets/Lichess/chess-puzzles" target="_blank" rel="noreferrer">dataset source</a>.</p></div>
           </div>
         </section>
       </div>
@@ -1486,6 +1550,55 @@
           <p>Online matchmaking is not connected yet. Start a local pass-and-play game while sharing the same board.</p>
           <button class="subtle-button" id="localFriendButton" type="button">Start a local friend game</button>
         </section>
+      </div>
+    </section>
+
+    <section class="settings-screen" id="settingsScreen" aria-labelledby="settingsTitle" hidden>
+      <div class="settings-head"><div><div class="lobby-kicker">PERSONALIZE YOUR GAME</div><h1 id="settingsTitle">Settings</h1><p>Make the board, sound and profile feel like yours.</p></div><button class="subtle-button" id="settingsBack" type="button">← Back</button></div>
+      <div class="settings-layout">
+        <nav class="card settings-nav" aria-label="Settings sections">
+          <button type="button" class="settings-nav-button active" data-settings-panel="profile">Profile</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="appearance">Board & pieces</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="audio">Sound</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="language">Language</button>
+        </nav>
+        <div class="settings-content">
+          <section class="card settings-panel" data-settings-content="profile">
+            <div class="card-heading"><span class="card-title">Player profile</span><span class="eyebrow">YOUR ACCOUNT ON THIS DEVICE</span></div>
+            <div class="profile-editor">
+              <div class="profile-editor-avatar" id="profileAvatarPreview" aria-label="Profile picture preview">♙</div>
+              <div class="profile-editor-fields">
+                <label class="field"><span class="field-label">Username</span><input id="profileName" type="text" maxlength="24" autocomplete="nickname" placeholder="Player"></label>
+                <label class="field"><span class="field-label">Profile picture</span><input id="profileImage" type="file" accept="image/png,image/jpeg,image/webp"></label>
+                <div class="settings-actions"><button class="primary-button" id="saveProfileButton" type="button">Save profile</button><button class="subtle-button" id="clearProfileImage" type="button">Remove picture</button></div>
+              </div>
+            </div>
+            <p class="note">Your profile is saved on this device and shown in local games. No account or image upload is required.</p>
+          </section>
+          <section class="card settings-panel" data-settings-content="appearance" hidden>
+            <div class="card-heading"><span class="card-title">Board & pieces</span><span class="eyebrow">LIVE PREVIEW</span></div>
+            <div class="theme-settings-grid">
+              <label class="field"><span class="field-label">Board theme</span><select id="boardThemeSelect"></select></label>
+              <label class="field"><span class="field-label">Piece style</span><select id="pieceThemeSelect"></select></label>
+            </div>
+            <div class="theme-preview-wrap"><div class="theme-preview-label">Preview</div><div class="theme-preview-board" id="themePreviewBoard" role="img" aria-label="Board and piece theme preview"></div></div>
+          </section>
+          <section class="card settings-panel" data-settings-content="audio" hidden>
+            <div class="card-heading"><span class="card-title">Sound & music</span><span class="eyebrow">FOUR INCLUDED TRACKS</span></div>
+            <div class="settings-audio-controls">
+              <button class="sound-toggle" id="musicToggle" type="button" aria-pressed="true">♫ Music on</button>
+              <label class="field"><span class="field-label">Starting track</span><select id="musicTrack" aria-label="Starting music track"><option value="electric-1">Electric Melody 1</option><option value="electric-2">Electric Melody 2</option><option value="warm-1">Warm Overdrive Sustain 1</option><option value="warm-2">Warm Overdrive Sustain 2</option></select></label>
+              <label class="field"><span class="field-label">Volume</span><span class="music-volume-control"><span aria-hidden="true">♫</span><input id="musicVolume" type="range" min="0" max="100" step="1" value="75" aria-label="Music volume"><output id="musicVolumeValue" for="musicVolume">75%</output></span></label>
+              <button class="sound-toggle" id="effectsToggle" type="button" aria-pressed="true">♬ Effects on</button>
+              <button class="sound-toggle" id="uiSoundsToggle" type="button" aria-pressed="true">♩ UI sounds on</button>
+            </div>
+            <p class="note">Music continues through the included tracks in order and loops back to the beginning.</p>
+          </section>
+          <section class="card settings-panel" data-settings-content="language" hidden>
+            <div class="card-heading"><span class="card-title">Language</span><span class="eyebrow">INTERFACE</span></div>
+            <label class="field"><span class="field-label" for="languageSelect">Display language</span><select id="languageSelect" aria-label="Display language"><option value="en">English</option><option value="fa">فارسی</option></select></label>
+          </section>
+        </div>
       </div>
     </section>
 
@@ -1572,9 +1685,11 @@
         <div class="player" id="bottomPlayer"></div>
         <section class="card" id="puzzleGameCard" hidden>
           <div class="card-heading"><span class="card-title" id="puzzleGameTitle">Chess puzzle</span><span class="eyebrow" id="puzzleGameRating"></span></div>
-          <p class="puzzle-copy" id="puzzleGameStatus"></p>
+          <div class="puzzle-game-meta"><span><strong id="puzzleGameStreak">0</strong><small>STREAK</small></span><span><strong id="puzzleGameTimer">0:00</strong><small>TIME</small></span><span><strong id="puzzleGameProgress">0 / 0</strong><small>COLLECTION</small></span></div>
+          <div class="puzzle-progress-track" role="progressbar" aria-label="Puzzle collection progress"><div class="puzzle-progress-fill" id="puzzleGameProgressFill"></div></div>
+          <p class="puzzle-copy" id="puzzleGameStatus">Find the best move for the side to move.</p>
           <p class="puzzle-status" id="puzzleGameFeedback" aria-live="polite"></p>
-          <div class="puzzle-actions"><button class="subtle-button" id="puzzleGameHint" type="button">Show hint</button><button class="subtle-button" id="puzzleGameNext" type="button">Next puzzle</button><button class="subtle-button" id="exitPuzzleButton" type="button">Exit puzzle</button></div>
+          <div class="puzzle-actions"><button class="subtle-button" id="puzzleGameBack" type="button" aria-label="Previous puzzle move">← Back</button><button class="subtle-button" id="puzzleGameForward" type="button" aria-label="Next puzzle move">Forward →</button><button class="subtle-button" id="puzzleGameHint" type="button">Show hint</button><button class="subtle-button" id="puzzleGameNext" type="button" disabled>Next puzzle</button><button class="subtle-button" id="exitPuzzleButton" type="button">Exit puzzle</button></div>
         </section>
       </section>
 
@@ -1656,6 +1771,7 @@
     </div>
   </main>
   <audio id="backgroundMusic" preload="none"></audio>
+  <div class="music-island" id="musicIsland" role="status" aria-live="polite" aria-hidden="true"><span class="music-island-dot"></span><span id="musicIslandName"></span></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="confirm-backdrop" id="exitMatchBackdrop" role="dialog" aria-modal="true" aria-labelledby="exitMatchTitle" hidden>
     <section class="confirm-dialog">
@@ -1694,10 +1810,34 @@
     (async () => {
       "use strict";
       const $ = (id) => document.getElementById(id);
+      const boardAssetThemes=["4fs27","6m5lc","8_bit","9rdwe","bases","bju81","blue","brown","bubblegum","burled_wood","checkers","dark_wood","dash","g715q","glass","graffiti","icy_sea","light","lolz","marble","metal","my2xa","neon","newspaper","ohdxn","orange","parchment","purple","red","sand","sky","stone","tan","tournament","translucent","walnut","z4m3d"];
+      const pieceAssetThemes=["3d_chesskid","3d_plastic","3d_staunton","3d_wood","8_bit","8qetl","alpha","bases","book","bubblegum","ca09k","cases","classic","club","condal","dash","ejgfv","game_room","glass","gothic","graffiti","icy_sea","light","lolz","luca","marble","maya","metal","modern","nature","neo_wood","neon","newspaper","ocean","sky","space","tigers","tournament","vintage","wood"];
+      const boardThemeValues=new Set(["sage","arctic","walnut",...boardAssetThemes.map(theme=>`chess-${theme}`)]);
+      const pieceThemeValues=new Set(["symbols","solid","outline",...pieceAssetThemes.map(theme=>`set-${theme}`)]);
+      function themeLabel(theme) {
+        return theme.replace(/_/g," ").replace(/\b[a-z]/g,letter=>letter.toUpperCase());
+      }
+      function addThemeOptions(select,options) {
+        select.replaceChildren(...options.map(([value,label])=>{
+          const option=document.createElement("option");
+          option.value=value;option.textContent=label;
+          return option;
+        }));
+      }
+      function populateThemeOptions() {
+        addThemeOptions($("boardThemeSelect"),[
+          ["sage","Sage"],["arctic","Arctic blue"],["walnut","Walnut (classic)"],
+          ...boardAssetThemes.map(theme=>[`chess-${theme}`,themeLabel(theme)])
+        ]);
+        addThemeOptions($("pieceThemeSelect"),[
+          ["symbols","Classic symbols"],["solid","Lichess classic"],["outline","Lichess outline"],
+          ...pieceAssetThemes.map(theme=>[`set-${theme}`,themeLabel(theme)])
+        ]);
+      }
       const faText = {
         "Nightfall Chess":"شطرنج شبانه","A quieter kind of competition":"رقابتی آرام و هوشمندانه",
         "Export PGN":"دریافت فایل PGN","First position":"نخستین وضعیت","Previous move":"حرکت پیشین","Next move":"حرکت بعدی","Final position":"وضعیت پایانی","Initial position":"وضعیت آغازین","Review position":"وضعیت مرور","King's Pawn Game":"بازی پیادهٔ شاه","King’s Pawn Game":"بازی پیادهٔ شاه",
-        "Stockfish is calculating a move…":"موتور Stockfish در حال محاسبهٔ حرکت است…","Stockfish is analyzing the moves…":"موتور Stockfish در حال تحلیل حرکت‌هاست…","Loading the full Stockfish engine (about 95 MB)…":"در حال بارگیری نسخهٔ کامل موتور Stockfish (حدود ۹۵ مگابایت)…",
+        "Stockfish is calculating a move…":"موتور Stockfish در حال محاسبهٔ حرکت است…","Stockfish is analyzing the moves…":"موتور Stockfish در حال تحلیل حرکت‌هاست…","Loading Stockfish Lite (about 1.8 MB)…":"در حال بارگیری نسخهٔ سبک Stockfish (حدود ۱٫۸ مگابایت)…",
         "Accuracy estimate based on Stockfish win-chance changes":"برآورد دقت بر پایهٔ تغییر شانس برد در ارزیابی Stockfish","Engine evaluation":"ارزیابی موتور","ECO":"رده‌بندی ECO",
         "♧ Online":"♧ آنلاین","PLAY TOGETHER":"باهم بازی کنید","Online with friends":"بازی آنلاین با دوستان",
         "Create a room and share its invite code, or enter a code your friend sent you.":"اتاقی بسازید و کد دعوتش را بفرستید یا کدی را که دوستتان فرستاده وارد کنید.",
@@ -1718,7 +1858,7 @@
         "Sharing is not supported here. The invite link was copied instead.":"اشتراک‌گذاری در اینجا پشتیبانی نمی‌شود؛ پیوند دعوت کپی شد.",
         "Could not share the invite:":"اشتراک دعوت انجام نشد:",
         "Allow takebacks":"اجازهٔ برگرداندن حرکت","Allow hints":"اجازهٔ راهنما","Allow move suggestions":"اجازهٔ پیشنهاد حرکت",
-        "3 minutes":"۳ دقیقه","Menu":"منو","Close menu":"بستن منو","Board":"صفحه","Pieces":"مهره‌ها","White pieces":"مهره‌های سفید","Black pieces":"مهره‌های سیاه","Reset colors":"بازنشانی رنگ‌ها","Piece colors":"رنگ مهره‌ها","Piece colors need the site to be opened from a web address.":"برای تغییر رنگ مهره‌ها، سایت را از طریق آدرس وب باز کنید.","Board and pieces":"صفحه و مهره‌ها","Hint":"راهنما","Suggest":"پیشنهاد","Exit match":"خروج از بازی","Exit puzzle":"خروج از معما","Cancel premove":"لغو پیش‌حرکت",
+        "3 minutes":"۳ دقیقه","Menu":"منو","Close menu":"بستن منو","Hint":"راهنما","Suggest":"پیشنهاد","Exit match":"خروج از بازی","Exit puzzle":"خروج از معما","Cancel premove":"لغو پیش‌حرکت",
         "Exit this match?":"از این بازی خارج می‌شوید؟",
         "Your current game will end. Your completed-game record will not change.":"بازی فعلی پایان می‌یابد و در آمار بازی‌های کامل‌شده تغییری ثبت نمی‌شود.",
         "Keep playing":"ادامهٔ بازی","Show a hint":"نمایش راهنما","Suggest a move":"پیشنهاد حرکت",
@@ -1733,7 +1873,17 @@
         "Puzzle rating adapts to your score and recent results.":"درجهٔ سختی معما با امتیاز و نتیجه‌های اخیر شما هماهنگ می‌شود.",
         "Your level is set. Solve a few easier positions first, then difficulty will follow your results.":"سطح شما ثبت شد. ابتدا چند موقعیت ساده‌تر را حل کنید؛ سپس سختی با نتیجه‌های شما هماهنگ می‌شود.",
         "Adaptive puzzle selection":"انتخاب هوشمند معما","Puzzle rating":"درجهٔ سختی معما",
-        "⚙ Settings":"⚙ تنظیمات","Language":"زبان","Play on the chessboard":"روی صفحهٔ شطرنج بازی کنید","Chess puzzle":"معمای شطرنج",
+        "⚙ Settings":"⚙ تنظیمات","Settings":"تنظیمات","PERSONALIZE YOUR GAME":"شخصی‌سازی بازی","Make the board, sound and profile feel like yours.":"صفحه، صدا و نمایه را مطابق سلیقهٔ خود تنظیم کنید.",
+        "Profile":"نمایه","Board & pieces":"صفحه و مهره‌ها","Sound":"صدا","Sound & music":"صدا و موسیقی","Language":"زبان","Display language":"زبان نمایش",
+        "Player profile":"نمایهٔ بازیکن","YOUR ACCOUNT ON THIS DEVICE":"حساب شما در این دستگاه","Username":"نام کاربری","Profile picture":"تصویر نمایه",
+        "Save profile":"ذخیرهٔ نمایه","Remove picture":"حذف تصویر","Your profile is saved on this device and shown in local games. No account or image upload is required.":"نمایه در این دستگاه ذخیره و در بازی‌های محلی نمایش داده می‌شود. حساب کاربری یا بارگذاری تصویر لازم نیست.",
+        "Board theme":"پوستهٔ صفحه","Piece style":"سبک مهره","LIVE PREVIEW":"پیش‌نمایش زنده","Preview":"پیش‌نمایش","Sage":"سبز ملایم","Arctic blue":"آبی یخی","Walnut":"گردویی",
+        "Classic symbols":"نمادهای کلاسیک","Lichess classic":"کلاسیک لیچس","Lichess outline":"خطی لیچس","FOUR INCLUDED TRACKS":"چهار قطعهٔ موجود",
+        "Starting track":"قطعهٔ آغازین","Volume":"بلندی صدا","Music continues through the included tracks in order and loops back to the beginning.":"موسیقی قطعه‌های موجود را به‌ترتیب پخش می‌کند و پس از پایان دوباره از ابتدا آغاز می‌شود.",
+        "Play":"بازی","Puzzles":"معماها","Progress":"پیشرفت","← Back":"← بازگشت","← Back to menu":"← بازگشت به فهرست",
+        "Solve puzzle":"حل معما","Rating":"درجه","STREAK":"رشته","TIME":"زمان","COLLECTION":"مجموعه","Forward →":"جلو →","Retry loading":"تلاش دوباره برای بارگیری",
+        "Loading the Lichess puzzle collection…":"در حال بارگیری مجموعهٔ معماهای لیچس…","Lichess puzzle dataset could not be loaded:":"مجموعهٔ معماهای لیچس بارگیری نشد:",
+        "Play on the chessboard":"روی صفحهٔ شطرنج بازی کنید","Chess puzzle":"معمای شطرنج",
         "Show hint":"نمایش راهنما","Next puzzle":"معمای بعدی","Exit puzzle":"خروج از معما","Real rated positions from the ":"مواضع واقعی رتبه‌بندی‌شده از "," (CC0).":" (CC0).",
         "♟ Training":"♟ آموزش","Aa Fonts":"Aa قلم‌ها","Fonts":"قلم‌ها","Choose a typeface for each language. Your choices are saved on this device.":"برای هر زبان یک قلم انتخاب کنید؛ انتخاب شما در همین دستگاه ذخیره می‌شود.",
         "English typeface":"قلم انگلیسی","Persian typeface":"قلم فارسی","Close fonts":"بستن پنجرهٔ قلم‌ها","Typeface preview":"پیش‌نمایش قلم",
@@ -1904,70 +2054,18 @@
         if(persist)try{localStorage.setItem("nightfall-chess-language-v1",isPersian?"fa":"en");}
         catch(error){showToast(`Language preference could not be saved: ${error.message}`);}
         localizeTree(document.body,true);
-        if(typeof renderThemePicker==="function"&&$("boardThemeOptions"))renderThemePicker();
         render();renderPuzzle();renderProfileStats();renderLesson();renderQuickReviews();
         if($("analysisBackdrop").classList.contains("open"))renderAnalysisPosition();
         if($("puzzleGameCard")&&!$("puzzleGameCard").hidden&&currentPuzzle) {
           $("puzzleGameTitle").textContent=puzzleTitle(currentPuzzle);
-          $("puzzleGameStatus").textContent=isPersian?`معمای ${currentPuzzle.id} · ${puzzleColor==="w"?"سفید":"سیاه"} حرکت می‌کند`:`Puzzle ${currentPuzzle.id} · ${puzzleColor==="w"?"White":"Black"} to move`;
+          $("puzzleGameStatus").textContent=isPersian?`معمای ${currentPuzzleIndex+1} از ${puzzleTotal} · با حرکت اجباری شروع کنید.`:`Puzzle ${currentPuzzleIndex+1} of ${puzzleTotal} · Find the forcing continuation.`;
+          $("puzzleGameRating").textContent=isPersian?`درجهٔ سختی ${String(currentPuzzle.rating).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])}`:`Rating ${currentPuzzle.rating}`;
+          updatePuzzleGameProgress();
           if(!puzzleSolved)$("puzzleGameFeedback").textContent="";
         }
         if($("analysisBackdrop").classList.contains("open")&&engineAnalysisGrades.length)renderGameAnalysis(engineAnalysisGrades,engineAnalysisResult);
       }
-      const baseSymbols = { K: "♔", Q: "♕", R: "♖", B: "♗", N: "♘", P: "♙", k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
-      const boardThemes=[
-        {id:"nightfall",en:"Nightfall",fa:"نایت‌فال",light:"#d9dece",dark:"#71806d"},
-        {id:"green",en:"Green",fa:"سبز",light:"#eeeed2",dark:"#769656"},
-        {id:"brown",en:"Brown",fa:"قهوه‌ای",light:"#f0d9b5",dark:"#b58863"},
-        {id:"blue",en:"Blue",fa:"آبی",light:"#dee3e6",dark:"#8ca2ad"},
-        {id:"icy",en:"Icy Sea",fa:"دریای یخی",light:"#d9e6ee",dark:"#6f97b0"},
-        {id:"walnut",en:"Walnut",fa:"گردو",light:"#e8cfa4",dark:"#8a5a34"},
-        {id:"tournament",en:"Tournament",fa:"تورنمنت",light:"#e8ead6",dark:"#3d7a56"},
-        {id:"marble",en:"Marble",fa:"مرمر",light:"#e7e4de",dark:"#8f98a3"},
-        {id:"sand",en:"Sand",fa:"ماسه",light:"#f1e5c8",dark:"#c8a96b"},
-        {id:"purple",en:"Purple",fa:"بنفش",light:"#e6dcef",dark:"#8d6fb0"},
-        {id:"bubblegum",en:"Bubblegum",fa:"آدامسی",light:"#f8e3ea",dark:"#e08fab"},
-        {id:"olive",en:"Olive",fa:"زیتونی",light:"#e4e4c4",dark:"#7d8040"},
-        {id:"metal",en:"Metal",fa:"فلزی",light:"#d0d5da",dark:"#7d8791"},
-        {id:"coral",en:"Coral",fa:"مرجانی",light:"#f6e2d6",dark:"#d27c66"},
-        {id:"midnight",en:"Midnight",fa:"نیمه‌شب",light:"#9aa5ba",dark:"#39435a"},
-        {id:"ocean",en:"Ocean",fa:"اقیانوس",light:"#cfe8ea",dark:"#2f7f8c"},
-        {id:"newspaper",en:"Newspaper",fa:"روزنامه",light:"#f2f2f0",dark:"#a3a9ad"}
-      ];
-      const pieceThemes=[
-        {id:"classic",en:"Classic",fa:"کلاسیک",filled:true},
-        {id:"ivory",en:"Ivory & Ebony",fa:"عاج و آبنوس",filled:true},
-        {id:"gold",en:"Gold & Silver",fa:"طلا و نقره",filled:true},
-        {id:"flat",en:"Flat",fa:"ساده",filled:true},
-        {id:"wood",en:"Wooden",fa:"چوبی",filled:true},
-        {id:"glass",en:"Glass",fa:"شیشه‌ای",filled:true},
-        {id:"neon",en:"Neon",fa:"نئون",filled:true},
-        {id:"royal",en:"Royal",fa:"سلطنتی",filled:true},
-        {id:"alpha",en:"Alpha",fa:"آلفا",filled:false,svg:true},
-        {id:"california",en:"California",fa:"کالیفرنیا",filled:false,svg:true},
-        {id:"cardinal",en:"Cardinal",fa:"کاردینال",filled:false,svg:true},
-        {id:"cburnett",en:"Cburnett",fa:"سی‌برنت",filled:false,svg:true},
-        {id:"dubrovny",en:"Dubrovny",fa:"دوبرووِنی",filled:false,svg:true},
-        {id:"gioco",en:"Gioco",fa:"جوکو",filled:false,svg:true},
-        {id:"governor",en:"Governor",fa:"فرماندار",filled:false,svg:true},
-        {id:"icpieces",en:"IC Pieces",fa:"آی‌سی",filled:false,svg:true},
-        {id:"maestro",en:"Maestro",fa:"مایسترو",filled:false,svg:true},
-        {id:"merida",en:"Merida",fa:"مریدا",filled:false,svg:true},
-        {id:"staunty",en:"Staunty",fa:"استانتی",filled:false,svg:true},
-        {id:"tatiana",en:"Tatiana",fa:"تاتیانا",filled:false,svg:true}
-      ];
-      const pieceColors={w:"",b:""},validColor=value=>typeof value==="string"&&/^#[0-9a-f]{6}$/i.test(value);
-      const themeStorageKey="nightfall-chess-look-v1";
-      let boardThemeId="nightfall",pieceThemeId="classic",pieceFilled=false;
-      try{
-        const savedLook=JSON.parse(localStorage.getItem(themeStorageKey)||"{}");
-        if(boardThemes.some(item=>item.id===savedLook.board))boardThemeId=savedLook.board;
-        if(pieceThemes.some(item=>item.id===savedLook.pieces))pieceThemeId=savedLook.pieces;
-        if(savedLook.colors&&validColor(savedLook.colors.w))pieceColors.w=savedLook.colors.w;
-        if(savedLook.colors&&validColor(savedLook.colors.b))pieceColors.b=savedLook.colors.b;
-      }catch(error){}
-      pieceFilled=pieceThemes.find(item=>item.id===pieceThemeId).filled;
-      const symbols = new Proxy(baseSymbols,{get:(table,key)=>pieceFilled&&typeof key==="string"&&key.length===1&&table[key.toLowerCase()]?table[key.toLowerCase()]:table[key]});
+      const symbols = { K: "♔", Q: "♕", R: "♖", B: "♗", N: "♘", P: "♙", k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
       const initialBoard = () => [
         ["r","n","b","q","k","b","n","r"], Array(8).fill("p"), ...Array.from({ length: 4 }, () => Array(8).fill(null)),
         Array(8).fill("P"), ["R","N","B","Q","K","B","N","R"]
@@ -1998,7 +2096,7 @@
         "sicilian":"سیسیلی","french":"فرانسوی","dutch":"هلندی","english":"انگلیسی","italian":"ایتالیایی","spanish":"اسپانیایی",
         "scandinavian":"اسکاندیناوی","caro-kann":"کارو-کان","ruy":"روی","lopez":"لوپز","reti":"رتی","réti":"رتی",
         "king's":"شاه","queen's":"وزیر","kings":"شاه","queens":"وزیر","indian":"هندی","london":"لندن","slav":"اسلاو",
-        "nimzo":"نیمزو","grünfeld":"گرونفلد","grunfeld":"گرونفلد","benoni":"بنونی","benko":"بنکو","budapest":"بوداپست",
+        "nimzo":"نیمزو","grünfeld":"گرونفلد","grunfeld":"گرونفلد","benoni":"بنونى","benko":"بنکو","budapest":"بوداپست",
         "evans":"اوانس","scotch":"اسکاتلندی","philidor":"فیلیدور","alekhine":"آلخین","najdorf":"نایدورف","petrov":"پتروف",
         "pirc":"پیرک","trompowsky":"ترومپوفسکی","catalan":"کاتالان","tarrasch":"تاراش","vienna":"وین","four":"چهار",
         "knights":"اسب‌ها","bishop":"فیل","bishops":"فیل‌ها","pawn":"پیاده","pawns":"پیاده‌ها","two":"دو","three":"سه",
@@ -2056,6 +2154,27 @@
         openingIdentity=null;
         recognizeOpening();
       }
+      const recentAiOpeningMoves=[];
+      function loadAiOpeningHistory() {
+        try {
+          const saved=localStorage.getItem("nightfall-chess-ai-openings-v1");
+          if(saved===null)return;
+          const moves=JSON.parse(saved);
+          if(!Array.isArray(moves)||moves.length>8||moves.some(move=>typeof move!=="string"||!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(move))) {
+            throw new Error("Saved AI opening history is invalid.");
+          }
+          recentAiOpeningMoves.push(...moves);
+        } catch(error) {
+          recentAiOpeningMoves.length=0;
+          showToast(`AI opening history could not be loaded: ${error.message}`);
+        }
+      }
+      function rememberAiOpeningMove(move) {
+        recentAiOpeningMoves.push(move);
+        if(recentAiOpeningMoves.length>8)recentAiOpeningMoves.shift();
+        try { localStorage.setItem("nightfall-chess-ai-openings-v1",JSON.stringify(recentAiOpeningMoves)); }
+        catch(error) { showToast(`AI opening history could not be saved: ${error.message}`); }
+      }
       function ecoOpeningBookMove(position,rating,style) {
         const maxPlies=rating<700?4:rating<1000?6:rating<1400?8:12;
         if(history.length>=maxPlies||!openingDatabaseByPosition.size)return null;
@@ -2068,9 +2187,26 @@
         const legal=legalMoves(position).flatMap(move=>move.promotion?["q","r","b","n"].map(promoteTo=>({...move,promoteTo})):[move]);
         const ranked=[...candidates].filter(([uci])=>legal.some(move=>moveToUci(move)===uci)).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
         if(!ranked.length)return null;
-        const styleOffset={balanced:0,aggressive:1,positional:2,defensive:3}[style]||0;
-        const selection=Math.min(ranked.length-1,styleOffset%Math.min(ranked.length,3));
-        return uciMove(position,ranked[selection][0]);
+        const openingPly=position.turn==="w"?0:1;
+        const recent=history.length<=openingPly+1?ranked.filter(([uci])=>recentAiOpeningMoves.includes(uci)):[];
+        const choices=recent.length<ranked.length?ranked.filter(([uci])=>!recentAiOpeningMoves.includes(uci)):ranked;
+        const weighted=choices.map(([uci,count])=>{
+          const move=uciMove(position,uci),piece=position.board[move.from[0]][move.from[1]]?.toLowerCase();
+          const central=["c4","d4","e4","f4"].includes(uci.slice(2,4));
+          const styleWeight=style==="aggressive"&&piece==="p"&&central?1.35
+            :style==="positional"&&central?1.2
+              :style==="defensive"&&["n","b"].includes(piece)?1.2:1;
+          return {uci,weight:Math.max(1,count)*styleWeight};
+        });
+        let selection=Math.random()*weighted.reduce((sum,candidate)=>sum+candidate.weight,0),chosen=weighted.at(-1).uci;
+        for(const candidate of weighted) {
+          selection-=candidate.weight;
+          if(selection<=0){chosen=candidate.uci;break;}
+        }
+        if(history.length<=openingPly+1) {
+          rememberAiOpeningMove(chosen);
+        }
+        return uciMove(position,chosen);
       }
       function stockfishAbortError() {
         return new DOMException("Stockfish search cancelled.", "AbortError");
@@ -2103,7 +2239,7 @@
       }
       function ensureStockfish() {
         if(stockfishReadyPromise)return stockfishReadyPromise;
-        if(matchActive&&aiThinking)$("statusText").textContent=isPersian?"در حال بارگیری موتور Stockfish…":"Loading the Stockfish engine…";
+        if(matchActive&&aiThinking)$("statusText").textContent=isPersian?"در حال بارگیری نسخهٔ سبک Stockfish (حدود ۱٫۸ مگابایت)…":"Loading Stockfish Lite (about 1.8 MB)…";
         stockfishReadyPromise=new Promise((resolve,reject)=>{
           stockfishReadyResolve=resolve;stockfishReadyReject=reject;
           try {
@@ -2156,9 +2292,9 @@
               error.code="ENGINE_WORKER_FAILED";failStockfishWorker(error);
             };
             stockfishReadyTimer=setTimeout(()=>{
-              const error=new Error("Stockfish did not finish loading within 30 seconds.");
+              const error=new Error("Stockfish did not finish loading within 3 minutes.");
               error.code="ENGINE_LOAD_TIMEOUT";failStockfishWorker(error);
-            },30000);
+            },180000);
             stockfishWorker.postMessage("uci");
           } catch(error) {
             error.code="ENGINE_WORKER_FAILED";failStockfishWorker(error);
@@ -2240,9 +2376,8 @@
       let mode = "ai", humanColor = "w", aiThinking = false, gameOver = false;
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
       const stockfishSearchCache=new Map();
-      window.addEventListener("load",()=>{setTimeout(()=>{ensureStockfish().catch(error=>console.warn("Stockfish preload failed; it will be retried when needed.",error));},200);});
       let clocks = { w: 0, b: 0 }, clockOn = false, clockStamp = Date.now(), toastTimer;
-      let aiTimer = null, analysisShown = false, resultRecorded = false, lastGameResult = "", audioContext = null, audioResumePromise = null, effectsBus = null, uiBus = null, musicVolume = .75, musicStyle = "electric-1", musicEnabled = true, effectsEnabled = true, uiSoundsEnabled = true, musicHasStarted = false, musicRequest = 0;
+      let aiTimer = null, analysisShown = false, resultRecorded = false, lastGameResult = "", audioContext = null, audioResumePromise = null, effectsBus = null, uiBus = null, musicVolume = .75, musicStyle = "electric-1", musicEnabled = true, effectsEnabled = true, uiSoundsEnabled = true, musicHasStarted = false, musicRequest = 0,musicIslandTimer=null;
       let matchActive = false, boardAnimating = false, trainingReturn = "lobby", currentLesson = 0, quizAnswered = false, gameStartedAt=new Date();
       const gameplaySettings={takebacks:true,hints:true,suggestions:true};
       let aiRequestVersion=0,assistanceGeneration=0,moveSuggestion=null,roomInviteCode="",aiSearchController=null;
@@ -2379,36 +2514,55 @@
       ];
       const emptyProfileStats = () => ({
         games:0,wins:0,draws:0,losses:0,bestWinStreak:0,winStreak:0,rating:400,skillAnswered:false,
-        dailyStreak:0,bestDailyStreak:0,dailyDate:"",dailyGames:0,dailyPuzzles:0,lastStreakDate:"",puzzlesSolved:0
+        dailyStreak:0,bestDailyStreak:0,dailyDate:"",dailyGames:0,dailyPuzzles:0,lastStreakDate:"",
+        puzzlesSolved:0,puzzleStreak:0,bestPuzzleStreak:0
       });
       let profileStats=emptyProfileStats();
-      const completedPuzzles=new Set();
-      let currentPuzzle=null,puzzleState=null,puzzleSelected=null,puzzleTargets=[],puzzleHintText="",puzzleMode=false,puzzleSolved=false,puzzleCursor=0,puzzleColor="w",puzzleReturnMode="ai",puzzleReplyTimer=null,puzzleWrongAttempts=0;
-      let puzzleDatabase=[
-        {id:"KOryu",rating:1439,fen:"r3k2r/ppq2ppp/4pn2/n2pN3/1b1P4/2N5/PPQ2PPP/R1B1R1K1 w kq - 1 1",moves:["c2a4","a5c6","e5c6","c7c6","a4b4"],themes:["middlegame","fork","capturingDefender"]},
-        {id:"XtdzJ",rating:1421,fen:"5rk1/1pp3p1/5qrp/p7/8/P2P1R1P/1PP2PP1/R2Q2K1 b - - 1 1",moves:["f6f3","d1f3","f8f3"],themes:["pin","crushing","endgame"]},
-        {id:"7gcBt",rating:1489,fen:"3r2k1/5p1r/4bQ1p/5N1P/p3q3/P7/BPP2P2/1K6 w - - 0 1",moves:["f6d8"],themes:["mateIn1","middlegame"]},
-        {id:"DaTSh",rating:1440,fen:"4r3/p1pn4/3k2bp/P1NP4/2P3P1/1P5P/6K1/4R3 w - - 1 1",moves:["c5b7"],themes:["mateIn1","endgame"]},
-        {id:"iL1qy",rating:1618,fen:"r6r/1N1bkpqp/p3p3/8/3p4/P2Q4/1PP2PPP/R4RK1 b - - 0 1",moves:["d7c6","g2g3","c6b7"],themes:["advantage","middlegame"]},
-        {id:"aSF2u",rating:1298,fen:"1k1n1r2/1p1qb2p/1P2p3/2PpP3/1N1P4/8/3B2rP/Q6K w - - 1 1",moves:["a1a7","b8c8","a7a8"],themes:["mateIn2","queensideAttack"]},
-        {id:"P64WL",rating:1300,fen:"8/8/3R4/p7/1p1p2k1/1P2r3/P2K4/8 w - - 0 1",moves:["d6d4","g4f3","d4d3","e3d3","d2d3"],themes:["endgame","rookEndgame"]},
-        {id:"pnNfB",rating:2094,fen:"r1bqk2r/1p1n1pb1/4p1p1/1P1pP2p/pB1P1PQP/3B1N2/1P4P1/3K3R w kq - 0 1",moves:["g4e6","f7e6","d3g6"],themes:["mateIn2","sacrifice","middlegame"]}
-      ].map(puzzle=>({...puzzle,color:puzzle.fen.split(" ")[1],reward:Math.max(8,Math.round(puzzle.rating/150))}));
-      async function loadPuzzleCollection() {
-        const response=await fetch(new URL("./puzzles.json",document.baseURI));
-        if(!response.ok)throw new Error(`Puzzle collection request failed (${response.status}).`);
-        const entries=await response.json();
-        if(!Array.isArray(entries))throw new Error("Puzzle collection must be a list.");
-        const ids=new Set(puzzleDatabase.map(puzzle=>puzzle.id));
-        const additions=entries.map(entry=>{
-          if(!entry||typeof entry.id!=="string"||!Number.isFinite(entry.rating)||typeof entry.fen!=="string"||!Array.isArray(entry.moves)||!entry.moves.length||!Array.isArray(entry.themes)) {
-            throw new Error("Puzzle collection contains an invalid record.");
+      let playerProfile={username:"Player",avatarData:""},pendingProfileAvatar=null;
+      let boardTheme="sage",pieceTheme="symbols",settingsReturnScreen="lobby",settingsPausedMatch=false;
+      let currentPuzzle=null,puzzleState=null,puzzleSelected=null,puzzleTargets=[],puzzleHintText="",puzzleHintSquare=null,puzzleMode=false,puzzleSolved=false,puzzleCursor=0,puzzleColor="w",puzzleReturnMode="ai",puzzleReplyTimer=null,puzzleWrongAttempts=0;
+      let puzzleTotal=0,puzzleNextIndex=0,currentPuzzleIndex=-1,puzzleSolvedCount=0,puzzlePageCache=[],puzzlePageStart=-1,puzzleTimerStarted=0,puzzleTimerInterval=null,puzzleLoading=false,puzzleLoadError="",puzzleDatasetReady=false,puzzleStatusPromise=null;
+      function puzzleApiUrl(path) {
+        const configured=new URLSearchParams(location.search).get("apiBase");
+        const isLoopback=["localhost","127.0.0.1"].includes(location.hostname);
+        const base=configured
+          ?new URL(configured,document.baseURI)
+          :isLoopback&&location.port!=="4173"
+            ?new URL(`${location.protocol}//${location.hostname}:4173/`)
+            :new URL(document.baseURI);
+        if(!["http:","https:"].includes(base.protocol))throw new Error("The puzzle API must use HTTP or HTTPS.");
+        return new URL(path,base);
+      }
+      async function requestPuzzleApi(path) {
+        let response;
+        try {
+          response=await fetch(puzzleApiUrl(path));
+        } catch(error) {
+          if(error instanceof TypeError) {
+            throw new Error("Cannot reach the puzzle data service. Run `npm start` in the project folder; with Live Server, keep that local API server running too.");
           }
-          if(ids.has(entry.id))throw new Error(`Puzzle collection repeats an existing ID: ${entry.id}`);
-          ids.add(entry.id);
-          return {...entry,color:entry.fen.split(/\s+/)[1],reward:Math.max(8,Math.round(entry.rating/150))};
-        });
-        puzzleDatabase.push(...additions);
+          throw error;
+        }
+        let payload=null;
+        try { payload=await response.json(); }
+        catch(error) {
+          if(response.ok)throw new Error(`The puzzle data service returned invalid JSON: ${error.message}`);
+        }
+        if(!response.ok)throw new Error(payload?.error||`Puzzle data request failed (HTTP ${response.status}).`);
+        return payload;
+      }
+      function loadPuzzleCollection() {
+        if(puzzleDatasetReady)return Promise.resolve();
+        if(puzzleStatusPromise)return puzzleStatusPromise;
+        puzzleStatusPromise=(async()=>{
+          const status=await requestPuzzleApi("api/puzzles/status");
+          if(!Number.isSafeInteger(status.total)||status.total<0)throw new Error("The puzzle dataset returned an invalid puzzle count.");
+          puzzleTotal=status.total;puzzleDatasetReady=true;puzzleLoadError="";
+          loadPuzzleProgress();
+          if(profileStats.skillAnswered)await nextPuzzle();
+          else renderPuzzle();
+        })().finally(()=>{puzzleStatusPromise=null;});
+        return puzzleStatusPromise;
       }
       const puzzleThemeNames={
         mateIn1:["Mate in one","مات در یک حرکت"],mateIn2:["Mate in two","مات در دو حرکت"],fork:["Fork","چنگال"],
@@ -2422,7 +2576,7 @@
       }
       function puzzleCopy(puzzle,key) {
         const phrases={
-          hint:["Find the forcing move. Check captures, checks and threats before deciding.","حرکت اجباری را پیدا کنید. پیش از تصمیم، کیش‌ها، گرفتن‌ها و تهدیدها را بررسی کنید."],
+          hint:["Look for a forcing move: checks, captures, and direct threats.","حرکت اجباری را پیدا کنید: کیش‌ها، گرفتن‌ها و تهدیدهای مستقیم را بررسی کنید."],
           why:["The main line follows the recorded solution from the original Lichess puzzle.","ادامهٔ اصلی، خط ثبت‌شدهٔ معمای اصلی لیچس را دنبال می‌کند."]
         };
         return phrases[key]?.[isPersian?1:0]||"";
@@ -2544,8 +2698,7 @@
           square.className=`quick-square ${(row+col)%2?"dark":"light"}`;
           square.setAttribute("role","gridcell");
           square.setAttribute("aria-label",`${"abcdefgh"[col]}${8-row}${piece?`, ${colorOf(piece)==="w"?"White":"Black"} ${pieceName(piece)}`:""}`);
-          square.textContent=piece?symbols[piece]:"";
-          if(piece)square.classList.add(colorOf(piece)==="w"?"white-piece":"black-piece");
+          if(piece)appendPiece(square,piece,"quick-piece");
           if(lastMove&&(same(lastMove.from,[row,col])||same(lastMove.to,[row,col])))square.classList.add("last-step");
           board.append(square);
         }
@@ -3199,7 +3352,8 @@
       }
       function saveMove(m) {
         if(puzzleMode) {
-          const expected=puzzleMove(currentPuzzle.moves[puzzleCursor]);
+          if(puzzleSolved)return false;
+          const expected=puzzleMove(currentPuzzle.solutionMoves[puzzleCursor]);
           if(!same(m.from,expected.from)||!same(m.to,expected.to)||(expected.promoteTo&&m.promoteTo!==expected.promoteTo)) {
             selected=null;legalTargets=[];renderBoard();
             puzzleWrongAttempts++;
@@ -3210,46 +3364,53 @@
           }
         }
         moveSuggestion=null;assistanceGeneration++;$("boardHelp").textContent="";
+        if(puzzleMode){puzzleHintSquare=null;puzzleHintText="";}
         const before=copyState(state), after=applyMove(state,m), san=notation(m,before,after);
         history.push({before,after:copyState(after),move:m,san}); redoStack=[]; state=after; selected=null; legalTargets=[];
         recognizeOpening();
         reviewPreviewIndex=null;
         const check=inCheck(after,after.turn),checkmate=check&&!legalMoves(after).length;
         playMoveSound(!!before.board[m.to[0]][m.to[1]]||m.enPassant,check,checkmate);
-        render(); animateMove(m,before);
+        render();
         if(puzzleMode) {
           puzzleCursor++;
           $("puzzleGameFeedback").textContent="";
           $("statusText").textContent=isPersian?`${state.turn==="w"?"نوبت سفید":"نوبت سیاه"}`:`${state.turn==="w"?"White":"Black"} to move`;
-          if(puzzleCursor>=currentPuzzle.moves.length)completePuzzle();
-          else schedulePuzzleReply();
+          if(puzzleCursor>=currentPuzzle.solutionMoves.length)completePuzzle();
+          animateMove(m,before);
           return true;
         }
+        animateMove(m,before);
         evaluateEnd();
         if(!tryExecutePremove()&&mode==="ai"&&!gameOver&&state.turn!==humanColor) scheduleAI();
         return true;
       }
       function completePuzzle() {
         if(puzzleSolved)return;
-        puzzleSolved=true;puzzleMode=false;
-        completedPuzzles.add(currentPuzzle.id);
-        try{localStorage.setItem("nightfall-chess-puzzles-v1",JSON.stringify([...completedPuzzles]));}
-        catch(error){showToast(`Solved puzzles could not be saved: ${error.message}`);}
+        puzzleSolved=true;
+        puzzleNextIndex=Math.max(puzzleNextIndex,currentPuzzleIndex+1);
+        puzzleSolvedCount++;
+        profileStats.puzzleStreak=puzzleWrongAttempts?0:profileStats.puzzleStreak+1;
+        profileStats.bestPuzzleStreak=Math.max(profileStats.bestPuzzleStreak,profileStats.puzzleStreak);
+        profileStats.puzzlesSolved=puzzleSolvedCount;
+        savePuzzleProgress();
+        saveProfile();
+        clearInterval(puzzleTimerInterval);puzzleTimerInterval=null;updatePuzzleTimer();
         const earned=changeScore(Math.max(4,currentPuzzle.reward-puzzleWrongAttempts*3));
-        profileStats.puzzlesSolved=completedPuzzles.size;markDailyActivity("puzzle");
+        markDailyActivity("puzzle");
         const amount=isPersian?String(earned).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):earned;
         $("puzzleGameFeedback").className="puzzle-status success";
         $("puzzleGameFeedback").textContent=isPersian?`درست است! ${puzzleCopy(currentPuzzle,"why")} · ${amount}+ امتیاز`:`Solved! ${puzzleCopy(currentPuzzle,"why")} · +${amount} points`;
         $("puzzleGameNext").disabled=false;
         $("puzzlePlayButton").disabled=true;
         $("statusText").textContent=isPersian?"معما حل شد":"Puzzle solved";
-        renderPuzzle();
+        renderPuzzle();render();
       }
       function schedulePuzzleReply() {
-        if(!puzzleMode||!currentPuzzle||state.turn===puzzleColor||puzzleCursor>=currentPuzzle.moves.length)return;
+        if(!puzzleMode||puzzleSolved||!currentPuzzle||state.turn===puzzleColor||puzzleCursor>=currentPuzzle.solutionMoves.length)return;
         if(boardAnimating)return;
         clearTimeout(puzzleReplyTimer);
-        const expected=puzzleMove(currentPuzzle.moves[puzzleCursor]);
+        const expected=puzzleMove(currentPuzzle.solutionMoves[puzzleCursor]);
         const move=legalMoves(state).flatMap(candidate=>candidate.promotion?["q","r","b","n"].map(promoteTo=>({...candidate,promoteTo})):[candidate])
           .find(candidate=>same(candidate.from,expected.from)&&same(candidate.to,expected.to)&&(!expected.promoteTo||candidate.promoteTo===expected.promoteTo));
         if(!move)throw new Error(`Puzzle ${currentPuzzle.id} opponent response is illegal at ply ${puzzleCursor+1}.`);
@@ -3312,65 +3473,148 @@
         return position;
       }
       function puzzleStartPosition(puzzle) {
-        return puzzlePosition(puzzle);
+        const position=puzzlePosition(puzzle),setupMove=legalPuzzleMove(position,puzzle.moves[0]);
+        if(!setupMove)throw new Error(`Puzzle ${puzzle.id} has an illegal setup move.`);
+        return applyMove(position,setupMove);
       }
-      function validatePuzzleSet() {
-        const ids=new Set();
-        for(const puzzle of puzzleDatabase) {
-          if(!puzzle.id||ids.has(puzzle.id))throw new Error(`Puzzle IDs must be unique: ${puzzle.id}`);
-          ids.add(puzzle.id);
-          if(!Number.isFinite(puzzle.rating)||!Number.isFinite(puzzle.reward)||!puzzle.moves.length)throw new Error(`Puzzle ${puzzle.id} has invalid metadata.`);
-          let position=puzzlePosition(puzzle);
-          for(const uci of puzzle.moves) {
-            const requested=puzzleMove(uci);
-            const move=legalMoves(position).flatMap(candidate=>candidate.promotion?["q","r","b","n"].map(promoteTo=>({...candidate,promoteTo})):[candidate])
-              .find(candidate=>same(candidate.from,requested.from)&&same(candidate.to,requested.to)&&(!requested.promoteTo||candidate.promoteTo===requested.promoteTo));
-            if(!move)throw new Error(`Puzzle ${puzzle.id} contains an illegal solution move: ${uci}`);
-            position=applyMove(position,move);
-          }
+      function legalPuzzleMove(position,uci) {
+        const requested=puzzleMove(uci);
+        return legalMoves(position).flatMap(candidate=>candidate.promotion?["q","r","b","n"].map(promoteTo=>({...candidate,promoteTo})):[candidate])
+          .find(candidate=>same(candidate.from,requested.from)&&same(candidate.to,requested.to)&&(!requested.promoteTo||candidate.promoteTo===requested.promoteTo))||null;
+      }
+      function validatePuzzle(puzzle) {
+        if(!puzzle||typeof puzzle.id!=="string"||!Number.isFinite(puzzle.rating)||!Array.isArray(puzzle.moves)||puzzle.moves.length<2||!Array.isArray(puzzle.themes)) {
+          throw new Error("Puzzle metadata is incomplete.");
         }
+        let position=puzzlePosition(puzzle);
+        for(const uci of puzzle.moves) {
+          const move=legalPuzzleMove(position,uci);
+          if(!move)throw new Error(`Puzzle ${puzzle.id} has an illegal move: ${uci}`);
+          position=applyMove(position,move);
+        }
+        puzzle.solutionMoves=puzzle.moves.slice(1);
+        puzzle.reward=Math.max(8,Math.round(puzzle.rating/150));
       }
       function puzzleMove(uci) {
         if(!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(uci))throw new Error(`Invalid puzzle UCI move: ${uci}`);
         const square=value=>[8-Number(value[1]),"abcdefgh".indexOf(value[0])];
         return {from:square(uci.slice(0,2)),to:square(uci.slice(2,4)),promoteTo:uci[4]};
       }
-      function availablePuzzles() {
-        const rating=Math.max(400,Math.min(2400,profileStats.rating));
-        const remaining=puzzleDatabase.filter(puzzle=>!completedPuzzles.has(puzzle.id));
-        const adapted=remaining.filter(puzzle=>puzzle.rating>=Math.max(400,rating-220)&&puzzle.rating<=rating+260);
-        return (adapted.length?adapted:remaining).sort((a,b)=>Math.abs(a.rating-rating)-Math.abs(b.rating-rating));
+      function savePuzzleProgress() {
+        try {
+          localStorage.setItem("nightfall-chess-puzzles-v2",JSON.stringify({nextIndex:puzzleNextIndex,solvedCount:puzzleSolvedCount}));
+        } catch(error) {
+          showToast(`Puzzle progress could not be saved: ${error.message}`);
+        }
       }
-      function nextPuzzle() {
-        if(!profileStats.skillAnswered)return;
-        const available=availablePuzzles(),puzzle=available.find(item=>!completedPuzzles.has(item.id));
-        currentPuzzle=puzzle||null;puzzleSelected=null;puzzleTargets=[];puzzleHintText="";puzzleSolved=false;puzzleCursor=0;puzzleWrongAttempts=0;puzzleState=puzzle?puzzlePosition(puzzle):null;
+      function loadPuzzleProgress() {
+        try {
+          const saved=localStorage.getItem("nightfall-chess-puzzles-v2");
+          if(saved!==null) {
+            const progress=JSON.parse(saved);
+            if(!Number.isSafeInteger(progress.nextIndex)||progress.nextIndex<0||progress.nextIndex>puzzleTotal
+              ||!Number.isSafeInteger(progress.solvedCount)||progress.solvedCount<0||progress.solvedCount>progress.nextIndex) {
+              throw new Error("Saved puzzle progress is invalid.");
+            }
+            puzzleNextIndex=progress.nextIndex;puzzleSolvedCount=progress.solvedCount;
+          }
+        } catch(error) {
+          puzzleNextIndex=0;puzzleSolvedCount=0;
+          showToast(`Puzzle progress could not be loaded: ${error.message}`);
+        }
+        profileStats.puzzlesSolved=puzzleSolvedCount;
+        renderProfileStats();
+      }
+      async function nextPuzzle() {
+        if(!profileStats.skillAnswered||puzzleLoading||!puzzleDatasetReady)return;
+        if(currentPuzzle&&!puzzleSolved&&currentPuzzleIndex===puzzleNextIndex)return;
+        puzzleLoading=true;puzzleLoadError="";currentPuzzle=null;puzzleHintText="";puzzleHintSquare=null;
         renderPuzzle();
+        try {
+          while(puzzleNextIndex<puzzleTotal) {
+            if(puzzleNextIndex<puzzlePageStart||puzzleNextIndex>=puzzlePageStart+puzzlePageCache.length) {
+              const page=await requestPuzzleApi(`api/puzzles?offset=${puzzleNextIndex}&limit=16`);
+              if(!Array.isArray(page.puzzles)||page.offset!==puzzleNextIndex||page.total!==puzzleTotal)throw new Error("The puzzle dataset returned an invalid page.");
+              puzzlePageStart=page.offset;puzzlePageCache=page.puzzles;
+            }
+            const entry=puzzlePageCache.find(item=>item.index===puzzleNextIndex);
+            if(!entry) {
+              if(!puzzlePageCache.length)break;
+              throw new Error(`Puzzle page is missing dataset position ${puzzleNextIndex}.`);
+            }
+            try {
+              currentPuzzle=entry.puzzle;
+              validatePuzzle(currentPuzzle);
+              currentPuzzleIndex=entry.index;
+              puzzleWrongAttempts=0;puzzleCursor=0;puzzleSolved=false;
+              puzzleState=puzzleStartPosition(currentPuzzle);
+              puzzleColor=puzzleState.turn;
+              break;
+            } catch(error) {
+              console.warn(`Skipping invalid Lichess puzzle ${entry.puzzle?.id||entry.index}:`,error);
+              currentPuzzle=null;
+              puzzleNextIndex=entry.index+1;
+              savePuzzleProgress();
+            }
+          }
+          if(!currentPuzzle&&puzzleNextIndex<puzzleTotal)throw new Error("No playable puzzle could be read from the next dataset page.");
+        } catch(error) {
+          puzzleLoadError=error.message;
+          console.error("Puzzle loading failed:",error);
+        } finally {
+          puzzleLoading=false;
+          renderPuzzle();
+        }
+      }
+      async function retryPuzzleLoading() {
+        puzzleLoadError="";
+        if(!puzzleDatasetReady) {
+          try { await loadPuzzleCollection(); }
+          catch(error) {
+            puzzleLoadError=error.message;
+            console.error("Puzzle dataset retry failed:",error);
+            renderPuzzle();
+          }
+        } else await nextPuzzle();
       }
       function renderPuzzle() {
-        const board=$("puzzleBoard"),available=availablePuzzles();
+        const board=$("puzzleBoard");
         board.replaceChildren();
-        $("puzzleRating").textContent=isPersian?`امتیاز ${String(profileStats.rating).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])}`:`Score ${profileStats.rating}`;
         const digit=value=>isPersian?String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):value;
-        $("puzzleProgress").textContent=isPersian?`${digit(completedPuzzles.size)} از ${digit(puzzleDatabase.length)} معمای واقعی حل‌شده`:`${completedPuzzles.size} of ${puzzleDatabase.length} real puzzles solved`;
+        $("puzzleRating").textContent=isPersian?`درجهٔ سختی ${digit(currentPuzzle?.rating??profileStats.rating)}`:`Rating ${currentPuzzle?.rating??profileStats.rating}`;
+        const progressPercent=puzzleTotal?Math.round(puzzleNextIndex/puzzleTotal*100):0;
+        const progressTrack=$("puzzleProgressFill").parentElement;
+        $("puzzleProgressFill").style.width=`${progressPercent}%`;progressTrack.setAttribute("aria-valuenow",String(progressPercent));
+        $("puzzleProgress").textContent=puzzleLoadError
+          ?(isPersian?`بارگیری معماها ناموفق بود: ${puzzleLoadError}`:`Puzzle loading failed: ${puzzleLoadError}`)
+          :puzzleLoading||!puzzleDatasetReady?(isPersian?"در حال بارگیری و بررسی موقعیت‌ها…":"Loading and validating the next positions…")
+            :isPersian?`${digit(puzzleSolvedCount)} از ${digit(puzzleTotal)} معمای مرتب‌شده حل شد`:`${puzzleSolvedCount} of ${puzzleTotal} sequential puzzles solved`;
         $("puzzleHint").textContent=puzzleHintText;
         $("puzzleFeedback").className="puzzle-status";
-        $("puzzlePlayButton").disabled=!currentPuzzle||puzzleSolved;
-        $("puzzleHintButton").disabled=!currentPuzzle;
-        $("nextPuzzleButton").disabled=!currentPuzzle;
+        $("puzzlePlayButton").disabled=!currentPuzzle||puzzleSolved||puzzleLoading;
+        $("puzzleHintButton").disabled=!currentPuzzle||puzzleSolved;
+        $("nextPuzzleButton").disabled=!puzzleSolved||puzzleLoading;
+        $("puzzleRetryButton").hidden=!puzzleLoadError||puzzleLoading;
+        $("puzzleRetryButton").disabled=puzzleLoading;
         if(!currentPuzzle) {
-          $("puzzlePrompt").textContent=isPersian?`همهٔ ${digit(puzzleDatabase.length)} معمای این مجموعه را حل کردید.`:`You completed all ${puzzleDatabase.length} puzzles in this collection.`;
+          $("puzzlePrompt").textContent=puzzleLoadError
+            ?(isPersian?"مجموعهٔ معما بارگیری نشد. سرور و فایل داده را بررسی کنید.":"Puzzle data could not be loaded. Check the server and dataset file.")
+            :puzzleLoading||!puzzleDatasetReady?(isPersian?"در حال آماده‌سازی معمای بعدی…":"Preparing the next puzzle…")
+              :!profileStats.skillAnswered?(isPersian?"برای شروع، ابتدا سطح خود را انتخاب کنید.":"Choose your skill level to begin.")
+                :puzzleNextIndex>=puzzleTotal?(isPersian?`همهٔ ${digit(puzzleTotal)} معمای مجموعه را حل کردید.`:`You completed all ${digit(puzzleTotal)} puzzles in the collection.`)
+                  :(isPersian?"معمای بعدی آماده نیست.":"The next puzzle is not available.");
           return;
         }
         puzzleState=puzzleStartPosition(currentPuzzle);
         const perspective=puzzleState.turn,rows=perspective==="w"?[0,1,2,3,4,5,6,7]:[7,6,5,4,3,2,1,0],cols=perspective==="w"?[0,1,2,3,4,5,6,7]:[7,6,5,4,3,2,1,0];
-        const label=isPersian?`معمای ${digit(available.indexOf(currentPuzzle)+1)} · ${puzzleTitle(currentPuzzle)} · ${perspective==="w"?"سفید":"سیاه"} حرکت کنید`:`Puzzle ${available.indexOf(currentPuzzle)+1} · ${puzzleTitle(currentPuzzle)} · ${perspective==="w"?"White":"Black"} to move`;
+        const label=isPersian?`معمای ${digit(currentPuzzleIndex+1)} از ${digit(puzzleTotal)} · ${puzzleTitle(currentPuzzle)} · ${perspective==="w"?"سفید":"سیاه"} حرکت کنید`:`Puzzle ${currentPuzzleIndex+1} of ${puzzleTotal} · ${puzzleTitle(currentPuzzle)} · ${perspective==="w"?"White":"Black"} to move`;
         $("puzzlePrompt").textContent=label;
         for(const row of rows)for(const col of cols) {
           const square=document.createElement("span"),piece=puzzleState.board[row][col];
           square.className=`quick-square puzzle-square ${(row+col)%2?"dark":"light"}`;
+          if(puzzleHintSquare&&same(puzzleHintSquare,[row,col]))square.classList.add("puzzle-hint-source");
           square.setAttribute("role","gridcell");square.setAttribute("aria-label",`${"abcdefgh"[col]}${8-row}${piece?`, ${colorOf(piece)==="w"?"White":"Black"} ${pieceName(piece)}`:""}`);
-          if(piece){square.textContent=symbols[piece];square.classList.add(colorOf(piece)==="w"?"white-piece":"black-piece");}
+          if(piece)appendPiece(square,piece,"quick-piece");
           board.append(square);
         }
       }
@@ -3380,44 +3624,81 @@
         puzzleReturnMode=mode;mode="friend";puzzleMode=true;puzzleSolved=false;puzzleCursor=0;
         state=puzzleStartPosition(currentPuzzle);puzzleColor=state.turn;history=[];redoStack=[];selected=null;legalTargets=[];premove=null;
         gameOver=false;matchActive=false;aiThinking=false;clockOn=false;orientation=state.turn;humanColor=state.turn;reviewPreviewIndex=null;openingIdentity=null;
-        $("lobby").hidden=true;$("trainingScreen").hidden=true;$("gameScreen").hidden=false;
+        $("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("onlineScreen").hidden=true;$("gameScreen").hidden=false;
         $("newGameCard").hidden=true;$("puzzleGameCard").hidden=false;$("newGameTop").hidden=true;$("flipButton").hidden=false;$("resetButton").hidden=true;
         $("puzzleGameTitle").textContent=puzzleTitle(currentPuzzle);
-        $("puzzleGameRating").textContent=isPersian?String(currentPuzzle.rating).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):String(currentPuzzle.rating);
-        $("puzzleGameStatus").textContent=isPersian?`معمای ${currentPuzzle.id} · ${currentPuzzle.color==="w"?"سفید":"سیاه"} حرکت می‌کند`:`Puzzle ${currentPuzzle.id} · ${currentPuzzle.color==="w"?"White":"Black"} to move`;
+        $("puzzleGameRating").textContent=isPersian?`درجهٔ سختی ${String(currentPuzzle.rating).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])}`:`Rating ${currentPuzzle.rating}`;
+        $("puzzleGameStatus").textContent=isPersian?`معمای ${currentPuzzleIndex+1} از ${puzzleTotal} · با حرکت اجباری شروع کنید.`:`Puzzle ${currentPuzzleIndex+1} of ${puzzleTotal} · Find the forcing continuation.`;
         $("puzzleGameFeedback").textContent="";
-        $("puzzleGameNext").disabled=true;
+        $("puzzleGameNext").disabled=true;puzzleTimerStarted=Date.now();updatePuzzleTimer();clearInterval(puzzleTimerInterval);
+        puzzleTimerInterval=setInterval(updatePuzzleTimer,1000);
         showGameInfoTab("moves");render();$("statusText").textContent=isPersian?"حرکت خود را روی صفحه انجام دهید.":"Make your move on the board.";
       }
       function exitPuzzle() {
-        cancelAIRequest();clearTimeout(puzzleReplyTimer);puzzleReplyTimer=null;puzzleMode=false;puzzleSolved=false;
+        cancelAIRequest();clearTimeout(puzzleReplyTimer);puzzleReplyTimer=null;clearInterval(puzzleTimerInterval);puzzleTimerInterval=null;puzzleMode=false;puzzleSolved=false;
         $("puzzleGameCard").hidden=true;$("gameScreen").hidden=true;$("lobby").hidden=false;$("flipButton").hidden=true;
         mode=puzzleReturnMode;setMode(mode);renderPuzzle();
       }
       function showPuzzleHint() {
-        if(!currentPuzzle)return;
-        puzzleHintText=puzzleCopy(currentPuzzle,"hint");
-        $("puzzleHint").textContent=isPersian?`راهنما: ${puzzleHintText}`:`Hint: ${puzzleHintText}`;
+        if(!currentPuzzle||puzzleSolved)return;
+        const nextMove=currentPuzzle.solutionMoves[puzzleCursor];
+        if(!nextMove)return;
+        puzzleHintSquare=puzzleMove(nextMove).from;
+        const from=`${"abcdefgh"[puzzleHintSquare[1]]}${8-puzzleHintSquare[0]}`;
+        puzzleHintText=isPersian?`راهنما: مهرهٔ خانهٔ ${from} را بررسی کنید؛ به کیش، گرفتن و تهدید فکر کنید.`:`Hint: examine the piece on ${from}. Look for checks, captures, and threats.`;
+        $("puzzleHint").textContent=puzzleHintText;
         if(puzzleMode)$("puzzleGameFeedback").textContent=$("puzzleHint").textContent;
+        renderPuzzle();renderBoard();
       }
-      function loadCompletedPuzzles() {
-        try {
-          const saved=localStorage.getItem("nightfall-chess-puzzles-v1");
-          if(saved===null)return;
-          const ids=JSON.parse(saved);
-          if(!Array.isArray(ids)||ids.some(id=>typeof id!=="string"||!puzzleDatabase.some(puzzle=>puzzle.id===id)))throw new Error("Saved puzzle progress is invalid");
-          ids.forEach(id=>completedPuzzles.add(id));profileStats.puzzlesSolved=completedPuzzles.size;
-        } catch(error) {
-          completedPuzzles.clear();profileStats.puzzlesSolved=0;
-          showToast(`Puzzle progress could not be loaded: ${error.message}`);
+      function updatePuzzleTimer() {
+        if(!puzzleTimerStarted)return;
+        const seconds=Math.max(0,Math.floor((Date.now()-puzzleTimerStarted)/1000));
+        const time=`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`;
+        $("puzzleGameTimer").textContent=isPersian?time.replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):time;
+      }
+      function updatePuzzleGameProgress() {
+        const percent=puzzleTotal?Math.round(puzzleNextIndex/puzzleTotal*100):0;
+        const number=value=>isPersian?String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):String(value);
+        $("puzzleGameStreak").textContent=number(profileStats.puzzleStreak);
+        $("puzzleGameProgress").textContent=`${number(Math.min(currentPuzzleIndex+1,puzzleTotal))} / ${number(puzzleTotal)}`;
+        $("puzzleGameProgressFill").style.width=`${percent}%`;
+        $("puzzleGameProgressFill").parentElement.setAttribute("aria-valuenow",String(percent));
+        $("puzzleGameBack").disabled=!history.length||boardAnimating;
+        $("puzzleGameForward").disabled=!redoStack.length||boardAnimating;
+        $("puzzleGameNext").disabled=!puzzleSolved;
+      }
+      function appendPiece(container,piece,className="piece") {
+        if(pieceTheme==="symbols") {
+          const span=document.createElement("span");
+          span.className=`${className} ${colorOf(piece)==="w"?"white":"black"}`;
+          span.textContent=symbols[piece]||"";
+          span.setAttribute("aria-hidden","true");
+          container.append(span);
+          return;
         }
+        const image=document.createElement("img");
+        image.className=`piece-image ${className}`;
+        image.alt="";
+        image.draggable=false;
+        image.src=pieceImageUrl(piece);
+        container.append(image);
+      }
+      function pieceImageUrl(piece) {
+        const names={p:"Pawn",n:"Knight",b:"Bishop",r:"Rook",q:"Queen",k:"King"};
+        const side=colorOf(piece)==="w"?"White":"Black";
+        if(pieceTheme.startsWith("set-")) {
+          const set=pieceTheme.slice(4),color=colorOf(piece)==="w"?"w":"b";
+          return new URL(`./chess.com-boards-and-pieces-2.x/pieces/${encodeURIComponent(set)}/${color}${piece.toLowerCase()}.png`,document.baseURI).href;
+        }
+        const variant=pieceTheme==="outline"?"-1":"";
+        return new URL(`./extracted_zip3/${encodeURIComponent(`Piece=${names[piece.toLowerCase()]}, Side=${side}${variant}.png`)}`,document.baseURI).href;
       }
       function setPlayerSkill() {
         const rating=Number($("playerSkill").value);
         if(![400,700,1000,1300,1600,2000].includes(rating))throw new Error("Choose a valid chess skill level.");
         profileStats.rating=rating;profileStats.skillAnswered=true;
         $("skillSetup").hidden=true;$("puzzleSection").hidden=false;
-        saveProfile();renderProfileStats();nextPuzzle();
+        saveProfile();renderProfileStats();switchLobbyPage("puzzles");void nextPuzzle();
       }
       function recordGameResult(result,winnerColor) {
         if(resultRecorded)return;
@@ -3453,8 +3734,9 @@
         $("puzzleSection").hidden=!profileStats.skillAnswered;
         const numbers=value=>isPersian?String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):value;
         $("profileMoreContent").innerHTML=isPersian
-          ?`امتیاز شطرنج: <strong>${numbers(profileStats.rating)}</strong><br>رشتهٔ روزانه: <strong>${numbers(profileStats.dailyStreak)}</strong> · بهترین: <strong>${numbers(profileStats.bestDailyStreak)}</strong><br>معماهای حل‌شده: <strong>${numbers(completedPuzzles.size)}</strong><br>مساوی: <strong>${numbers(profileStats.draws)}</strong> · باخت: <strong>${numbers(profileStats.losses)}</strong><br>بهترین رشتهٔ برد: <strong>${numbers(profileStats.bestWinStreak)}</strong><br>درس‌های کامل‌شده: <strong>${numbers(completedLessons.size)} از ${numbers(lessons.length)}</strong><br>درجهٔ هوش مصنوعی: <strong>${$("lobbyStrength").value}</strong> · سبک: <strong>${$("lobbyStyle").selectedOptions[0].text}</strong>`
-          :`Chess score: <strong>${profileStats.rating}</strong><br>Daily streak: <strong>${profileStats.dailyStreak}</strong> · Best: <strong>${profileStats.bestDailyStreak}</strong><br>Puzzles solved: <strong>${completedPuzzles.size}</strong><br>Draws: <strong>${profileStats.draws}</strong> · Losses: <strong>${profileStats.losses}</strong><br>Best win streak: <strong>${profileStats.bestWinStreak}</strong><br>Lessons completed: <strong>${completedLessons.size} / ${lessons.length}</strong><br>AI level: <strong>${$("lobbyStrength").value}</strong> · Style: <strong>${$("lobbyStyle").selectedOptions[0].text}</strong>`;
+          ?`امتیاز شطرنج: <strong>${numbers(profileStats.rating)}</strong><br>رشتهٔ روزانه: <strong>${numbers(profileStats.dailyStreak)}</strong> · بهترین: <strong>${numbers(profileStats.bestDailyStreak)}</strong><br>معماهای حل‌شده: <strong>${numbers(profileStats.puzzlesSolved)}</strong> · رشتهٔ معما: <strong>${numbers(profileStats.puzzleStreak)}</strong><br>مساوی: <strong>${numbers(profileStats.draws)}</strong> · باخت: <strong>${numbers(profileStats.losses)}</strong><br>بهترین رشتهٔ برد: <strong>${numbers(profileStats.bestWinStreak)}</strong><br>درس‌های کامل‌شده: <strong>${numbers(completedLessons.size)} از ${numbers(lessons.length)}</strong><br>درجهٔ هوش مصنوعی: <strong>${$("lobbyStrength").value}</strong> · سبک: <strong>${$("lobbyStyle").selectedOptions[0].text}</strong>`
+          :`Chess score: <strong>${profileStats.rating}</strong><br>Daily streak: <strong>${profileStats.dailyStreak}</strong> · Best: <strong>${profileStats.bestDailyStreak}</strong><br>Puzzles solved: <strong>${profileStats.puzzlesSolved}</strong> · Puzzle streak: <strong>${profileStats.puzzleStreak}</strong><br>Draws: <strong>${profileStats.draws}</strong> · Losses: <strong>${profileStats.losses}</strong><br>Best win streak: <strong>${profileStats.bestWinStreak}</strong><br>Lessons completed: <strong>${completedLessons.size} / ${lessons.length}</strong><br>AI level: <strong>${$("lobbyStrength").value}</strong> · Style: <strong>${$("lobbyStyle").selectedOptions[0].text}</strong>`;
+        if($("puzzleGameStreak"))$("puzzleGameStreak").textContent=String(profileStats.puzzleStreak);
       }
       function loadProfileStats() {
         try {
@@ -3464,7 +3746,7 @@
             const keys=["games","wins","draws","losses","bestWinStreak","winStreak"];
             if(!parsed||keys.some(key=>!Number.isSafeInteger(parsed[key])||parsed[key]<0))throw new Error("Saved player statistics are invalid");
             profileStats={...emptyProfileStats(),...parsed,skillAnswered:parsed.skillAnswered===true};
-            const progressionKeys=["rating","dailyStreak","bestDailyStreak","dailyGames","dailyPuzzles","puzzlesSolved"];
+            const progressionKeys=["rating","dailyStreak","bestDailyStreak","dailyGames","dailyPuzzles","puzzlesSolved","puzzleStreak","bestPuzzleStreak"];
             if(progressionKeys.some(key=>!Number.isSafeInteger(profileStats[key])||profileStats[key]<0)||profileStats.rating>3000)throw new Error("Saved chess progression is invalid");
             if(typeof profileStats.dailyDate!=="string"||typeof profileStats.lastStreakDate!=="string")throw new Error("Saved daily streak data is invalid");
             if(profileStats.wins+profileStats.draws+profileStats.losses!==profileStats.games)throw new Error("Saved player statistics do not match");
@@ -3476,6 +3758,70 @@
         normalizeDailyProgress();
         $("playerSkill").value=String([400,700,1000,1300,1600,2000].reduce((best,value)=>Math.abs(value-profileStats.rating)<Math.abs(best-profileStats.rating)?value:best,400));
         renderProfileStats();
+      }
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g,character=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[character]));
+      }
+      function renderProfileAvatar(target,source=playerProfile.avatarData) {
+        target.replaceChildren();
+        if(source) {
+          const image=document.createElement("img");
+          image.src=source;image.alt="";
+          target.append(image);
+        } else target.textContent="♙";
+      }
+      function loadPlayerProfile() {
+        try {
+          const saved=localStorage.getItem("nightfall-chess-player-profile-v1");
+          if(saved!==null) {
+            const parsed=JSON.parse(saved);
+            if(typeof parsed.username!=="string"||parsed.username.trim().length>24
+              ||(parsed.avatarData!==""&&(!/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(parsed.avatarData)||parsed.avatarData.length>180000))) {
+              throw new Error("Saved player profile is invalid.");
+            }
+            playerProfile={username:parsed.username.trim()||"Player",avatarData:parsed.avatarData};
+          }
+        } catch(error) {
+          playerProfile={username:"Player",avatarData:""};
+          showToast(`Player profile could not be loaded: ${error.message}`);
+        }
+        $("profileName").value=playerProfile.username;
+        renderProfileAvatar($("profileAvatarPreview"));
+      }
+      function savePlayerProfile() {
+        const username=$("profileName").value.trim();
+        if(!username||username.length>24) {
+          showToast("Choose a username between 1 and 24 characters.");
+          $("profileName").focus();
+          return;
+        }
+        const updated={username,avatarData:pendingProfileAvatar===null?playerProfile.avatarData:pendingProfileAvatar};
+        try {
+          localStorage.setItem("nightfall-chess-player-profile-v1",JSON.stringify(updated));
+          playerProfile=updated;pendingProfileAvatar=null;
+          renderProfileAvatar($("profileAvatarPreview"));renderPlayers();
+          showToast("Profile saved on this device.");
+        } catch(error) {
+          showToast(`Player profile could not be saved: ${error.message}`);
+        }
+      }
+      async function prepareProfileImage(file) {
+        if(!file)return;
+        if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw new Error("Choose a PNG, JPEG, or WebP image.");
+        if(file.size>5*1024*1024)throw new Error("Profile pictures must be 5 MB or smaller.");
+        const image=await createImageBitmap(file);
+        try {
+          const scale=Math.min(1,256/Math.max(image.width,image.height));
+          const canvas=document.createElement("canvas");
+          canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));
+          const context=canvas.getContext("2d");
+          if(!context)throw new Error("Image preview is unavailable in this browser.");
+          context.drawImage(image,0,0,canvas.width,canvas.height);
+          pendingProfileAvatar=canvas.toDataURL("image/jpeg",.82);
+          renderProfileAvatar($("profileAvatarPreview"),pendingProfileAvatar);
+        } finally {
+          image.close();
+        }
       }
       function saveLessonProgress() {
         try {
@@ -3561,7 +3907,7 @@
           square.setAttribute("role","gridcell");square.setAttribute("aria-label",`${squareLabel(row,col)}${piece?`, ${colorOf(piece)==="w"?"White":"Black"} ${pieceName(piece)}`:""}`);
           if(last&&(same(last.from,[row,col])||same(last.to,[row,col])))square.classList.add("last-move");
           if(checkKing&&same(checkKing,[row,col]))square.classList.add("check");
-          if(piece){const glyph=document.createElement("span");glyph.className=`piece ${colorOf(piece)==="w"?"white":"black"}`;glyph.textContent=symbols[piece];glyph.setAttribute("aria-hidden","true");square.append(glyph);}
+          if(piece)appendPiece(square,piece);
           if((orientation==="w"&&col===0)||(orientation==="b"&&col===7)){const rank=document.createElement("span");rank.className="coordinate rank-coordinate";rank.textContent=8-row;square.append(rank);}
           if((orientation==="w"&&row===7)||(orientation==="b"&&row===0)){const file=document.createElement("span");file.className="coordinate";file.textContent="abcdefgh"[col];square.append(file);}
           board.append(square);
@@ -3600,7 +3946,8 @@
           if(checkKing&&same(checkKing,[r,c])) sq.classList.add("check");
           const target=legalTargets.find(m=>same(m.to,[r,c]));
           if(target) { sq.classList.add("target"); if(state.board[r][c]||target.enPassant) sq.classList.add("capture"); }
-          if(p) { const span=document.createElement("span"); span.className=`piece ${colorOf(p)==="w"?"white":"black"}`; span.textContent=symbols[p]|| (p==="P"?"♙":"♟"); span.setAttribute("aria-hidden","true"); sq.append(span); }
+          if(p)appendPiece(sq,p);
+          if(puzzleMode&&puzzleHintSquare&&same(puzzleHintSquare,[r,c]))sq.classList.add("puzzle-hint-source");
           if((orientation==="w"&&c===0)||(orientation==="b"&&c===7)) { const rank=document.createElement("span");rank.className="coordinate rank-coordinate";rank.textContent=8-r;sq.append(rank); }
           if((orientation==="w"&&r===7)||(orientation==="b"&&r===0)) { const file=document.createElement("span");file.className="coordinate";file.textContent="abcdefgh"[c];sq.append(file); }
           sq.addEventListener("click",()=>clickSquare(r,c)); board.append(sq);
@@ -3610,6 +3957,7 @@
         const board=$("board");
         if(window.matchMedia("(prefers-reduced-motion: reduce)").matches||typeof Element.prototype.animate!=="function") {
           animateMoveImpact(move,before);
+          if(puzzleMode)schedulePuzzleReply();
           return;
         }
         const movers=[{from:move.from,to:move.to}];
@@ -3622,11 +3970,17 @@
           if(!source||!target||!piece||!before.board[mover.from[0]][mover.from[1]])continue;
           const from=source.getBoundingClientRect(),to=target.getBoundingClientRect();
           const dx=from.left+from.width/2-(to.left+to.width/2),dy=from.top+from.height/2-(to.top+to.height/2);
+          if(move.promoteTo&&same(mover.from,move.from)) {
+            const pawn=before.board[move.from[0]][move.from[1]];
+            if(pieceTheme==="symbols")piece.textContent=symbols[pawn];
+            else piece.src=pieceImageUrl(pawn);
+          }
           piece.classList.add("moving");
           animations.push({piece,animation:piece.animate([{transform:`translate(${dx}px, ${dy}px) translateY(-2%)`},{transform:"translateY(-2%)"}],{duration:360,easing:"cubic-bezier(.2,.8,.2,1)"})});
         }
         if(!animations.length) {
           animateMoveImpact(move,before);
+          if(puzzleMode)schedulePuzzleReply();
           return;
         }
         boardAnimating=true;board.classList.add("animating");
@@ -3674,31 +4028,51 @@
         return {title:`${code} · ${name}`,label:`${code} · ${name}`};
       }
       function playerHtml(color,top) {
-        const isAI=mode==="ai"&&color!==humanColor, isWhite=color==="w", active=state.turn===color&&!gameOver;
+        const isAI=mode==="ai"&&color!==humanColor;
+        const isProfileSide=puzzleMode?color===puzzleColor:mode==="ai"?color===humanColor:color===orientation;
+        const isPuzzleOpponent=puzzleMode&&!isProfileSide, isWhite=color==="w", active=state.turn===color&&!gameOver;
         const style=$("style").selectedOptions[0].text;
-        const name=isAI?isPersian?`هوش مصنوعی · ${style}`:`${style} AI`:`${isWhite?"White":"Black"}${mode==="ai"?" · You":""}`;
-        const detail=isAI?isPersian?`${$("strength").value} درجه · سبک ${style}`:`${$("strength").value} rating · ${$("style").value} style`:isPersian?"بازیکن محلی":"Local player";
+        const name=isAI?isPersian?`هوش مصنوعی · ${style}`:`${style} AI`
+          :isProfileSide?playerProfile.username
+            :isPuzzleOpponent?isPersian?"حریف معما":"Puzzle opponent"
+              :isPersian?"مهمان محلی":"Local guest";
+        const detail=isAI?isPersian?`${$("strength").value} درجه · سبک ${style}`:`${$("strength").value} rating · ${$("style").value} style`
+          :isProfileSide?isPersian?"نمایهٔ شما":"Your profile"
+            :isPersian?"بازیکن محلی":"Local player";
         const openingInfo=openingForPlayer(color);
         const opening=openingInfo?`<div class="player-opening" title="${isPersian?"گشایش این بازیکن":`${isWhite?"White":"Black"} opening`}">${openingInfo.label}</div>`:"";
         const time=clockOn?formatTime(clocks[color]):"—";
-        return `<div class="avatar" aria-hidden="true">${isAI?"✦":isWhite?"♙":"♟"}</div><div class="player-info"><div class="player-name">${name}</div><div class="player-detail">${detail}</div>${opening}${capturedPiecesHtml(color)}</div><div class="clock${active?" active":""}" aria-label="${isWhite?"White":"Black"} clock">${time}</div>`;
+        const avatar=isProfileSide&&playerProfile.avatarData?`<img src="${escapeHtml(playerProfile.avatarData)}" alt="">`:isAI?"✦":isWhite?"♙":"♟";
+        return `<div class="avatar" aria-hidden="true">${avatar}</div><div class="player-info"><div class="player-name">${escapeHtml(name)}</div><div class="player-detail">${escapeHtml(detail)}</div>${opening}${capturedPiecesHtml(color,top)}</div><div class="clock${active?" active":""}" aria-label="${isWhite?"White":"Black"} clock">${time}</div>`;
       }
-      function capturedPiecesHtml(color) {
+      function capturedPiecesHtml(color,showAdvantage) {
+        const pieceValues={p:1,n:3,b:3,r:5,q:9,k:0};
         const pieces=history.flatMap(entry=>{
           if(entry.before.turn!==color) return [];
           const [r,c]=entry.move.to;
           const captured=entry.before.board[r][c]||(entry.move.enPassant?(color==="w"?"p":"P"):null);
-          return captured?[{piece:captured,value:values[captured.toLowerCase()]/100}]:[];
+          return captured?[{piece:captured}]:[];
         });
-        const score=Number(pieces.reduce((total,item)=>total+item.value,0).toFixed(1));
-        const formatScore=value=>{const formatted=String(value);return isPersian?formatted.replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):formatted;};
-        const scoreLabel=isPersian?`ارزش مهره‌های گرفته‌شده +${formatScore(score)} امتیاز`:`Captured material: +${score} ${score===1?"point":"points"}`;
+        const capturedScore=side=>history.reduce((total,entry)=>{
+          if(entry.before.turn!==side)return total;
+          const [row,col]=entry.move.to;
+          const captured=entry.before.board[row][col]||(entry.move.enPassant?(side==="w"?"p":"P"):null);
+          return total+(captured?pieceValues[captured.toLowerCase()]:0);
+        },0);
+        const advantage=capturedScore("w")-capturedScore("b");
+        const formatScore=value=>isPersian?String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):value;
+        const leader=advantage>0?(isPersian?"سفید":"White"):advantage<0?(isPersian?"سیاه":"Black"):"";
+        const advantageText=advantage===0?(isPersian?"برابر":"Even"):`${leader} +${formatScore(Math.abs(advantage))}`;
+        const scoreLabel=isPersian?`برتری مادی: ${advantageText}`:`Material advantage: ${advantageText}`;
         const emptyLabel=isPersian?"مهره‌ای گرفته نشده":"No captures";
-        const captured=pieces.map(({piece,value})=>{
+        const captured=pieces.map(({piece})=>{
           const label=isPersian?(faText[pieceName(piece)]||pieceName(piece)):pieceName(piece);
-          return `<span class="captured-entry" title="${label} · ${formatScore(value)} ${isPersian?"امتیاز":"points"}"><span class="captured-value">${formatScore(value)}</span><span class="captured-piece">${symbols[piece]}</span></span>`;
+          return `<span class="captured-entry" title="${escapeHtml(label)}"><span class="captured-piece">${symbols[piece]}</span></span>`;
         }).join("");
-        return `<div class="captured" aria-label="${scoreLabel}${pieces.length?`, ${pieces.length} ${isPersian?"مهره گرفته‌شده":`captured piece${pieces.length===1?"":"s"}`}`:""}"><span class="captured-score" title="${scoreLabel}">+${formatScore(score)}</span>${pieces.length?captured:`<span class="captured-empty">${emptyLabel}</span>`}</div>`;
+        const capturedSummary=pieces.length?`${pieces.length} ${isPersian?"مهره گرفته‌شده":`captured piece${pieces.length===1?"":"s"}`}`:emptyLabel;
+        const scoreChip=showAdvantage?`<span class="captured-score" title="${scoreLabel}">${advantageText}</span>`:"";
+        const ariaLabel=showAdvantage?`${scoreLabel}, ${capturedSummary}`:capturedSummary;
+        return `<div class="captured" aria-label="${ariaLabel}">${scoreChip}${pieces.length?captured:`<span class="captured-empty">${emptyLabel}</span>`}</div>`;
       }
       function renderPlayers() {
         const topColor=orientation==="w"?"b":"w";
@@ -3719,8 +4093,8 @@
         updateStrategyReport();
         renderBoard(); renderPlayers(); renderMoves();
         $("cancelPremoveButton").hidden=!premove;
-        $("undoButton").hidden=!gameplaySettings.takebacks;
-        $("redoButton").hidden=!gameplaySettings.takebacks;
+        $("undoButton").hidden=puzzleMode||!gameplaySettings.takebacks;
+        $("redoButton").hidden=puzzleMode||!gameplaySettings.takebacks;
         $("undoButton").disabled=!history.length||aiThinking||boardAnimating;
         $("redoButton").disabled=!redoStack.length||aiThinking||boardAnimating;
         $("hintButton").hidden=!matchActive||gameOver||!gameplaySettings.hints;
@@ -3731,6 +4105,7 @@
         $("exitMatchButton").textContent=isPersian?(puzzleMode?"خروج از معما":"خروج از بازی"):(puzzleMode?"Exit puzzle":"Exit match");
         $("exitMatchButton").disabled=boardAnimating;
         $("startButton").disabled=aiThinking;
+        if(puzzleMode)updatePuzzleGameProgress();
       }
       function updateStrategyReport() {
         const englishTitle=openingIdentity?`${openingIdentity.eco} · ${openingIdentity.name}`:"Opening not identified yet";
@@ -3891,7 +4266,7 @@
         $("strategyCopy").textContent=copy;
       }
       function clickSquare(r,c) {
-        if(gameOver||boardAnimating)return;
+        if(gameOver||boardAnimating||(puzzleMode&&puzzleSolved))return;
         if(puzzleMode&&state.turn!==puzzleColor)return;
         const p=state.board[r][c];
         const selectedPiece=selected&&state.board[selected[0]][selected[1]],selectedColor=colorOf(selectedPiece),clickedColor=colorOf(p);
@@ -4007,10 +4382,7 @@
           square.className=`quick-square ${(row+col)%2?"dark":"light"}`;
           square.setAttribute("role","gridcell");
           square.setAttribute("aria-label",`${"abcdefgh"[col]}${8-row}${piece?`, ${colorOf(piece)==="w"?"White":"Black"} ${pieceName(piece)}`:""}`);
-          if(piece) {
-            square.textContent=symbols[piece];
-            square.classList.add(colorOf(piece)==="w"?"white-piece":"black-piece");
-          }
+          if(piece)appendPiece(square,piece,"quick-piece");
           if(lastMove&&(same(lastMove.from,[row,col])||same(lastMove.to,[row,col])))square.classList.add("last-step");
           if(blunder&&(same(blunder.move.from,[row,col])||same(blunder.move.to,[row,col])))square.classList.add("blunder-square");
           board.append(square);
@@ -4112,7 +4484,7 @@
             rankLabel.textContent=String(8-r);
             square.append(rankLabel);
           }
-          if(piece) {const span=document.createElement("span");span.className=`piece ${colorOf(piece)==="w"?"white":"black"}`;span.textContent=symbols[piece];square.append(span);}
+          if(piece)appendPiece(square,piece);
           square.addEventListener("click",()=>clickPieceLessonSquare(r,c));
           board.append(square);
         }
@@ -4184,13 +4556,111 @@
         $("nextLesson").disabled=!correct;
         renderLessonList();
       }
+      function switchLobbyPage(page) {
+        if(!["play","puzzles","progress"].includes(page))return;
+        $("lobby").dataset.page=page;
+        document.querySelectorAll("[data-lobby-page]").forEach(button=>{
+          const active=button.dataset.lobbyPage===page;
+          button.classList.toggle("active",active);
+          if(active)button.setAttribute("aria-current","page");
+          else button.removeAttribute("aria-current");
+        });
+        if(page==="puzzles"&&!puzzleDatasetReady&&!puzzleStatusPromise) {
+          renderPuzzle();
+          void loadPuzzleCollection().catch(error=>{
+            puzzleLoadError=error.message;
+            console.error("Puzzle dataset could not be loaded:",error);
+            renderPuzzle();
+            showToast(isPersian?`مجموعهٔ واقعی معما بارگیری نشد: ${error.message}`:`Lichess puzzle dataset could not be loaded: ${error.message}`);
+          });
+        } else if(page==="puzzles"&&profileStats.skillAnswered&&!currentPuzzle&&!puzzleLoading)void nextPuzzle();
+      }
+      function showSettingsPanel(panel) {
+        document.querySelectorAll("[data-settings-content]").forEach(section=>{section.hidden=section.dataset.settingsContent!==panel;});
+        document.querySelectorAll("[data-settings-panel]").forEach(button=>{
+          const active=button.dataset.settingsPanel===panel;
+          button.classList.toggle("active",active);
+          button.setAttribute("aria-current",String(active));
+        });
+      }
+      function openSettings() {
+        const visible=["gameScreen","trainingScreen","onlineScreen","lobby"].find(id=>!$(id).hidden);
+        settingsReturnScreen=visible||"lobby";
+        settingsPausedMatch=settingsReturnScreen==="gameScreen"&&matchActive;
+        if(settingsPausedMatch){stopClock();cancelAIRequest();}
+        for(const id of ["gameScreen","trainingScreen","onlineScreen","lobby"])$(id).hidden=true;
+        $("settingsScreen").hidden=false;
+        showSettingsPanel("profile");
+      }
+      function closeSettings() {
+        $("settingsScreen").hidden=true;
+        $(settingsReturnScreen).hidden=false;
+        if(settingsPausedMatch&&matchActive) {
+          startClock();
+          if(mode==="ai"&&state.turn!==humanColor)scheduleAI();
+        }
+        settingsPausedMatch=false;
+      }
+      function renderThemePreview() {
+        const board=$("themePreviewBoard");
+        board.replaceChildren();
+        const position=initialBoard();
+        for(let row=0;row<8;row++)for(let col=0;col<8;col++) {
+          const square=document.createElement("span"),piece=position[row][col];
+          square.className="theme-preview-square";
+          if(piece)appendPiece(square,piece,"preview-piece");
+          board.append(square);
+        }
+      }
+      function applyAppearance() {
+        document.documentElement.dataset.boardTheme=boardTheme;
+        const textureTheme=boardTheme.startsWith("chess-")?boardTheme.slice(6):"";
+        document.documentElement.style.setProperty("--board-texture",textureTheme
+          ?`url("${new URL(`./chess.com-boards-and-pieces-2.x/boards/${encodeURIComponent(textureTheme)}.png`,document.baseURI).href}")`
+          :"none");
+        $("boardThemeSelect").value=boardTheme;$("pieceThemeSelect").value=pieceTheme;
+        renderThemePreview();
+        renderBoard();renderPuzzle();renderQuickReview();
+        if(currentLesson>=CORE_LESSON_COUNT)renderOpeningScenarioBoard(currentLesson-CORE_LESSON_COUNT);
+        if(!$("pieceLab").hidden)renderPieceLab();
+      }
+      function saveAppearance() {
+        boardTheme=$("boardThemeSelect").value;
+        pieceTheme=$("pieceThemeSelect").value;
+        if(!boardThemeValues.has(boardTheme)||!pieceThemeValues.has(pieceTheme)) {
+          throw new Error("Choose a supported board and piece theme.");
+        }
+        try {
+          localStorage.setItem("nightfall-chess-appearance-v1",JSON.stringify({boardTheme,pieceTheme}));
+        } catch(error) {
+          showToast(`Board themes could not be saved: ${error.message}`);
+        }
+        applyAppearance();
+      }
+      function loadAppearance() {
+        try {
+          const saved=localStorage.getItem("nightfall-chess-appearance-v1");
+          if(saved!==null) {
+            const appearance=JSON.parse(saved);
+            if(!boardThemeValues.has(appearance.boardTheme)||!pieceThemeValues.has(appearance.pieceTheme)) {
+              throw new Error("Saved board theme is invalid.");
+            }
+            boardTheme=appearance.boardTheme;pieceTheme=appearance.pieceTheme;
+          }
+        } catch(error) {
+          boardTheme="sage";pieceTheme="symbols";
+          showToast(`Board themes could not be loaded: ${error.message}`);
+        }
+        applyAppearance();
+      }
       function openTraining() {
+        if(!$("settingsScreen").hidden)closeSettings();
         trainingReturn=$("gameScreen").hidden?($("onlineScreen").hidden?"lobby":"online"):"game";
         if(trainingReturn==="game") {
           stopClock();cancelAIRequest();
           $("statusText").textContent=gameOver?$("statusText").textContent:(mode==="ai"&&state.turn!==humanColor?"Training pause · AI will resume":"Training pause");
         }
-        $("lobby").hidden=true;$("onlineScreen").hidden=true;$("gameScreen").hidden=true;$("trainingScreen").hidden=false;
+        $("lobby").hidden=true;$("onlineScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=true;$("trainingScreen").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;$("trainingTop").hidden=true;
         $("trainingBack").textContent=trainingReturn==="game"?"← Back to game":trainingReturn==="online"?"← Back to online":"← Back to menu";
         renderLesson();
@@ -4228,27 +4698,25 @@
         $("lobbyStrength").value=$("strength").value;$("lobbyStrengthLabel").textContent=$("strength").value;
         $("lobbyStyle").value=$("style").value;$("lobbyColor").value=$("colorChoice").value;
         $("lobbyTime").value=$("timeControl").value;$("lobbyAiTime").value=$("aiTimeControl").value;
-        $("lobby").hidden=false;$("onlineScreen").hidden=true;$("gameScreen").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=true;
+        $("lobby").hidden=false;$("onlineScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=true;
         setMode(mode);
       }
       function openOnline() {
+        if(!$("settingsScreen").hidden)closeSettings();
         if(matchActive){showToast(isPersian?"ابتدا بازی فعلی را تمام کنید.":"Finish the current match before opening Online.");return;}
-        $("lobby").hidden=true;$("gameScreen").hidden=true;$("trainingScreen").hidden=true;$("onlineScreen").hidden=false;
+        $("lobby").hidden=true;$("gameScreen").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("onlineScreen").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;
         const invite=new URLSearchParams(location.hash.slice(1)).get("room");
         if(invite&&/^[A-Z0-9]{4,12}$/i.test(invite))$("joinRoomCode").value=invite.toUpperCase();
       }
       function closeOnline() {
-        $("onlineScreen").hidden=true;$("lobby").hidden=false;
+        $("onlineScreen").hidden=true;$("settingsScreen").hidden=true;$("lobby").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;
       }
       function inviteUrl() {
         if(!roomInviteCode)throw new Error("Create a room before sharing an invite.");
         const invite=new URL(location.href);
-        const inviteLook={room:roomInviteCode,b:boardThemeId,p:pieceThemeId};
-        if(pieceColors.w)inviteLook.pw=pieceColors.w.slice(1);
-        if(pieceColors.b)inviteLook.pb=pieceColors.b.slice(1);
-        invite.hash=new URLSearchParams(inviteLook).toString();
+        invite.hash=new URLSearchParams({room:roomInviteCode}).toString();
         return invite.href;
       }
       async function copyInvite() {
@@ -4332,18 +4800,19 @@
         showToast(mode==="ai"?`New game · ${humanColor==="w"?"You play White":"You play Black"}`:"New local game");
       }
       function undo() {
-        if(!gameplaySettings.takebacks||!history.length||gameOver||aiThinking||boardAnimating||puzzleSolved) return;
+        if((!gameplaySettings.takebacks&&!puzzleMode)||!history.length||gameOver||aiThinking||boardAnimating||(!puzzleMode&&puzzleSolved)) return;
+        clearTimeout(puzzleReplyTimer);puzzleReplyTimer=null;
         premove=null;moveSuggestion=null;assistanceGeneration++;
         stopClock();
         $("analysisBackdrop").classList.remove("open");analysisShown=false;
         const count=puzzleMode?1:mode==="ai"&&history.length>=2?2:1;
         for(let i=0;i<count&&history.length;i++) { const entry=history.pop();redoStack.push(entry);state=copyState(entry.before); }
         rebuildOpeningIdentity();
-        if(puzzleMode){puzzleCursor=history.length;$("puzzleGameFeedback").textContent="";}
+        if(puzzleMode){puzzleCursor=history.length;$("puzzleGameFeedback").textContent=puzzleSolved?(isPersian?"از دکمهٔ جلو برای بازگشت به پایان معما استفاده کنید.":"Use Forward to return to the completed line."):"";}
         selected=null;legalTargets=[];gameOver=false;matchActive=!puzzleMode;reviewPreviewIndex=null;$("reviewGameButton").hidden=true;$("exportPgnButton").hidden=true;$("goMenuButton").hidden=true;render();if(!puzzleMode)evaluateEnd();startClock();
       }
       function redo() {
-        if(!gameplaySettings.takebacks||!redoStack.length||gameOver||aiThinking||boardAnimating||puzzleSolved) return;
+        if((!gameplaySettings.takebacks&&!puzzleMode)||!redoStack.length||gameOver||aiThinking||boardAnimating||(!puzzleMode&&puzzleSolved)) return;
         moveSuggestion=null;assistanceGeneration++;
         const replayingPuzzle=puzzleMode;
         premove=null;
@@ -4351,7 +4820,7 @@
         const count=replayingPuzzle?1:mode==="ai"&&redoStack.length>=2?2:1;
         for(let i=0;i<count&&redoStack.length;i++) { const entry=redoStack.pop();history.push(entry);state=copyState(entry.after); }
         rebuildOpeningIdentity();
-        if(replayingPuzzle){puzzleCursor=history.length;if(puzzleCursor>=currentPuzzle.moves.length)completePuzzle();}
+        if(replayingPuzzle){puzzleCursor=history.length;if(puzzleCursor>=currentPuzzle.solutionMoves.length)completePuzzle();}
         selected=null;legalTargets=[];gameOver=false;matchActive=!replayingPuzzle;reviewPreviewIndex=null;render();if(!replayingPuzzle)evaluateEnd();
         if(puzzleMode)schedulePuzzleReply();else if(!replayingPuzzle&&mode==="ai"&&!gameOver&&state.turn!==humanColor)scheduleAI();
       }
@@ -4385,7 +4854,7 @@
         return audioResumePromise;
       }
       function startMusicFromGesture() {
-        if(!musicEnabled||musicVolume===0)return;
+        if(!musicEnabled||musicVolume===0||musicHasStarted&&!$("backgroundMusic").paused)return;
         void startMusic();
       }
       function tone(frequency,duration,type="sine",volume=.025,delay=0,channel="effects") {
@@ -4439,10 +4908,21 @@
         musicStyle=style;
         try{localStorage.setItem("nightfall-chess-music-style-v1",style);}
         catch(error){showToast(`Music track could not be saved: ${error.message}`);}
-        musicRequest++;
+        musicRequest++;musicHasStarted=false;
         const audio=$("backgroundMusic");
         audio.pause();audio.currentTime=0;audio.removeAttribute("src");audio.load();
         if(musicEnabled&&musicVolume>0)void startMusic();
+      }
+      function showMusicIsland(style) {
+        const label=$("musicTrack").selectedOptions[0]?.text||style;
+        $("musicIslandName").textContent=isPersian?translateFa(label):label;
+        $("musicIsland").classList.add("visible");
+        $("musicIsland").setAttribute("aria-hidden","false");
+        clearTimeout(musicIslandTimer);
+        musicIslandTimer=setTimeout(()=>{
+          $("musicIsland").classList.remove("visible");
+          $("musicIsland").setAttribute("aria-hidden","true");
+        },2400);
       }
       async function startMusic() {
         if(!musicEnabled||musicVolume===0)return;
@@ -4453,7 +4933,7 @@
         try {
           await audio.play();
           if(request!==musicRequest||!musicEnabled)audio.pause();
-          else musicHasStarted=true;
+          else {musicHasStarted=true;showMusicIsland(musicStyle);}
         } catch(error) {
           if(request===musicRequest&&musicEnabled)showToast(`Music could not start: ${error.message}`);
         }
@@ -4465,7 +4945,16 @@
         try{localStorage.setItem("nightfall-chess-music-enabled-v1",String(enabled));}
         catch(error){showToast(`Music setting could not be saved: ${error.message}`);}
         if(enabled)void startMusic();
-        else {musicRequest++;$("backgroundMusic").pause();}
+        else {musicRequest++;musicHasStarted=false;$("backgroundMusic").pause();}
+      }
+      function advanceMusicTrack() {
+        const tracks=Object.keys(musicTracks),current=tracks.indexOf(musicStyle);
+        musicStyle=tracks[(current+1)%tracks.length];
+        $("musicTrack").value=musicStyle;
+        try{localStorage.setItem("nightfall-chess-music-style-v1",musicStyle);}
+        catch(error){showToast(`Music track could not be saved: ${error.message}`);}
+        musicHasStarted=false;musicRequest++;
+        void startMusic();
       }
       function setEffects(enabled) {
         effectsEnabled=enabled;
@@ -4808,29 +5297,25 @@
         if(bookMove)return bookMove;
         const depth=rating<700?6:rating<1000?8:rating<1400?10:rating<1700?12:14;
         const movetime=rating<700?450:rating<1000?700:rating<1400?1000:rating<1700?1400:1800;
-        try {
-          const result=await stockfishSearch(position,{rating,style:$("style").value,depth,movetime,signal});
-          const move=uciMove(position,result.best);
-          if(!move)throw new Error(`Stockfish returned an illegal move: ${result.best}`);
-          return move;
-        } catch(error) {
-          if(error.name==="AbortError"||signal?.aborted)throw error;
-          console.error(error);
-          showToast(isPersian?"استاک‌فیش در دسترس نیست؛ موتور داخلی بازی را ادامه می‌دهد.":"Stockfish is unavailable; the built-in engine will continue.");
-          return chooseFallbackMove(position,rating);
-        }
+        const result=await stockfishSearch(position,{rating,style:$("style").value,depth,movetime,signal});
+        const move=uciMove(position,result.best);
+        if(!move)throw new Error(`Stockfish returned an illegal move: ${result.best}`);
+        return move;
       }
       function scheduleAI() {
         if(gameOver||mode!=="ai"||state.turn===humanColor) return;
         aiThinking=true;$("statusText").textContent="Thinking…";
         $("undoButton").disabled=true;$("redoButton").disabled=true;
-        const request=++aiRequestVersion,position=copyState(state),fen=stateToFen(position),controller=new AbortController();
+        const request=++aiRequestVersion,position=copyState(state),fen=stateToFen(position),controller=new AbortController(),thinkStartedAt=performance.now();
         aiSearchController=controller;
         aiTimer=setTimeout(async()=>{
           aiTimer=null;
           if(request!==aiRequestVersion||gameOver||mode!=="ai"||state.turn===humanColor)return;
           try {
             const move=await chooseAIMove(position,controller.signal);
+            const rating=Number($("strength").value);
+            const naturalThinkTime=(rating<700?450:rating<1000?650:rating<1400?850:1100)+Math.random()*(rating<700?800:rating<1400?1100:1500);
+            await new Promise(resolve=>setTimeout(resolve,Math.max(0,naturalThinkTime-(performance.now()-thinkStartedAt))));
             if(request!==aiRequestVersion||gameOver||mode!=="ai"||state.turn===humanColor||stateToFen(state)!==fen)return;
             if(!move)throw new Error("The chess engine returned no legal move.");
             saveMove(move);
@@ -4877,158 +5362,22 @@
       $("style").addEventListener("change",()=>{styleStats();renderPlayers();});
       $("startButton").addEventListener("click",startGame);
       $("newGameTop").addEventListener("click",showLobby);
-      const glyphToCode={};
-      for(const [key,glyph] of Object.entries(baseSymbols))glyphToCode[glyph]=(key===key.toUpperCase()?"w":"b")+key.toUpperCase();
-      const pieceCodes=["wK","wQ","wR","wB","wN","wP","bK","bQ","bR","bB","bN","bP"];
-      const svgTextCache=new Map(),recoloredCache=new Map();
-      let svgSetId=null,recolorTimer=0,recolorRun=0;
-      const pieceFileUrl=(set,code)=>`assets/pieces/${set}/${code}.svg`;
-      function hexToRgb(hex) { const value=parseInt(hex.slice(1),16); return [value>>16&255,value>>8&255,value&255]; }
-      function parseSvgColor(token) {
-        const text=token.trim().toLowerCase();
-        if(text==="white")return [255,255,255];
-        if(text==="black")return [0,0,0];
-        if(text[0]==="#") {
-          let digits=text.slice(1);
-          if(digits.length===3||digits.length===4)digits=[...digits].map(char=>char+char).join("");
-          return /^[0-9a-f]{6,8}$/.test(digits)?hexToRgb("#"+digits.slice(0,6)):null;
-        }
-        const match=text.match(/^rgba?\(([^)]*)\)$/);
-        if(!match)return null;
-        const parts=match[1].split(",").slice(0,3).map(part=>part.trim());
-        if(parts.length<3)return null;
-        const channels=parts.map(part=>part.endsWith("%")?parseFloat(part)*2.55:parseFloat(part));
-        return channels.every(Number.isFinite)?channels.map(value=>Math.max(0,Math.min(255,Math.round(value)))):null;
-      }
-      function recolorSvg(text,code,color) {
-        const base=code[0]==="w"?[255,255,255]:[0,0,0],target=hexToRgb(color);
-        return text.replace(/(?<![\w-])(fill|stroke|stop-color|flood-color|color)(\s*[:=]\s*["']?\s*)(#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|white|black)/g,(whole,property,glue,token)=>{
-          const rgb=parseSvgColor(token);
-          if(!rgb)return whole;
-          const shifted=rgb.map((channel,index)=>Math.max(0,Math.min(255,Math.round(target[index]+channel-base[index]))));
-          return `${property}${glue}#${shifted.map(channel=>channel.toString(16).padStart(2,"0")).join("")}`;
-        });
-      }
-      function pieceImageSrc(set,code) {
-        const color=pieceColors[code[0]];
-        return (color&&recoloredCache.get(`${set}|${code}|${color}`))||pieceFileUrl(set,code);
-      }
-      async function recolorActiveSet() {
-        const run=++recolorRun,set=svgSetId;
-        if(!set||(!pieceColors.w&&!pieceColors.b)){decoratePieces(true);renderThemePicker();return;}
-        try {
-          await Promise.all(pieceCodes.map(async code=>{
-            const color=pieceColors[code[0]];
-            if(!color)return;
-            const key=`${set}|${code}|${color}`;
-            if(recoloredCache.has(key))return;
-            const url=pieceFileUrl(set,code);
-            if(!svgTextCache.has(url))svgTextCache.set(url,fetch(url).then(response=>{if(!response.ok)throw new Error(response.status);return response.text();}));
-            const text=await svgTextCache.get(url);
-            recoloredCache.set(key,"data:image/svg+xml;charset=utf-8,"+encodeURIComponent(recolorSvg(text,code,color)));
-          }));
-        }catch(error) {
-          if(run===recolorRun)showToast("Piece colors need the site to be opened from a web address.");
-          svgTextCache.clear();
-        }
-        if(run===recolorRun){decoratePieces(true);renderThemePicker();}
-      }
-      function undecoratePieces() {
-        document.querySelectorAll(".svg-piece").forEach(element=>{element.classList.remove("svg-piece");element.style.backgroundImage="";delete element.dataset.svgCode;});
-      }
-      function decoratePieces(refresh=false) {
-        if(!svgSetId)return;
-        const selector=".piece, .captured-piece, #promotionOptions button";
-        document.querySelectorAll(selector).forEach(element=>{
-          if(element.closest(".piece-swatch"))return;
-          const code=glyphToCode[element.textContent.trim()];
-          if(!code)return;
-          if(!refresh&&element.dataset.svgCode===code&&element.classList.contains("svg-piece"))return;
-          element.classList.add("svg-piece");element.dataset.svgCode=code;
-          element.style.backgroundImage=`url("${pieceImageSrc(svgSetId,code)}")`;
-        });
-      }
-      let decorateQueued=false;
-      new MutationObserver(()=>{
-        if(!svgSetId||decorateQueued)return;
-        decorateQueued=true;
-        queueMicrotask(()=>{decorateQueued=false;decoratePieces();});
-      }).observe(document.body,{childList:true,subtree:true,characterData:true});
-      function applyLook(persist=true) {
-        const board=boardThemes.find(item=>item.id===boardThemeId),pieces=pieceThemes.find(item=>item.id===pieceThemeId);
-        const root=document.documentElement;
-        root.style.setProperty("--sq-light",board.light);root.style.setProperty("--sq-dark",board.dark);
-        root.dataset.board=board.id;root.dataset.pieces=pieces.svg?"svg":pieces.id;
-        for(const [side,name] of [["w","--pw"],["b","--pb"]]) {
-          if(pieceColors[side])root.style.setProperty(name,pieceColors[side]);else root.style.removeProperty(name);
-        }
-        pieceFilled=pieces.filled;
-        const previousSet=svgSetId;
-        svgSetId=pieces.svg?pieces.id:null;
-        if(previousSet&&!svgSetId)undecoratePieces();
-        if(svgSetId)decoratePieces(previousSet!==svgSetId);
-        if(persist)try{localStorage.setItem(themeStorageKey,JSON.stringify({board:board.id,pieces:pieces.id,colors:{w:pieceColors.w,b:pieceColors.b}}));}catch(error){}
-      }
-      function renderThemePicker() {
-        const boardBox=$("boardThemeOptions"),pieceBox=$("pieceThemeOptions");
-        boardBox.replaceChildren();pieceBox.replaceChildren();
-        for(const theme of boardThemes) {
-          const button=document.createElement("button"),name=isPersian?theme.fa:theme.en;
-          button.type="button";button.className="theme-chip";button.setAttribute("role","radio");button.setAttribute("aria-checked",String(theme.id===boardThemeId));button.dataset.theme=theme.id;button.title=name;
-          const swatch=document.createElement("span");swatch.className="board-swatch";swatch.style.background=`conic-gradient(${theme.light} 25%, ${theme.dark} 0 50%, ${theme.light} 0 75%, ${theme.dark} 0)`;swatch.setAttribute("aria-hidden","true");
-          const label=document.createElement("span");label.className="theme-name";label.textContent=name;
-          button.append(swatch,label);
-          button.addEventListener("click",()=>{boardThemeId=theme.id;applyLook();renderThemePicker();});
-          boardBox.append(button);
-        }
-        for(const theme of pieceThemes) {
-          const button=document.createElement("button"),name=isPersian?theme.fa:theme.en;
-          button.type="button";button.className="theme-chip";button.setAttribute("role","radio");button.setAttribute("aria-checked",String(theme.id===pieceThemeId));button.dataset.theme=theme.id;button.title=name;
-          const preview=document.createElement("span");preview.className="piece-swatch";preview.dataset.pieces=theme.id;preview.setAttribute("aria-hidden","true");
-          const board=boardThemes.find(item=>item.id===boardThemeId);preview.style.background=`conic-gradient(${board.light} 25%, ${board.dark} 0 50%, ${board.light} 0 75%, ${board.dark} 0)`;
-          if(theme.svg) {
-            preview.classList.add("image-swatch");
-            for(const code of ["wN","bN"]) {
-              const image=document.createElement("img");image.alt="";image.src=theme.id===svgSetId?pieceImageSrc(theme.id,code):pieceFileUrl(theme.id,code);image.draggable=false;
-              preview.append(image);
-            }
-          }else for(const [color,piece] of [["white","N"],["black","n"]]) {
-            const glyph=document.createElement("span");glyph.className=`piece ${color}`;
-            glyph.textContent=theme.filled?baseSymbols[piece.toLowerCase()]:baseSymbols[piece];
-            preview.append(glyph);
-          }
-          const label=document.createElement("span");label.className="theme-name";label.textContent=name;
-          button.append(preview,label);
-          button.addEventListener("click",()=>{pieceThemeId=theme.id;applyLook();renderThemePicker();render();if(theme.svg)recolorActiveSet();});
-          pieceBox.append(button);
-        }
-      }
-      applyLook(false);
-      {
-        const sharedLook=new URLSearchParams(location.hash.slice(1));
-        if(boardThemes.some(item=>item.id===sharedLook.get("b")))boardThemeId=sharedLook.get("b");
-        if(pieceThemes.some(item=>item.id===sharedLook.get("p")))pieceThemeId=sharedLook.get("p");
-        for(const [side,name] of [["w","pw"],["b","pb"]]) {
-          const value="#"+(sharedLook.get(name)||"");
-          if(validColor(value))pieceColors[side]=value.toLowerCase();
-        }
-        if(sharedLook.get("b")||sharedLook.get("p")||sharedLook.get("pw")||sharedLook.get("pb"))applyLook();
-      }
-      const colorInputs={w:$("whitePieceColor"),b:$("blackPieceColor")},colorDefaults={w:"#ffffff",b:"#1c1f1d"};
-      function syncColorInputs() { for(const side of ["w","b"])colorInputs[side].value=pieceColors[side]||colorDefaults[side]; }
-      for(const side of ["w","b"])colorInputs[side].addEventListener("input",()=>{
-        pieceColors[side]=colorInputs[side].value.toLowerCase();
-        applyLook();
-        clearTimeout(recolorTimer);
-        recolorTimer=setTimeout(()=>{recolorActiveSet();render();},120);
-      });
-      $("resetPieceColors").addEventListener("click",()=>{
-        pieceColors.w="";pieceColors.b="";syncColorInputs();applyLook();recolorActiveSet();render();
-      });
-      syncColorInputs();
-      renderThemePicker();
-      if(svgSetId)recolorActiveSet();
       $("goMenuButton").addEventListener("click",showLobby);
+      $("settingsTop").addEventListener("click",openSettings);
+      $("settingsBack").addEventListener("click",closeSettings);
+      document.querySelectorAll("[data-lobby-page]").forEach(button=>button.addEventListener("click",()=>switchLobbyPage(button.dataset.lobbyPage)));
+      document.querySelectorAll("[data-settings-panel]").forEach(button=>button.addEventListener("click",()=>showSettingsPanel(button.dataset.settingsPanel)));
+      $("saveProfileButton").addEventListener("click",savePlayerProfile);
+      $("profileImage").addEventListener("change",async event=>{
+        try { await prepareProfileImage(event.currentTarget.files[0]); }
+        catch(error) { console.error(error);showToast(`Profile picture could not be prepared: ${error.message}`); }
+      });
+      $("clearProfileImage").addEventListener("click",()=>{
+        pendingProfileAvatar="";$("profileImage").value="";renderProfileAvatar($("profileAvatarPreview"),"");savePlayerProfile();
+      });
+      populateThemeOptions();
+      $("boardThemeSelect").addEventListener("change",saveAppearance);
+      $("pieceThemeSelect").addEventListener("change",saveAppearance);
       const gameScreenEl=$("gameScreen");
       function setGameMenu(open) {
         gameScreenEl.classList.toggle("menu-open",open);
@@ -5111,8 +5460,7 @@
       $("uiSoundsToggle").addEventListener("click",()=>setUiSounds(!uiSoundsEnabled));
       $("backgroundMusic").addEventListener("ended",event=>{
         if(!musicEnabled||musicVolume===0)return;
-        event.currentTarget.currentTime=0;
-        void event.currentTarget.play().catch(error=>showToast(`Music could not continue: ${error.message}`));
+        advanceMusicTrack();
       });
       $("reviewGameButton").addEventListener("click",()=>showAnalysis(lastGameResult||$("statusText").textContent));
       $("exportPgnButton").addEventListener("click",exportPgn);
@@ -5143,18 +5491,26 @@
         if(currentLesson<lessons.length-1)selectLesson(currentLesson+1);
         else showToast(completedLessons.size===lessons.length?"Course complete — keep practicing in real games":"Nice work. Revisit any lesson or keep practicing.");
       });
-      loadGameplaySettings();
+      loadGameplaySettings();loadAiOpeningHistory();
       try{await loadOpeningDatabase();}
       catch(error){console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);}
-      try{await loadPuzzleCollection();}
-      catch(error){console.error(error);showToast(isPersian?"مجموعهٔ بزرگ معما بارگیری نشد؛ معماهای پایه در دسترس هستند.":"The expanded puzzle collection could not be loaded; the starter puzzles are still available.");}
-      validatePuzzleSet();ensureTwentyMoveLines();loadProfileStats();loadLessonProgress();loadCompletedPuzzles();loadMusicSettings();reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
+      ensureTwentyMoveLines();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();
+      reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
       $("setSkillButton").addEventListener("click",setPlayerSkill);
       $("puzzleHintButton").addEventListener("click",showPuzzleHint);
       $("nextPuzzleButton").addEventListener("click",nextPuzzle);
       $("puzzlePlayButton").addEventListener("click",startPuzzle);
       $("puzzleGameHint").addEventListener("click",showPuzzleHint);
-      $("puzzleGameNext").addEventListener("click",()=>{nextPuzzle();if(currentPuzzle)startPuzzle();else exitPuzzle();});
+      $("puzzleGameBack").addEventListener("click",undo);
+      $("puzzleGameForward").addEventListener("click",redo);
+      $("puzzleGameNext").addEventListener("click",async()=>{
+        if(!puzzleSolved)return;
+        await nextPuzzle();
+        if(currentPuzzle)startPuzzle();
+        else if(puzzleLoadError)showToast(`Next puzzle could not be loaded: ${puzzleLoadError}`);
+        else exitPuzzle();
+      });
+      $("puzzleRetryButton").addEventListener("click",()=>void retryPuzzleLoading());
       $("exitPuzzleButton").addEventListener("click",exitPuzzle);
       $("languageSelect").addEventListener("change",event=>setLanguage(event.currentTarget.value));
       styleStats();renderLesson();render();evaluateEnd();setMode("ai");
