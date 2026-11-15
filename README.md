@@ -38,6 +38,12 @@ The page automatically uses the API on port `4173` when it is served from `local
 
 The first puzzle request streams the full 309 MB compressed Lichess archive into a disk-backed index; the browser receives only small pages of puzzles. The first index can take about a minute. Check `http://127.0.0.1:4173/api/puzzles/status` for readiness and the total indexed count. Puzzle data and Stockfish are served locally; neither feature depends on a CDN or cross-origin isolation.
 
+## Game archive and review
+
+Completed games and saved Chess Moments are stored in browser IndexedDB on the current device. The archive keeps full move/state history and PGN metadata, supports replay, review, PGN download, result/date filters, favorites, and confirmed deletion. Stockfish review results are cached with each archived game so later reviews can reuse completed analysis. Daily challenge completion is stored locally; the featured position is selected from the included rated puzzle sample. These records are device-local and are not synchronized between browsers.
+
+AI move searches run in the existing local Stockfish worker. The engine can calculate while the player sees the thinking indicator; the reply waits at least 2.7 seconds from the player's move before animating, unless calculation takes longer. Reduced-motion preferences intentionally disable piece animations.
+
 ## Supabase Classroom
 
 Classroom is a static-site feature backed by Supabase; it does not use a Node WebSocket server. Configure Supabase once, then publish the same static files to GitHub Pages (including a repository site deployed beneath `/Chess/`).

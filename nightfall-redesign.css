@@ -707,7 +707,81 @@ html[lang="fa"] #gameScreen.layout > .side-panel { border-right: 1px solid #b7a3
 .analysis-board { border-color: #8980aa; border-radius: 9px; background: #0c101a; box-shadow: 0 16px 38px #0007, 0 0 0 1px #b7a3ff15; }
 #analysisBoard .square.light { background-color: var(--light-square); }
 #analysisBoard .square.dark { background-color: var(--dark-square); }
+.analysis-board .square.best-line-source::before,
+.analysis-board .square.best-line-target::before { position: absolute; inset: 5%; border: 2px solid #e8c86f; border-radius: 50%; background: #e8c86f22; content: ""; pointer-events: none; }
+.analysis-board .square.best-line-target::before { border-radius: 8px; background: #e8c86f35; }
 @keyframes hero-board-drift { 50% { transform: perspective(900px) rotateX(8deg) rotateZ(-3deg) translateY(-5px); } }
+
+.daily-challenge-card { grid-column: 1 / -1; display: grid; gap: 8px; }
+.daily-challenge-actions, .moment-save-row, .archive-filters, .analysis-filter-row,
+.review-autoplay-controls, .best-line-heading, .best-line-actions {
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+}
+.daily-challenge-actions { justify-content: space-between; }
+.daily-challenge-status { color: var(--moonlight); font-size: .88rem; }
+.archive-filters { margin: 0 0 10px; }
+.archive-filters select, .archive-filters input, .analysis-filter-row select,
+.review-autoplay-controls select {
+  min-height: 34px; padding: 5px 9px; border: 1px solid #ffffff19; border-radius: 9px;
+  background: #10131d; color: #e6e2f2;
+}
+.recent-game-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 9px; }
+.recent-game-details { min-width: 0; }
+.recent-game-actions { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+.recent-game-actions button, .moment-actions button { min-height: 31px; padding: 5px 9px; font-size: .78rem; }
+.journey-card, .moments-card { min-width: 0; }
+.journey-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.journey-metric { padding: 10px; border: 1px solid #ffffff10; border-radius: 10px; background: #ffffff04; }
+.journey-metric strong, .journey-metric span { display: block; }
+.journey-metric strong { color: var(--gold); font-size: 1.05rem; }
+.journey-metric span { margin-top: 3px; color: #b6b7c5; font-size: .75rem; }
+.journey-trend { display: grid; gap: 5px; margin-top: 10px; padding: 9px; border: 1px solid #ffffff10; border-radius: 10px; background: #0c101a; }
+.journey-trend > strong { color: #c9c4db; font-size: .8rem; }
+.journey-trend > span { color: #aeb0bf; font-size: .77rem; }
+.journey-trend svg { width: 100%; max-height: 92px; }
+.journey-trend-grid { stroke: #ffffff16; stroke-width: 1; }
+.journey-trend-line { fill: none; stroke: var(--moonlight); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.journey-trend circle { fill: var(--gold); stroke: #11131c; stroke-width: 1.5; }
+.achievement-list { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 10px; }
+.achievement-badge { padding: 6px 9px; border: 1px solid #b7a3ff30; border-radius: 999px; background: #b7a3ff0b; color: #d7cefa; font-size: .76rem; }
+.moment-note-label { display: block; margin: 8px 0 5px; color: #bfc0cc; font-size: .82rem; }
+.moment-save-row input { flex: 1 1 160px; min-width: 0; padding: 9px 10px; border: 1px solid #ffffff19; border-radius: 9px; background: #10131d; color: #eee; }
+.moment-list { display: grid; gap: 8px; padding: 0; list-style: none; }
+.moment-row { padding: 9px; border: 1px solid #ffffff10; border-radius: 10px; background: #ffffff04; }
+.moment-row > strong, .moment-row > small { display: block; }
+.moment-row > small { margin-top: 3px; color: #aeb0bf; }
+.moment-actions { display: flex; gap: 6px; margin-top: 7px; }
+.review-autoplay-controls { justify-content: center; margin-top: 8px; color: #b9bac8; font-size: .8rem; }
+.analysis-filter-row { justify-content: flex-end; margin: 8px 0; color: #b9bac8; font-size: .83rem; }
+.analysis-table-wrap { max-width: 100%; overflow: auto; border: 1px solid #ffffff12; border-radius: 11px; }
+.analysis-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.analysis-content-column .analysis-list { display: table-row-group; min-height: 0; max-height: none; flex: initial; margin: 0; overflow: visible; }
+.analysis-table th { position: sticky; top: 0; padding: 8px 7px; background: #171a29; color: #aaaabc; text-align: start; white-space: nowrap; }
+.analysis-table td { padding: 7px; border-top: 1px solid #ffffff0b; vertical-align: middle; }
+.analysis-table tr[data-index] { cursor: pointer; transition: background .15s; }
+.analysis-table tr[data-index]:hover, .analysis-table tr[aria-current="true"] { background: #b7a3ff12; }
+.analysis-table tr.critical-move { box-shadow: inset 3px 0 #e88b9b; }
+.analysis-table td .subtle-button { min-height: 29px; padding: 4px 7px; font-size: .74rem; white-space: nowrap; }
+.review-move-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+.best-line-panel { margin: 9px 0; padding: 12px; border: 1px solid #b7a3ff36; border-radius: 12px; background: #b7a3ff0b; }
+.best-line-heading { justify-content: space-between; color: #eee9ff; }
+.best-line-heading span { color: var(--gold); }
+.best-line-panel p { margin: 7px 0; color: #c4c1d2; font-size: .84rem; }
+.best-line-actions { justify-content: flex-start; }
+.best-line-actions > span { flex: 1; text-align: center; color: #e5dcff; font-weight: 650; }
+.evaluation-graph [data-index] { cursor: pointer; }
+.evaluation-graph .evaluation-point { fill: var(--gold); stroke: #11131c; stroke-width: 2; }
+.evaluation-graph .evaluation-point.critical { fill: #f08a9a; }
+.analysis-board { position: relative; }
+.review-best-arrow { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.review-best-arrow-line { stroke: #e8c86f; stroke-width: .14; stroke-linecap: round; opacity: .9; filter: drop-shadow(0 1px 2px #000b); }
+
+@media (max-width: 680px) {
+  .journey-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .analysis-dialog { width: min(96vw, 680px); max-height: 94dvh; overflow: auto; }
+  .analysis-table { min-width: 780px; }
+  .daily-challenge-actions { align-items: flex-start; flex-direction: column; }
+}
 
 @media (max-width: 760px) {
   .lobby { gap: 10px; }

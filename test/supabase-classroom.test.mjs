@@ -51,8 +51,8 @@ test("classroom chess validation supports castling, captures, and promotion", ()
   assert.equal(castleState.moves[0].san, "O-O");
   assert.equal(castleState.fen.includes("R4RK1"), true);
 
-  const capture = roomPosition("4k3/8/8/8/8/8/1p6/R3K3 w Q - 0 1");
-  const captureState = applyClassroomMove(capture.chess, capture.state, { from: "a1", to: "b2" });
+  const capture = roomPosition("4k3/8/8/8/8/8/p7/R3K3 w Q - 0 1");
+  const captureState = applyClassroomMove(capture.chess, capture.state, { from: "a1", to: "a2" });
   assert.equal(captureState.moves[0].captured, "p");
 
   const promotion = roomPosition("7k/P7/8/8/8/8/8/7K w - - 0 1");
