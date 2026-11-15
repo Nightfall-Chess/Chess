@@ -124,12 +124,6 @@
     select:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     input[type="range"] { width: 100%; height: 5px; margin: 7px 0; accent-color: var(--accent); cursor: pointer; }
     .range-labels { display: flex; justify-content: space-between; color: #707a72; font-size: 10px; }
-    .style-ratings { display: grid; gap: 9px; margin-top: 15px; }
-    .rating-row { display: grid; grid-template-columns: 72px 1fr 33px; align-items: center; gap: 8px; }
-    .rating-name { color: var(--muted); font-size: 10px; }
-    .rating-track { height: 4px; border-radius: 5px; background: #303633; overflow: hidden; }
-    .rating-fill { height: 100%; border-radius: inherit; background: #99c657; transition: width .2s; }
-    .rating-value { color: #b6beb7; font-size: 10px; font-variant-numeric: tabular-nums; text-align: right; }
     .primary-button { width: 100%; min-height: 40px; margin-top: 17px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 700; cursor: pointer; transition: filter .15s, transform .15s; }
     .primary-button:hover { filter: brightness(1.05); transform: translateY(-1px); }
     .primary-button:disabled { opacity: .55; cursor: default; transform: none; }
@@ -141,7 +135,13 @@
     .move-row:nth-child(even) { background: #ffffff05; }
     .move-number { color: #747d76; }
     .move-current { color: var(--accent); }
-    .board-move-button { width: 100%; padding: 2px 3px; border: 0; border-radius: 4px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+    .board-move-button { display: flex; align-items: center; gap: 6px; width: 100%; padding: 2px 3px; border: 0; border-radius: 4px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+    .move-quality { margin-left: auto; padding: 1px 5px; border-radius: 5px; background: #ffffff0b; color: var(--muted); font-size: 9px; font-weight: 600; white-space: nowrap; }
+    .move-quality.best, .move-quality.excellent, .move-quality.good { background: #96ce5420; color: #c9e69a; }
+    .move-quality.mid { background: #edbb5b20; color: #f0c66f; }
+    .move-quality.bad { background: #e66c6420; color: #ff9188; }
+    .move-quality.pending { animation: quality-pulse 1.2s ease-in-out infinite alternate; }
+    @keyframes quality-pulse { to { opacity: .45; } }
     .board-move-button:hover, .board-move-button[aria-current="true"] { background: #c8f1691c; color: var(--accent); }
     .empty-moves { padding: 9px 3px; color: #778078; line-height: 1.5; }
     .game-info-tabs { display: flex; gap: 6px; margin: -5px 0 12px; }
@@ -1329,6 +1329,22 @@
     .settings-audio-controls .music-volume-control { width: 100%; min-height: 38px; }
     .settings-audio-controls .music-volume-control input { flex: 1; width: auto; }
     .theme-settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .theme-option-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; max-height: 230px; margin-top: 7px; padding: 3px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 9px; background: #121613; }
+    .theme-option { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 48px; padding: 5px 7px; border: 1px solid transparent; border-radius: 7px; background: #191e1a; color: var(--muted); text-align: left; cursor: pointer; }
+    .theme-option:hover { border-color: #46513b; background: #222923; color: var(--text); }
+    .theme-option[aria-checked="true"] { border-color: #8ca75e; background: #252e20; color: var(--text); box-shadow: inset 0 0 0 1px #c8f16920; }
+    .theme-option:focus-visible { z-index: 1; outline: 2px solid var(--accent); outline-offset: 1px; }
+    .theme-option-label { overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+    .theme-board-preview, .theme-piece-preview { display: flex; flex: 0 0 44px; align-items: center; justify-content: center; width: 44px; height: 34px; overflow: hidden; border: 1px solid #3c463c; border-radius: 4px; background: #242a24; }
+    .theme-board-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .theme-board-swatches { display: grid; width: 100%; height: 100%; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+    .theme-board-swatches span:nth-child(1), .theme-board-swatches span:nth-child(4) { background: var(--preview-light); }
+    .theme-board-swatches span:nth-child(2), .theme-board-swatches span:nth-child(3) { background: var(--preview-dark); }
+    .theme-piece-preview { gap: 1px; }
+    .theme-piece-preview img { width: 50%; height: 90%; object-fit: contain; }
+    .theme-piece-preview .theme-symbol { font-size: 22px; line-height: 1; }
+    .theme-piece-preview .theme-symbol:first-child { color: #fffef4; text-shadow: 0 1px 2px #111; }
+    .theme-piece-preview .theme-symbol:last-child { color: #a7b3a5; text-shadow: 0 1px 2px #111; }
     .theme-preview-wrap { margin-top: 20px; }
     .theme-preview-label { margin-bottom: 8px; color: var(--muted); font-size: 11px; }
     .theme-preview-board { display: grid; grid-template-columns: repeat(8, 1fr); width: min(100%, 290px); overflow: hidden; border: 5px solid #272d28; border-radius: 11px; }
@@ -1461,9 +1477,6 @@
               <input id="lobbyStrength" type="range" min="400" max="2000" step="100" value="1200">
               <div class="range-labels"><span>400 · Beginner</span><span>2000 · Expert</span></div>
             </div>
-            <div class="field"><div class="field-row"><label class="field-label" for="lobbyStyle">Style</label></div>
-              <select id="lobbyStyle"><option value="balanced">Balanced</option><option value="aggressive">Aggressive</option><option value="positional">Positional</option><option value="defensive">Defensive</option></select>
-            </div>
             <div class="field"><div class="field-row"><label class="field-label" for="lobbyColor">Your side</label></div>
               <select id="lobbyColor"><option value="w">White</option><option value="b">Black</option><option value="random">Random</option></select>
             </div>
@@ -1477,14 +1490,6 @@
             </div>
             <p class="note" style="grid-column:1/-1;margin:7px 0 0">Take turns on the same board. Hand the device over after each move.</p>
           </div>
-          <details class="lobby-extra" id="lobbyAiMore">
-            <summary>Show AI skill ratings</summary>
-            <div class="lobby-extra-content style-ratings" style="margin-top:0" aria-label="AI skill ratings">
-              <div class="rating-row"><span class="rating-name">Tactics</span><div class="rating-track"><div class="rating-fill" id="lobbyTacticsBar"></div></div><span class="rating-value" id="lobbyTacticsRating"></span></div>
-              <div class="rating-row"><span class="rating-name">Position</span><div class="rating-track"><div class="rating-fill" id="lobbyPositionBar"></div></div><span class="rating-value" id="lobbyPositionRating"></span></div>
-              <div class="rating-row"><span class="rating-name">Defense</span><div class="rating-track"><div class="rating-fill" id="lobbyDefenseBar"></div></div><span class="rating-value" id="lobbyDefenseRating"></span></div>
-            </div>
-          </details>
           <div class="gameplay-options" aria-label="Game options">
             <label class="gameplay-option"><input id="lobbyTakebacks" type="checkbox" checked><span>Allow takebacks</span></label>
             <label class="gameplay-option"><input id="lobbyHints" type="checkbox" checked><span>Allow hints</span></label>
@@ -1558,6 +1563,7 @@
       <div class="settings-layout">
         <nav class="card settings-nav" aria-label="Settings sections">
           <button type="button" class="settings-nav-button active" data-settings-panel="profile">Profile</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="gameplay">Gameplay</button>
           <button type="button" class="settings-nav-button" data-settings-panel="appearance">Board & pieces</button>
           <button type="button" class="settings-nav-button" data-settings-panel="audio">Sound</button>
           <button type="button" class="settings-nav-button" data-settings-panel="language">Language</button>
@@ -1575,11 +1581,16 @@
             </div>
             <p class="note">Your profile is saved on this device and shown in local games. No account or image upload is required.</p>
           </section>
+          <section class="card settings-panel" data-settings-content="gameplay" hidden>
+            <div class="card-heading"><span class="card-title">Gameplay</span><span class="eyebrow">PERSONALIZE YOUR GAME</span></div>
+            <label class="gameplay-option"><input id="moveAnnotationsSetting" type="checkbox"><span>Show move quality (best, mistake, blunder)</span></label>
+            <p class="note">Move quality is estimated with Stockfish after each move. Analysis may take a moment.</p>
+          </section>
           <section class="card settings-panel" data-settings-content="appearance" hidden>
             <div class="card-heading"><span class="card-title">Board & pieces</span><span class="eyebrow">LIVE PREVIEW</span></div>
             <div class="theme-settings-grid">
-              <label class="field"><span class="field-label">Board theme</span><select id="boardThemeSelect"></select></label>
-              <label class="field"><span class="field-label">Piece style</span><select id="pieceThemeSelect"></select></label>
+              <div class="field"><div class="field-label" id="boardThemeLabel">Board theme</div><div class="theme-option-list" id="boardThemeOptions" role="radiogroup" aria-labelledby="boardThemeLabel"></div></div>
+              <div class="field"><div class="field-label" id="pieceThemeLabel">Piece style</div><div class="theme-option-list" id="pieceThemeOptions" role="radiogroup" aria-labelledby="pieceThemeLabel"></div></div>
             </div>
             <div class="theme-preview-wrap"><div class="theme-preview-label">Preview</div><div class="theme-preview-board" id="themePreviewBoard" role="img" aria-label="Board and piece theme preview"></div></div>
           </section>
@@ -1709,20 +1720,6 @@
               <div class="range-labels"><span>400 · Beginner</span><span>2000 · Expert</span></div>
             </div>
             <div class="field">
-              <div class="field-row"><label class="field-label" for="style">Playing style</label></div>
-              <select id="style">
-                <option value="balanced">Balanced</option>
-                <option value="aggressive">Aggressive</option>
-                <option value="positional">Positional</option>
-                <option value="defensive">Defensive</option>
-              </select>
-            </div>
-            <div class="style-ratings" aria-label="AI style ratings">
-              <div class="rating-row"><span class="rating-name">Tactics</span><div class="rating-track"><div class="rating-fill" id="tacticsBar"></div></div><span class="rating-value" id="tacticsRating"></span></div>
-              <div class="rating-row"><span class="rating-name">Position</span><div class="rating-track"><div class="rating-fill" id="positionBar"></div></div><span class="rating-value" id="positionRating"></span></div>
-              <div class="rating-row"><span class="rating-name">Defense</span><div class="rating-track"><div class="rating-fill" id="defenseBar"></div></div><span class="rating-value" id="defenseRating"></span></div>
-            </div>
-            <div class="field">
               <div class="field-row"><label class="field-label" for="colorChoice">Play as</label></div>
               <select id="colorChoice"><option value="w">White</option><option value="b">Black</option><option value="random">Random</option></select>
             </div>
@@ -1817,27 +1814,71 @@
       function themeLabel(theme) {
         return theme.replace(/_/g," ").replace(/\b[a-z]/g,letter=>letter.toUpperCase());
       }
-      function addThemeOptions(select,options) {
-        select.replaceChildren(...options.map(([value,label])=>{
-          const option=document.createElement("option");
-          option.value=value;option.textContent=label;
-          return option;
-        }));
+      function boardImageUrl(theme) {
+        return new URL(`./chess.com-boards-and-pieces-2.x/boards/${encodeURIComponent(theme)}.png`,document.baseURI).href;
+      }
+      function addThemeOptions(container,options,kind) {
+        for(const [value,label] of options) {
+          const button=document.createElement("button"),preview=document.createElement("span"),text=document.createElement("span");
+          button.type="button";button.className="theme-option";button.dataset.themeValue=value;button.setAttribute("role","radio");
+          button.setAttribute("aria-label",label);button.title=label;
+          preview.className=kind==="board"?"theme-board-preview":"theme-piece-preview";
+          if(kind==="board"&&value.startsWith("chess-")) {
+            const image=document.createElement("img");
+            image.src=boardImageUrl(value.slice(6));image.alt="";image.width=44;image.height=34;image.loading="lazy";image.decoding="async";
+            preview.append(image);
+          } else if(kind==="board") {
+            const colors={sage:["#f0d9b5","#9c6746"],arctic:["#e8edf8","#b7c1d9"],walnut:["#ead9bc","#a87550"]};
+            const swatches=document.createElement("span");swatches.className="theme-board-swatches";
+            swatches.style.setProperty("--preview-light",colors[value][0]);swatches.style.setProperty("--preview-dark",colors[value][1]);
+            for(let index=0;index<4;index++)swatches.append(document.createElement("span"));
+            preview.append(swatches);
+          } else {
+            for(const piece of ["Q","n"]) {
+              if(value==="symbols") {
+                const symbol=document.createElement("span");symbol.className="theme-symbol";symbol.textContent=symbols[piece];preview.append(symbol);
+              } else {
+                const image=document.createElement("img");
+                image.src=pieceImageUrl(piece,value);image.alt="";image.width=24;image.height=30;image.loading="lazy";image.decoding="async";
+                preview.append(image);
+              }
+            }
+          }
+          text.className="theme-option-label";text.textContent=label;
+          button.append(preview,text);container.append(button);
+        }
+        container.addEventListener("click",event=>{
+          const button=event.target instanceof Element?event.target.closest("button[data-theme-value]"):null;
+          if(!button)return;
+          if(kind==="board")boardTheme=button.dataset.themeValue;else pieceTheme=button.dataset.themeValue;
+          saveAppearance();
+        });
+        container.addEventListener("keydown",event=>{
+          if(!["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Home","End"].includes(event.key))return;
+          const buttons=[...container.querySelectorAll("button[data-theme-value]")],index=buttons.indexOf(document.activeElement);
+          if(index<0)return;
+          event.preventDefault();
+          const next=event.key==="Home"?0:event.key==="End"?buttons.length-1:
+            (index+(event.key==="ArrowRight"||event.key==="ArrowDown"?1:-1)+buttons.length)%buttons.length;
+          buttons[next].focus();buttons[next].click();
+        });
       }
       function populateThemeOptions() {
-        addThemeOptions($("boardThemeSelect"),[
+        addThemeOptions($("boardThemeOptions"),[
           ["sage","Sage"],["arctic","Arctic blue"],["walnut","Walnut (classic)"],
           ...boardAssetThemes.map(theme=>[`chess-${theme}`,themeLabel(theme)])
-        ]);
-        addThemeOptions($("pieceThemeSelect"),[
+        ],"board");
+        addThemeOptions($("pieceThemeOptions"),[
           ["symbols","Classic symbols"],["solid","Lichess classic"],["outline","Lichess outline"],
           ...pieceAssetThemes.map(theme=>[`set-${theme}`,themeLabel(theme)])
-        ]);
+        ],"piece");
       }
       const faText = {
         "Nightfall Chess":"شطرنج شبانه","A quieter kind of competition":"رقابتی آرام و هوشمندانه",
         "Export PGN":"دریافت فایل PGN","First position":"نخستین وضعیت","Previous move":"حرکت پیشین","Next move":"حرکت بعدی","Final position":"وضعیت پایانی","Initial position":"وضعیت آغازین","Review position":"وضعیت مرور","King's Pawn Game":"بازی پیادهٔ شاه","King’s Pawn Game":"بازی پیادهٔ شاه",
         "Stockfish is calculating a move…":"موتور Stockfish در حال محاسبهٔ حرکت است…","Stockfish is analyzing the moves…":"موتور Stockfish در حال تحلیل حرکت‌هاست…","Loading Stockfish Lite (about 1.8 MB)…":"در حال بارگیری نسخهٔ سبک Stockfish (حدود ۱٫۸ مگابایت)…",
+        "Best":"بهترین","Excellent":"عالی","Good":"خوب","Inaccuracy":"نادقیق","Mistake":"اشتباه","Blunder":"اشتباه فاحش","Unavailable":"در دسترس نیست","Analyzing":"در حال تحلیل",
+        "Show move quality (best, mistake, blunder)":"نمایش کیفیت حرکت (بهترین، اشتباه، اشتباه فاحش)","Move quality is estimated with Stockfish after each move. Analysis may take a moment.":"کیفیت حرکت پس از هر نوبت با Stockfish برآورد می‌شود. تحلیل ممکن است کمی زمان ببرد.",
         "Accuracy estimate based on Stockfish win-chance changes":"برآورد دقت بر پایهٔ تغییر شانس برد در ارزیابی Stockfish","Engine evaluation":"ارزیابی موتور","ECO":"رده‌بندی ECO",
         "♧ Online":"♧ آنلاین","PLAY TOGETHER":"باهم بازی کنید","Online with friends":"بازی آنلاین با دوستان",
         "Create a room and share its invite code, or enter a code your friend sent you.":"اتاقی بسازید و کد دعوتش را بفرستید یا کدی را که دوستتان فرستاده وارد کنید.",
@@ -1897,12 +1938,10 @@
         "Choose game mode":"انتخاب حالت بازی","Play AI":"بازی با هوش مصنوعی","Play a friend":"بازی با دوست",
         "Choose an opponent that fits your level.":"حریفی متناسب با سطح خود انتخاب کنید.","Take turns on the same board.":"به‌نوبت روی یک صفحه بازی کنید.",
         "AI rating":"درجهٔ سختی هوش مصنوعی","400 · Beginner":"۴۰۰ · مبتدی","2000 · Expert":"۲۰۰۰ · حرفه‌ای",
-        "Style":"سبک بازی","Balanced":"متعادل","Aggressive":"تهاجمی","Positional":"موقعیتی","Defensive":"دفاعی",
         "Your side":"مهره‌های شما","White":"سفید","Black":"سیاه","Random":"تصادفی","Your side":"رنگ شما",
         "Time control":"زمان بازی","No clock":"بدون زمان","5 minutes":"۵ دقیقه","10 minutes":"۱۰ دقیقه","30 minutes":"۳۰ دقیقه",
         "Take turns on the same board. Hand the device over after each move.":"روی یک صفحه نوبتی بازی کنید؛ بعد از هر حرکت، دستگاه را به دوستتان بدهید.",
-        "Show AI skill ratings":"نمایش درجهٔ مهارت هوش مصنوعی","AI skill ratings":"درجهٔ مهارت هوش مصنوعی",
-        "Tactics":"تاکتیک","Position":"وضعیت","Defense":"دفاع","Start game":"شروع بازی","Start new game":"شروع بازی جدید",
+        "Position":"وضعیت","Start game":"شروع بازی","Start new game":"شروع بازی جدید",
         "Player statistics":"آمار بازیکن","Games":"بازی‌ها","Wins":"بردها","Win rate":"درصد برد","Chess score":"امتیاز شطرنج",
         "Before your first puzzle…":"پیش از اولین معما…","Choose the level that feels closest to your chess experience. This sets your starting score and puzzle difficulty.":"سطحی را انتخاب کنید که به تجربهٔ شطرنج شما نزدیک‌تر است. امتیاز آغازین و سختی معماها بر این اساس تعیین می‌شوند.",
         "Your chess experience":"تجربهٔ شطرنج شما","New to chess · 400":"تازه‌کار · ۴۰۰","Beginner · 700":"مبتدی · ۷۰۰","Casual player · 1000":"تفننی · ۱۰۰۰",
@@ -2087,7 +2126,7 @@
         const ep=position.ep?`${"abcdefgh"[position.ep[1]]}${8-position.ep[0]}`:"-";
         return `${board} ${position.turn} ${castle} ${ep} ${position.halfmove||0} ${position.fullmove||1}`;
       }
-      let openingIdentity=null,openingDatabasePromise=null;
+      let openingIdentity=null,openingByColor={w:null,b:null},openingDatabasePromise=null;
       const openingDatabaseByPosition=new Map();
       const openingPersianTerms={
         "accepted":"پذیرفته‌شده","advance":"پیشروی","attack":"حمله","attacking":"حمله‌ای","defense":"دفاع","defence":"دفاع",
@@ -2139,19 +2178,56 @@
         return `${letters[eco[0]]} ${digits}`;
       }
       function recognizeOpening() {
-        if(openingIdentity||history.length<2||!openingDatabaseByPosition.size)return;
+        if(history.length<2||!openingDatabaseByPosition.size)return;
+        let bestMatch=null;
         for(let ply=2;ply<=history.length;ply++) {
           const position=history[ply-1].after,key=stateToFen(position).split(" ").slice(0,3).join(" ");
-          const matches=(openingDatabaseByPosition.get(key)||[]).filter(entry=>entry.m.length>=ply&&entry.m.slice(0,ply).every((move,index)=>move===moveToUci(history[index].move)));
+          const matches=(openingDatabaseByPosition.get(key)||[]).filter(entry=>entry.m.length===ply&&entry.m.every((move,index)=>move===moveToUci(history[index].move)));
           if(!matches.length)continue;
-          matches.sort((a,b)=>a.m.length-b.m.length||a.e.localeCompare(b.e)||a.n.localeCompare(b.n));
-          const match=matches[0];
-          openingIdentity={eco:match.e,name:match.n,nameFa:openingNameInPersian(match.n),position:key,ply};
-          break;
+          matches.sort((a,b)=>a.e.localeCompare(b.e)||a.n.localeCompare(b.n));
+          bestMatch={...matches[0],position:key,ply};
+        }
+        if(bestMatch) {
+          openingIdentity={eco:bestMatch.e,name:bestMatch.n,nameFa:openingNameInPersian(bestMatch.n),position:bestMatch.position,ply:bestMatch.ply};
+          const whiteName=whiteOpeningName();
+          const blackName=blackOpeningName();
+          openingByColor={
+            w:{eco:bestMatch.e,name:whiteName,nameFa:openingNameInPersian(whiteName),ply:bestMatch.ply},
+            b:{eco:bestMatch.e,name:blackName,nameFa:openingNameInPersian(blackName),ply:bestMatch.ply}
+          };
         }
       }
+      function whiteOpeningName() {
+        const moves=history.filter(entry=>entry.before.turn==="w").map(entry=>entry.san.replace(/[+#?!]+$/g,""));
+        if(moves[0]==="e4") {
+          if(moves.includes("f4"))return "King's Gambit";
+          if(moves.includes("d4"))return "Center Game";
+          if(moves.includes("Nf3"))return "King's Knight Opening";
+          return "King's Pawn Game";
+        }
+        if(moves[0]==="d4") {
+          if(moves.includes("Bf4"))return "London System";
+          if(moves.includes("c4"))return "Queen's Gambit";
+          return "Queen's Pawn Game";
+        }
+        if(moves[0]==="c4")return "English Opening";
+        if(moves[0]==="Nf3")return "Réti Opening";
+        if(moves[0]==="f4")return "Bird Opening";
+        return "White Opening";
+      }
+      function blackOpeningName() {
+        const whiteMove=history[0]?.san.replace(/[+#?!]+$/g,"");
+        const blackMove=history[1]?.san.replace(/[+#?!]+$/g,"");
+        const responses={
+          e4:{e5:"Open Game",c5:"Sicilian Defense",e6:"French Defense",c6:"Caro-Kann Defense",d5:"Scandinavian Defense",Nf6:"Alekhine Defense",d6:"Pirc Defense",g6:"Modern Defense",Nc6:"Nimzowitsch Defense"},
+          d4:{d5:"Queen's Pawn Defense",Nf6:"Indian Defense",f5:"Dutch Defense",c5:"Benoni Defense",e6:"Queen's Pawn Defense"},
+          c4:{e5:"Reversed Sicilian",c5:"Symmetrical English",e6:"Anglo-Indian Defense",Nf6:"Anglo-Indian Defense"},
+          Nf3:{d5:"Queen's Pawn Defense",Nf6:"Indian Defense",c5:"Sicilian Defense"}
+        };
+        return responses[whiteMove]?.[blackMove]||`Response to ${whiteMove||"White's move"}`;
+      }
       function rebuildOpeningIdentity() {
-        openingIdentity=null;
+        openingIdentity=null;openingByColor={w:null,b:null};
         recognizeOpening();
       }
       const recentAiOpeningMoves=[];
@@ -2175,7 +2251,7 @@
         try { localStorage.setItem("nightfall-chess-ai-openings-v1",JSON.stringify(recentAiOpeningMoves)); }
         catch(error) { showToast(`AI opening history could not be saved: ${error.message}`); }
       }
-      function ecoOpeningBookMove(position,rating,style) {
+      function ecoOpeningBookMove(position,rating) {
         const maxPlies=rating<700?4:rating<1000?6:rating<1400?8:12;
         if(history.length>=maxPlies||!openingDatabaseByPosition.size)return null;
         const prefix=history.map(entry=>moveToUci(entry.move)),candidates=new Map();
@@ -2190,14 +2266,7 @@
         const openingPly=position.turn==="w"?0:1;
         const recent=history.length<=openingPly+1?ranked.filter(([uci])=>recentAiOpeningMoves.includes(uci)):[];
         const choices=recent.length<ranked.length?ranked.filter(([uci])=>!recentAiOpeningMoves.includes(uci)):ranked;
-        const weighted=choices.map(([uci,count])=>{
-          const move=uciMove(position,uci),piece=position.board[move.from[0]][move.from[1]]?.toLowerCase();
-          const central=["c4","d4","e4","f4"].includes(uci.slice(2,4));
-          const styleWeight=style==="aggressive"&&piece==="p"&&central?1.35
-            :style==="positional"&&central?1.2
-              :style==="defensive"&&["n","b"].includes(piece)?1.2:1;
-          return {uci,weight:Math.max(1,count)*styleWeight};
-        });
+        const weighted=choices.map(([uci,count])=>({uci,weight:Math.max(1,count)}));
         let selection=Math.random()*weighted.reduce((sum,candidate)=>sum+candidate.weight,0),chosen=weighted.at(-1).uci;
         for(const candidate of weighted) {
           selection-=candidate.weight;
@@ -2302,9 +2371,9 @@
         });
         return stockfishReadyPromise;
       }
-      function stockfishSearch(position,{rating=2000,style="balanced",depth=10,movetime=0,unrestricted=false,multiPV=1,signal}={}) {
+      function stockfishSearch(position,{rating=2000,depth=10,movetime=0,unrestricted=false,multiPV=1,signal}={}) {
         const fen=stateToFen(position),normalizedRating=Math.max(400,Math.min(2000,Math.round(rating)));
-        const cacheKey=[fen,normalizedRating,style,depth,movetime,unrestricted,multiPV].join("|");
+        const cacheKey=[fen,normalizedRating,depth,movetime,unrestricted,multiPV].join("|");
         if(stockfishSearchCache.has(cacheKey))return Promise.resolve(stockfishSearchCache.get(cacheKey));
         const operation=stockfishQueue.then(async()=>{
           const run=async(retry)=>{
@@ -2312,12 +2381,11 @@
             await ensureStockfish();
             if(signal?.aborted)throw stockfishAbortError();
             return new Promise((resolve,reject)=>{
-              const styleBias={balanced:0,aggressive:70,positional:0,defensive:-50}[style]||0;
               const options=unrestricted
                 ?["setoption name UCI_LimitStrength value false","setoption name Skill Level value 20"]
                 :normalizedRating>=1320
-                  ?[`setoption name UCI_LimitStrength value true`,`setoption name UCI_Elo value ${Math.max(1320,Math.min(2000,normalizedRating+styleBias))}`,"setoption name Skill Level value 20"]
-                  :["setoption name UCI_LimitStrength value false",`setoption name Skill Level value ${Math.max(0,Math.min(11,Math.round((normalizedRating-400)/82)+(style==="aggressive"?1:style==="defensive"?-1:0)))}`];
+                  ?[`setoption name UCI_LimitStrength value true`,`setoption name UCI_Elo value ${Math.max(1320,Math.min(2000,normalizedRating))}`,"setoption name Skill Level value 20"]
+                  :["setoption name UCI_LimitStrength value false",`setoption name Skill Level value ${Math.max(0,Math.min(11,Math.round((normalizedRating-400)/82)))}`];
               const safeDepth=Math.max(1,Math.min(30,Math.round(depth))),safeMultiPV=Math.max(1,Math.min(4,Math.round(multiPV)));
               const safeMoveTime=Math.max(0,Math.min(30000,Math.round(movetime)));
               const job={
@@ -2379,7 +2447,7 @@
       let clocks = { w: 0, b: 0 }, clockOn = false, clockStamp = Date.now(), toastTimer;
       let aiTimer = null, analysisShown = false, resultRecorded = false, lastGameResult = "", audioContext = null, audioResumePromise = null, effectsBus = null, uiBus = null, musicVolume = .75, musicStyle = "electric-1", musicEnabled = true, effectsEnabled = true, uiSoundsEnabled = true, musicHasStarted = false, musicRequest = 0,musicIslandTimer=null;
       let matchActive = false, boardAnimating = false, trainingReturn = "lobby", currentLesson = 0, quizAnswered = false, gameStartedAt=new Date();
-      const gameplaySettings={takebacks:true,hints:true,suggestions:true};
+      const gameplaySettings={takebacks:true,hints:true,suggestions:true,moveAnnotations:false};
       let aiRequestVersion=0,assistanceGeneration=0,moveSuggestion=null,roomInviteCode="",aiSearchController=null;
       function syncGameplaySettings(source="lobby") {
         const ids=source==="lobby"
@@ -2399,18 +2467,68 @@
           const saved=localStorage.getItem("nightfall-chess-gameplay-v1");
           if(saved!==null) {
             const options=JSON.parse(saved);
-            for(const name of Object.keys(gameplaySettings)) {
+            for(const name of ["takebacks","hints","suggestions"]) {
               if(typeof options[name]!=="boolean")throw new Error(`Saved ${name} option is invalid.`);
               gameplaySettings[name]=options[name];
             }
+            if(options.moveAnnotations!==undefined) {
+              if(typeof options.moveAnnotations!=="boolean")throw new Error("Saved moveAnnotations option is invalid.");
+              gameplaySettings.moveAnnotations=options.moveAnnotations;
+            }
           }
         } catch(error) {
-          Object.assign(gameplaySettings,{takebacks:true,hints:true,suggestions:true});
+          Object.assign(gameplaySettings,{takebacks:true,hints:true,suggestions:true,moveAnnotations:false});
           showToast(`Game options could not be loaded: ${error.message}`);
         }
         $("lobbyTakebacks").checked=$("takebacksSetting").checked=gameplaySettings.takebacks;
         $("lobbyHints").checked=$("hintsSetting").checked=gameplaySettings.hints;
         $("lobbySuggestions").checked=$("suggestionsSetting").checked=gameplaySettings.suggestions;
+        $("moveAnnotationsSetting").checked=gameplaySettings.moveAnnotations;
+      }
+      function saveMoveAnnotationSetting() {
+        gameplaySettings.moveAnnotations=$("moveAnnotationsSetting").checked;
+        try{localStorage.setItem("nightfall-chess-gameplay-v1",JSON.stringify(gameplaySettings));}
+        catch(error){showToast(`Move quality setting could not be saved: ${error.message}`);}
+        if(gameplaySettings.moveAnnotations) {
+          history.forEach((entry,index)=>scheduleMoveQuality(entry,index));
+        }
+        renderMoves();
+      }
+      function moveQuality(loss) {
+        if(loss<=20)return {label:"Best",quality:"best"};
+        if(loss<=50)return {label:"Excellent",quality:"excellent"};
+        if(loss<=100)return {label:"Good",quality:"good"};
+        if(loss<=200)return {label:"Inaccuracy",quality:"mid"};
+        if(loss<=400)return {label:"Mistake",quality:"bad"};
+        return {label:"Blunder",quality:"bad"};
+      }
+      function scheduleMoveQuality(entry,index) {
+        if(!gameplaySettings.moveAnnotations||entry.moveQuality||entry.qualityPending||puzzleMode)return;
+        entry.qualityPending=true;
+        renderMoves();
+        window.setTimeout(async()=>{
+          if(!gameplaySettings.moveAnnotations||history[index]!==entry) {
+            entry.qualityPending=false;
+            return;
+          }
+          try {
+            const [best,played]=await Promise.all([
+              stockfishSearch(entry.before,{rating:2000,depth:10,movetime:450,unrestricted:true}),
+              stockfishSearch(entry.after,{rating:2000,depth:10,movetime:450,unrestricted:true})
+            ]);
+            if(!gameplaySettings.moveAnnotations||history[index]!==entry)return;
+            const loss=Math.max(0,engineScore(best.info)+engineScore(played.info));
+            entry.moveQuality={...moveQuality(loss),loss};
+          } catch(error) {
+            if(error.name==="AbortError")return;
+            entry.moveQualityError=error.message;
+            console.error("Move quality analysis failed.",error);
+            showToast(`Move quality analysis failed: ${error.message}`);
+          } finally {
+            entry.qualityPending=false;
+            if(history[index]===entry)renderMoves();
+          }
+        },350);
       }
       function cancelAIRequest() {
         aiRequestVersion++;
@@ -2430,7 +2548,7 @@
         moveSuggestion=null;
         $("boardHelp").textContent=isPersian?"موتور Stockfish در حال یافتن حرکت است…":"Stockfish is calculating a move…";
         try {
-          const result=await stockfishSearch(position,{rating:2000,style:"balanced",depth:14,movetime:1200,unrestricted:true,signal:controller.signal});
+          const result=await stockfishSearch(position,{rating:2000,depth:14,movetime:1200,unrestricted:true,signal:controller.signal});
           if(generation!==assistanceGeneration||!matchActive||gameOver||stateToFen(state)!==fen)return;
           const move=uciMove(position,result.best);
           if(!move)throw new Error(`Stockfish returned an illegal move: ${result.best}`);
@@ -3366,12 +3484,14 @@
         moveSuggestion=null;assistanceGeneration++;$("boardHelp").textContent="";
         if(puzzleMode){puzzleHintSquare=null;puzzleHintText="";}
         const before=copyState(state), after=applyMove(state,m), san=notation(m,before,after);
-        history.push({before,after:copyState(after),move:m,san}); redoStack=[]; state=after; selected=null; legalTargets=[];
+        const entry={before,after:copyState(after),move:m,san};
+        history.push(entry); redoStack=[]; state=after; selected=null; legalTargets=[];
         recognizeOpening();
         reviewPreviewIndex=null;
         const check=inCheck(after,after.turn),checkmate=check&&!legalMoves(after).length;
         playMoveSound(!!before.board[m.to[0]][m.to[1]]||m.enPassant,check,checkmate);
         render();
+        if(gameplaySettings.moveAnnotations)scheduleMoveQuality(entry,history.length-1);
         if(puzzleMode) {
           puzzleCursor++;
           $("puzzleGameFeedback").textContent="";
@@ -3382,7 +3502,7 @@
         }
         animateMove(m,before);
         evaluateEnd();
-        if(!tryExecutePremove()&&mode==="ai"&&!gameOver&&state.turn!==humanColor) scheduleAI();
+        if(!boardAnimating&&!tryExecutePremove()&&mode==="ai"&&!gameOver&&state.turn!==humanColor)scheduleAI();
         return true;
       }
       function completePuzzle() {
@@ -3623,7 +3743,7 @@
         cancelAIRequest();clearTimeout(puzzleReplyTimer);stopClock();
         puzzleReturnMode=mode;mode="friend";puzzleMode=true;puzzleSolved=false;puzzleCursor=0;
         state=puzzleStartPosition(currentPuzzle);puzzleColor=state.turn;history=[];redoStack=[];selected=null;legalTargets=[];premove=null;
-        gameOver=false;matchActive=false;aiThinking=false;clockOn=false;orientation=state.turn;humanColor=state.turn;reviewPreviewIndex=null;openingIdentity=null;
+        gameOver=false;matchActive=false;aiThinking=false;clockOn=false;orientation=state.turn;humanColor=state.turn;reviewPreviewIndex=null;openingIdentity=null;openingByColor={w:null,b:null};
         $("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("onlineScreen").hidden=true;$("gameScreen").hidden=false;
         $("newGameCard").hidden=true;$("puzzleGameCard").hidden=false;$("newGameTop").hidden=true;$("flipButton").hidden=false;$("resetButton").hidden=true;
         $("puzzleGameTitle").textContent=puzzleTitle(currentPuzzle);
@@ -3683,14 +3803,14 @@
         image.src=pieceImageUrl(piece);
         container.append(image);
       }
-      function pieceImageUrl(piece) {
+      function pieceImageUrl(piece,theme=pieceTheme) {
         const names={p:"Pawn",n:"Knight",b:"Bishop",r:"Rook",q:"Queen",k:"King"};
         const side=colorOf(piece)==="w"?"White":"Black";
-        if(pieceTheme.startsWith("set-")) {
-          const set=pieceTheme.slice(4),color=colorOf(piece)==="w"?"w":"b";
+        if(theme.startsWith("set-")) {
+          const set=theme.slice(4),color=colorOf(piece)==="w"?"w":"b";
           return new URL(`./chess.com-boards-and-pieces-2.x/pieces/${encodeURIComponent(set)}/${color}${piece.toLowerCase()}.png`,document.baseURI).href;
         }
-        const variant=pieceTheme==="outline"?"-1":"";
+        const variant=theme==="outline"?"-1":"";
         return new URL(`./extracted_zip3/${encodeURIComponent(`Piece=${names[piece.toLowerCase()]}, Side=${side}${variant}.png`)}`,document.baseURI).href;
       }
       function setPlayerSkill() {
@@ -3734,8 +3854,8 @@
         $("puzzleSection").hidden=!profileStats.skillAnswered;
         const numbers=value=>isPersian?String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):value;
         $("profileMoreContent").innerHTML=isPersian
-          ?`امتیاز شطرنج: <strong>${numbers(profileStats.rating)}</strong><br>رشتهٔ روزانه: <strong>${numbers(profileStats.dailyStreak)}</strong> · بهترین: <strong>${numbers(profileStats.bestDailyStreak)}</strong><br>معماهای حل‌شده: <strong>${numbers(profileStats.puzzlesSolved)}</strong> · رشتهٔ معما: <strong>${numbers(profileStats.puzzleStreak)}</strong><br>مساوی: <strong>${numbers(profileStats.draws)}</strong> · باخت: <strong>${numbers(profileStats.losses)}</strong><br>بهترین رشتهٔ برد: <strong>${numbers(profileStats.bestWinStreak)}</strong><br>درس‌های کامل‌شده: <strong>${numbers(completedLessons.size)} از ${numbers(lessons.length)}</strong><br>درجهٔ هوش مصنوعی: <strong>${$("lobbyStrength").value}</strong> · سبک: <strong>${$("lobbyStyle").selectedOptions[0].text}</strong>`
-          :`Chess score: <strong>${profileStats.rating}</strong><br>Daily streak: <strong>${profileStats.dailyStreak}</strong> · Best: <strong>${profileStats.bestDailyStreak}</strong><br>Puzzles solved: <strong>${profileStats.puzzlesSolved}</strong> · Puzzle streak: <strong>${profileStats.puzzleStreak}</strong><br>Draws: <strong>${profileStats.draws}</strong> · Losses: <strong>${profileStats.losses}</strong><br>Best win streak: <strong>${profileStats.bestWinStreak}</strong><br>Lessons completed: <strong>${completedLessons.size} / ${lessons.length}</strong><br>AI level: <strong>${$("lobbyStrength").value}</strong> · Style: <strong>${$("lobbyStyle").selectedOptions[0].text}</strong>`;
+          ?`امتیاز شطرنج: <strong>${numbers(profileStats.rating)}</strong><br>رشتهٔ روزانه: <strong>${numbers(profileStats.dailyStreak)}</strong> · بهترین: <strong>${numbers(profileStats.bestDailyStreak)}</strong><br>معماهای حل‌شده: <strong>${numbers(profileStats.puzzlesSolved)}</strong> · رشتهٔ معما: <strong>${numbers(profileStats.puzzleStreak)}</strong><br>مساوی: <strong>${numbers(profileStats.draws)}</strong> · باخت: <strong>${numbers(profileStats.losses)}</strong><br>بهترین رشتهٔ برد: <strong>${numbers(profileStats.bestWinStreak)}</strong><br>درس‌های کامل‌شده: <strong>${numbers(completedLessons.size)} از ${numbers(lessons.length)}</strong><br>درجهٔ هوش مصنوعی: <strong>${$("lobbyStrength").value}</strong>`
+          :`Chess score: <strong>${profileStats.rating}</strong><br>Daily streak: <strong>${profileStats.dailyStreak}</strong> · Best: <strong>${profileStats.bestDailyStreak}</strong><br>Puzzles solved: <strong>${profileStats.puzzlesSolved}</strong> · Puzzle streak: <strong>${profileStats.puzzleStreak}</strong><br>Draws: <strong>${profileStats.draws}</strong> · Losses: <strong>${profileStats.losses}</strong><br>Best win streak: <strong>${profileStats.bestWinStreak}</strong><br>Lessons completed: <strong>${completedLessons.size} / ${lessons.length}</strong><br>AI level: <strong>${$("lobbyStrength").value}</strong>`;
         if($("puzzleGameStreak"))$("puzzleGameStreak").textContent=String(profileStats.puzzleStreak);
       }
       function loadProfileStats() {
@@ -3950,7 +4070,7 @@
           if(puzzleMode&&puzzleHintSquare&&same(puzzleHintSquare,[r,c]))sq.classList.add("puzzle-hint-source");
           if((orientation==="w"&&c===0)||(orientation==="b"&&c===7)) { const rank=document.createElement("span");rank.className="coordinate rank-coordinate";rank.textContent=8-r;sq.append(rank); }
           if((orientation==="w"&&r===7)||(orientation==="b"&&r===0)) { const file=document.createElement("span");file.className="coordinate";file.textContent="abcdefgh"[c];sq.append(file); }
-          sq.addEventListener("click",()=>clickSquare(r,c)); board.append(sq);
+          board.append(sq);
         }
       }
       function animateMove(move,before) {
@@ -3976,7 +4096,8 @@
             else piece.src=pieceImageUrl(pawn);
           }
           piece.classList.add("moving");
-          animations.push({piece,animation:piece.animate([{transform:`translate(${dx}px, ${dy}px) translateY(-2%)`},{transform:"translateY(-2%)"}],{duration:360,easing:"cubic-bezier(.2,.8,.2,1)"})});
+          const isAiMove=mode==="ai"&&before.turn!==humanColor;
+          animations.push({piece,animation:piece.animate([{transform:`translate(${dx}px, ${dy}px) translateY(-2%)`},{transform:"translateY(-2%)"}],{duration:isAiMove?1500:480,easing:"cubic-bezier(.16,.76,.32,1)"})});
         }
         if(!animations.length) {
           animateMoveImpact(move,before);
@@ -3988,7 +4109,7 @@
         let remaining=animations.length;
         animations.forEach(({piece,animation})=>{
           let settled=false;
-          const finish=()=>{if(settled)return;settled=true;piece.classList.remove("moving");remaining--;if(remaining===0){boardAnimating=false;board.classList.remove("animating");render();animateMoveImpact(move,before);if(puzzleMode)schedulePuzzleReply();else tryExecutePremove();}};
+          const finish=()=>{if(settled)return;settled=true;piece.classList.remove("moving");remaining--;if(remaining===0){boardAnimating=false;board.classList.remove("animating");render();animateMoveImpact(move,before);if(puzzleMode)schedulePuzzleReply();else if(!tryExecutePremove()&&mode==="ai"&&!gameOver&&state.turn!==humanColor)scheduleAI();}};
           animation.onfinish=finish;animation.oncancel=finish;
         });
       }
@@ -4022,21 +4143,21 @@
         return "♟";
       }
       function openingForPlayer(color) {
-        if(!openingIdentity)return null;
-        const name=isPersian?openingIdentity.nameFa:openingIdentity.name;
-        const code=isPersian?`ردهٔ ${ecoCodeInPersian(openingIdentity.eco)}`:`ECO ${openingIdentity.eco}`;
+        const opening=openingByColor[color];
+        if(!opening)return null;
+        const name=isPersian?opening.nameFa:opening.name;
+        const code=isPersian?`ردهٔ ${ecoCodeInPersian(opening.eco)}`:`ECO ${opening.eco}`;
         return {title:`${code} · ${name}`,label:`${code} · ${name}`};
       }
       function playerHtml(color,top) {
         const isAI=mode==="ai"&&color!==humanColor;
         const isProfileSide=puzzleMode?color===puzzleColor:mode==="ai"?color===humanColor:color===orientation;
         const isPuzzleOpponent=puzzleMode&&!isProfileSide, isWhite=color==="w", active=state.turn===color&&!gameOver;
-        const style=$("style").selectedOptions[0].text;
-        const name=isAI?isPersian?`هوش مصنوعی · ${style}`:`${style} AI`
+        const name=isAI?isPersian?"هوش مصنوعی":"AI"
           :isProfileSide?playerProfile.username
             :isPuzzleOpponent?isPersian?"حریف معما":"Puzzle opponent"
               :isPersian?"مهمان محلی":"Local guest";
-        const detail=isAI?isPersian?`${$("strength").value} درجه · سبک ${style}`:`${$("strength").value} rating · ${$("style").value} style`
+        const detail=isAI?isPersian?`${$("strength").value} درجه`:`${$("strength").value} rating`
           :isProfileSide?isPersian?"نمایهٔ شما":"Your profile"
             :isPersian?"بازیکن محلی":"Local player";
         const openingInfo=openingForPlayer(color);
@@ -4085,7 +4206,14 @@
         const list=$("movesList"); $("moveCount").textContent=isPersian?`${String(history.length).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])} حرکت`:`${history.length} ${history.length===1?"move":"moves"}`;
         if(!history.length) { list.innerHTML=`<div class="empty-moves">${isPersian?"حرکت‌های شما اینجا نمایش داده می‌شوند.":"Your moves will appear here."}</div>`; return; }
         const colorMoves=color=>history.map((entry,index)=>({entry,index})).filter(({entry})=>entry.before.turn===color);
-        list.innerHTML=["w","b"].map((color,column)=>`<div class="move-color-list"><div class="move-color-title">${color==="w"?"♙ White":"♟ Black"}</div>${colorMoves(color).map(({entry,index})=>`<div class="move-row"><span class="move-number">${isPersian?String(Math.floor(index/2)+1).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):Math.floor(index/2)+1}.</span><button class="board-move-button${index===history.length-1?" move-current":""}" type="button" data-ply="${index}" aria-label="${isPersian?`نمایش حرکت ${color==="w"?"سفید":"سیاه"} شمارهٔ ${String(Math.floor(index/2)+1).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])}: ${entry.san}`:`Show ${color==="w"?"White":"Black"} move ${Math.floor(index/2)+1}: ${entry.san}`}"${gameOver?"":" disabled"}>${entry.san}</button></div>`).join("")}</div>`).join("");
+        list.innerHTML=["w","b"].map(color=>`<div class="move-color-list"><div class="move-color-title">${color==="w"?"♙ White":"♟ Black"}</div>${colorMoves(color).map(({entry,index})=>{
+          const quality=gameplaySettings.moveAnnotations
+            ?entry.moveQuality?`<span class="move-quality ${entry.moveQuality.quality}" title="${Math.round(entry.moveQuality.loss)} cp lost">${isPersian?(faText[entry.moveQuality.label]||entry.moveQuality.label):entry.moveQuality.label}</span>`
+              :entry.moveQualityError?`<span class="move-quality bad" title="${escapeHtml(entry.moveQualityError)}">${isPersian?"ناموفق":"Unavailable"}</span>`
+                :entry.qualityPending?`<span class="move-quality pending" aria-label="${isPersian?"در حال تحلیل":"Analyzing"}">…</span>`:""
+            :"";
+          return `<div class="move-row"><span class="move-number">${isPersian?String(Math.floor(index/2)+1).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):Math.floor(index/2)+1}.</span><button class="board-move-button${index===history.length-1?" move-current":""}" type="button" data-ply="${index}" aria-label="${isPersian?`نمایش حرکت ${color==="w"?"سفید":"سیاه"} شمارهٔ ${String(Math.floor(index/2)+1).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])}: ${entry.san}`:`Show ${color==="w"?"White":"Black"} move ${Math.floor(index/2)+1}: ${entry.san}`}"${gameOver?"":" disabled"}>${entry.san}${quality}</button></div>`;
+        }).join("")}</div>`).join("");
         list.querySelectorAll("[data-ply]").forEach(button=>button.addEventListener("click",()=>showReviewPosition(Number(button.dataset.ply))));
         list.scrollTop=list.scrollHeight;
       }
@@ -4112,7 +4240,7 @@
         const code=openingIdentity?(isPersian?`ردهٔ ${ecoCodeInPersian(openingIdentity.eco)}`:`ECO ${openingIdentity.eco}`):"";
         const title=openingIdentity?`${code} · ${isPersian?openingIdentity.nameFa:openingIdentity.name}`:isPersian?"گشایش هنوز شناسایی نشده":"Opening not identified yet";
         const copy=openingIdentity
-          ?isPersian?`گشایش ${openingIdentity.nameFa} با ${code} از پایگاه گشایش‌ها بر پایهٔ وضعیت دقیق صفحه شناسایی شده است. این نام در ادامهٔ بازی ثابت می‌ماند.`:`${openingIdentity.name} (${openingIdentity.eco}) was identified from the exact position in the ECO database. Its name stays fixed for the rest of the game.`
+          ?isPersian?`گشایش ${openingIdentity.nameFa} با ${code} از پایگاه گشایش‌ها بر پایهٔ وضعیت دقیق صفحه شناسایی شده است. با ادامهٔ بازی، نام آن دقیق‌تر می‌شود.`:`${openingIdentity.name} (${openingIdentity.eco}) was identified from the exact position in the ECO database. Its name becomes more specific as play continues.`
           :isPersian?"با ادامهٔ بازی، نام گشایش پس از رسیدن به یک وضعیت ثبت‌شده در پایگاه ECO نمایش داده می‌شود.":"The ECO opening name will appear when the game reaches a position listed in the database.";
         $("strategyTitle").dataset.english=englishTitle;
         $("strategyTitle").textContent=title;
@@ -4612,21 +4740,26 @@
           board.append(square);
         }
       }
+      function updateThemeOptionSelection(container,theme) {
+        for(const button of container.querySelectorAll("button[data-theme-value]")) {
+          const selected=button.dataset.themeValue===theme;
+          button.setAttribute("aria-checked",String(selected));button.tabIndex=selected?0:-1;
+        }
+      }
       function applyAppearance() {
         document.documentElement.dataset.boardTheme=boardTheme;
         const textureTheme=boardTheme.startsWith("chess-")?boardTheme.slice(6):"";
         document.documentElement.style.setProperty("--board-texture",textureTheme
-          ?`url("${new URL(`./chess.com-boards-and-pieces-2.x/boards/${encodeURIComponent(textureTheme)}.png`,document.baseURI).href}")`
+          ?`url("${boardImageUrl(textureTheme)}")`
           :"none");
-        $("boardThemeSelect").value=boardTheme;$("pieceThemeSelect").value=pieceTheme;
+        updateThemeOptionSelection($("boardThemeOptions"),boardTheme);
+        updateThemeOptionSelection($("pieceThemeOptions"),pieceTheme);
         renderThemePreview();
         renderBoard();renderPuzzle();renderQuickReview();
         if(currentLesson>=CORE_LESSON_COUNT)renderOpeningScenarioBoard(currentLesson-CORE_LESSON_COUNT);
         if(!$("pieceLab").hidden)renderPieceLab();
       }
       function saveAppearance() {
-        boardTheme=$("boardThemeSelect").value;
-        pieceTheme=$("pieceThemeSelect").value;
         if(!boardThemeValues.has(boardTheme)||!pieceThemeValues.has(pieceTheme)) {
           throw new Error("Choose a supported board and piece theme.");
         }
@@ -4689,14 +4822,13 @@
         $("lobbyAiMode").classList.toggle("active",mode==="ai");$("lobbyFriendMode").classList.toggle("active",mode==="friend");
         $("lobbyAiMode").setAttribute("aria-pressed",String(mode==="ai"));$("lobbyFriendMode").setAttribute("aria-pressed",String(mode==="friend"));
         $("lobbyAiSettings").hidden=mode!=="ai";$("lobbyFriendSettings").hidden=mode!=="friend";
-        $("lobbyAiMore").hidden=mode!=="ai";
         render();
       }
       function showLobby() {
         if(matchActive)return;
         stopClock();cancelAIRequest();
         $("lobbyStrength").value=$("strength").value;$("lobbyStrengthLabel").textContent=$("strength").value;
-        $("lobbyStyle").value=$("style").value;$("lobbyColor").value=$("colorChoice").value;
+        $("lobbyColor").value=$("colorChoice").value;
         $("lobbyTime").value=$("timeControl").value;$("lobbyAiTime").value=$("aiTimeControl").value;
         $("lobby").hidden=false;$("onlineScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=true;
         setMode(mode);
@@ -4788,13 +4920,14 @@
         $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("resetButton").hidden=true;
         $("analysisBackdrop").classList.remove("open");
         analysisShown=false;
-        matchActive=true;state=startState();history=[];redoStack=[];selected=null;legalTargets=[];premove=null;gameOver=false;aiThinking=false;resultRecorded=false;lastGameResult="";reviewPreviewIndex=null;analysisPositionIndex=null;openingIdentity=null;gameStartedAt=new Date();
+        matchActive=true;state=startState();history=[];redoStack=[];selected=null;legalTargets=[];premove=null;gameOver=false;aiThinking=false;resultRecorded=false;lastGameResult="";reviewPreviewIndex=null;analysisPositionIndex=null;openingIdentity=null;openingByColor={w:null,b:null};gameStartedAt=new Date();
         $("reviewGameButton").hidden=true;$("exportPgnButton").hidden=true;$("goMenuButton").hidden=true;
         showGameInfoTab("moves");
         if(mode==="ai") { const choice=$("colorChoice").value; humanColor=choice==="random"?(Math.random()<.5?"w":"b"):choice; orientation=humanColor; }
         else { humanColor="w";orientation="w"; }
         const seconds=Number(mode==="ai"?$("aiTimeControl").value:$("timeControl").value);
         clockOn=seconds>0;clocks={w:seconds,b:seconds};clockStamp=Date.now();
+        if(mode==="ai")void ensureStockfish().catch(error=>console.warn("Stockfish warm-up failed:",error));
         render(); evaluateEnd(); startClock();
         if(mode==="ai"&&state.turn!==humanColor) scheduleAI();
         showToast(mode==="ai"?`New game · ${humanColor==="w"?"You play White":"You play Black"}`:"New local game");
@@ -4822,20 +4955,14 @@
         rebuildOpeningIdentity();
         if(replayingPuzzle){puzzleCursor=history.length;if(puzzleCursor>=currentPuzzle.solutionMoves.length)completePuzzle();}
         selected=null;legalTargets=[];gameOver=false;matchActive=!replayingPuzzle;reviewPreviewIndex=null;render();if(!replayingPuzzle)evaluateEnd();
+        if(!replayingPuzzle&&gameplaySettings.moveAnnotations)history.forEach((entry,index)=>scheduleMoveQuality(entry,index));
         if(puzzleMode)schedulePuzzleReply();else if(!replayingPuzzle&&mode==="ai"&&!gameOver&&state.turn!==humanColor)scheduleAI();
       }
       const values={p:100,n:320,b:330,r:500,q:900,k:0};
-      function styleStats() {
-        const rating=Number($("strength").value), style=$("style").value;
-        const skill=Math.round(32+(rating-400)/1600*66), delta={balanced:[0,0,0],aggressive:[15,-4,-7],positional:[-5,16,-2],defensive:[-5,-3,16]}[style];
-        const vals=[skill+delta[0],skill+delta[1],skill+delta[2]];
-        [["tactics",vals[0]],["position",vals[1]],["defense",vals[2]]].forEach(([name,val])=>{
-          const width=`${Math.max(4,Math.min(100,val))}%`;
-          $(`${name}Rating`).textContent=val;$(`${name}Bar`).style.width=width;
-          $(`lobby${name[0].toUpperCase()+name.slice(1)}Rating`).textContent=val;
-          $(`lobby${name[0].toUpperCase()+name.slice(1)}Bar`).style.width=width;
-        });
+      function updateAiRating() {
+        const rating=Number($("strength").value);
         $("strengthLabel").textContent=rating;
+        $("lobbyStrengthLabel").textContent=rating;
         renderProfileStats();
       }
       function ensureAudio() {
@@ -5055,7 +5182,7 @@
         const legal=legalMoves(position);
         if(!legal.length)return {best:"(none)",info:{scoreType:inCheck(position,position.turn)?"mate":"cp",score:0}};
         if(position.halfmove>=100||isInsufficient(position))return {best:"(none)",info:{scoreType:"cp",score:0}};
-        return stockfishSearch(position,{rating:2000,style:"balanced",depth:16,movetime:700,unrestricted:true});
+        return stockfishSearch(position,{rating:2000,depth:16,movetime:700,unrestricted:true});
       }
       async function showAnalysis(result) {
         const generation=++analysisGeneration;
@@ -5112,7 +5239,7 @@
         const resultText=lastGameResult||resultStatus().text;
         const result=/\bWhite wins\b/i.test(resultText)?"1-0":/\bBlack wins\b/i.test(resultText)?"0-1":/\bDraw\b|stalemate|insufficient material|threefold|50-move/i.test(resultText)?"1/2-1/2":"*";
         const botColor=mode==="ai"?(humanColor==="w"?"b":"w"):null;
-        const playerName=color=>botColor===color?`Stockfish 19 (${$("style").value})`:mode==="ai"?"Player":color==="w"?"White":"Black";
+        const playerName=color=>botColor===color?"Stockfish 19":mode==="ai"?"Player":color==="w"?"White":"Black";
         const playerRating=color=>botColor===color?String($("strength").value):mode==="ai"&&profileStats.skillAnswered?String(profileStats.rating):"?";
         const date=gameStartedAt, dateTag=`${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,"0")}.${String(date.getDate()).padStart(2,"0")}`;
         const escapeTag=value=>String(value).replace(/\\/g,"\\\\").replace(/"/g,'\\"').replace(/[\r\n]/g," ");
@@ -5177,10 +5304,7 @@
             score+=sign*(king[0]===homeRank?8:0)+(sign*shelter*5);
           }
         }
-        const style=$("style").value;
-        score+=center*(style==="positional"?1.8:1);
-        if(style==="aggressive") score+=inCheck(s,perspective==="w"?"b":"w")?34:0;
-        if(style==="defensive")score+=inCheck(s,perspective)?-28:0;
+        score+=center;
         return score;
       }
       function orderMoves(s,moves) {
@@ -5249,35 +5373,6 @@
         transpositionTable.set(key,{depth,score:best,bound});
         return best;
       }
-      const openingBook=[
-        {style:"balanced",moves:"e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5a4 g8f6"},
-        {style:"balanced",moves:"e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 d2d3 f8c5"},
-        {style:"balanced",moves:"d2d4 d7d5 c2c4 e7e6 b1c3 g8f6 c1g5"},
-        {style:"balanced",moves:"e2e4 e7e5 g1f3 b8c6 d2d4 e5d4 f3d4"},
-        {style:"aggressive",moves:"e2e4 c7c5 g1f3 d7d6 d2d4 c5d4 f3d4 g8f6 b1c3"},
-        {style:"aggressive",moves:"e2e4 e7e5 f2f4 e5f4 g1f3 g7g5"},
-        {style:"aggressive",moves:"d2d4 g8f6 c2c4 g7g6 b1c3 f8g7 e2e4 d7d6"},
-        {style:"aggressive",moves:"e2e4 c7c5 b1c3 b8c6 f2f4"},
-        {style:"positional",moves:"d2d4 d7d5 c1f4 g8f6 e2e3 e7e6 g1f3"},
-        {style:"positional",moves:"e2e4 c7c6 d2d4 d7d5 b1c3 d5e4 c3e4"},
-        {style:"positional",moves:"d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 b1c3"},
-        {style:"positional",moves:"e2e4 e7e6 d2d4 d7d5 b1c3 g8f6"},
-        {style:"defensive",moves:"c2c4 e7e5 b1c3 g8f6 g1f3 b8c6"},
-        {style:"defensive",moves:"g1f3 d7d5 g2g3 g8f6 f1g2 c7c6"},
-        {style:"defensive",moves:"e2e4 e7e6 d2d4 d7d5 e4e5 c7c5"},
-        {style:"defensive",moves:"d2d4 d7d5 c2c4 e7e6 g1f3 g8f6 e2e3"}
-      ].map(line=>({...line,moves:line.moves.split(" ")}));
-      function openingBookMove(rating) {
-        if(rating<1000||history.length>=16)return null;
-        const played=history.map(entry=>`${"abcdefgh"[entry.move.from[1]]}${8-entry.move.from[0]}${"abcdefgh"[entry.move.to[1]]}${8-entry.move.to[0]}${entry.move.promoteTo||""}`);
-        const lines=openingBook.filter(line=>line.moves.length>played.length&&played.every((move,index)=>line.moves[index]===move));
-        if(!lines.length)return null;
-        const style=$("style").value,preferred=lines.filter(line=>line.style===style),options=(preferred.length?preferred:lines).map(line=>line.moves[played.length]);
-        const next=options[0];
-        const from=[8-Number(next[1]),"abcdefgh".indexOf(next[0])],to=[8-Number(next[3]),"abcdefgh".indexOf(next[2])];
-        return legalMoves(state).flatMap(move=>move.promotion?["q","r","b","n"].map(promoteTo=>({...move,promoteTo})):[move])
-          .find(move=>same(move.from,from)&&same(move.to,to)&&(!next[4]||move.promoteTo===next[4]))||null;
-      }
       function chooseFallbackMove(position,rating) {
         const moves=orderMoves(position,legalMoves(position));
         if(!moves.length)return null;
@@ -5293,11 +5388,11 @@
       async function chooseAIMove(position=state,signal) {
         const rating=Number($("strength").value);
         if(!legalMoves(position).length)return null;
-        const bookMove=ecoOpeningBookMove(position,rating,$("style").value);
+        const bookMove=ecoOpeningBookMove(position,rating);
         if(bookMove)return bookMove;
         const depth=rating<700?6:rating<1000?8:rating<1400?10:rating<1700?12:14;
         const movetime=rating<700?450:rating<1000?700:rating<1400?1000:rating<1700?1400:1800;
-        const result=await stockfishSearch(position,{rating,style:$("style").value,depth,movetime,signal});
+        const result=await stockfishSearch(position,{rating,depth,movetime,signal});
         const move=uciMove(position,result.best);
         if(!move)throw new Error(`Stockfish returned an illegal move: ${result.best}`);
         return move;
@@ -5314,7 +5409,7 @@
           try {
             const move=await chooseAIMove(position,controller.signal);
             const rating=Number($("strength").value);
-            const naturalThinkTime=(rating<700?450:rating<1000?650:rating<1400?850:1100)+Math.random()*(rating<700?800:rating<1400?1100:1500);
+            const naturalThinkTime=(rating<700?1000:rating<1000?1100:rating<1400?1250:1400)+Math.random()*(rating<700?1000:rating<1400?1300:1500);
             await new Promise(resolve=>setTimeout(resolve,Math.max(0,naturalThinkTime-(performance.now()-thinkStartedAt))));
             if(request!==aiRequestVersion||gameOver||mode!=="ai"||state.turn===humanColor||stateToFen(state)!==fen)return;
             if(!move)throw new Error("The chess engine returned no legal move.");
@@ -5358,8 +5453,7 @@
       }
       $("aiMode").addEventListener("click",()=>setMode("ai"));
       $("friendMode").addEventListener("click",()=>setMode("friend"));
-      $("strength").addEventListener("input",()=>{styleStats();renderPlayers();});
-      $("style").addEventListener("change",()=>{styleStats();renderPlayers();});
+      $("strength").addEventListener("input",()=>{updateAiRating();renderPlayers();});
       $("startButton").addEventListener("click",startGame);
       $("newGameTop").addEventListener("click",showLobby);
       $("goMenuButton").addEventListener("click",showLobby);
@@ -5376,8 +5470,10 @@
         pendingProfileAvatar="";$("profileImage").value="";renderProfileAvatar($("profileAvatarPreview"),"");savePlayerProfile();
       });
       populateThemeOptions();
-      $("boardThemeSelect").addEventListener("change",saveAppearance);
-      $("pieceThemeSelect").addEventListener("change",saveAppearance);
+      $("board").addEventListener("click",event=>{
+        const square=event.target instanceof Element?event.target.closest(".square"):null;
+        if(square&&$("board").contains(square))clickSquare(Number(square.dataset.row),Number(square.dataset.col));
+      });
       const gameScreenEl=$("gameScreen");
       function setGameMenu(open) {
         gameScreenEl.classList.toggle("menu-open",open);
@@ -5435,10 +5531,8 @@
       $("lobbyAiMode").addEventListener("click",()=>setMode("ai"));
       $("lobbyFriendMode").addEventListener("click",()=>setMode("friend"));
       $("lobbyStrength").addEventListener("input",()=>{
-        $("lobbyStrengthLabel").textContent=$("lobbyStrength").value;
-        $("strength").value=$("lobbyStrength").value;styleStats();
+        $("strength").value=$("lobbyStrength").value;updateAiRating();
       });
-      $("lobbyStyle").addEventListener("change",()=>{$("style").value=$("lobbyStyle").value;styleStats();});
       $("lobbyColor").addEventListener("change",renderProfileStats);
       $("lobbyAiTime").addEventListener("change",event=>{$("aiTimeControl").value=event.currentTarget.value;});
       $("lobbyTime").addEventListener("change",event=>{$("timeControl").value=event.currentTarget.value;});
@@ -5446,12 +5540,13 @@
       $("timeControl").addEventListener("change",event=>{$("lobbyTime").value=event.currentTarget.value;});
       ["lobbyTakebacks","lobbyHints","lobbySuggestions"].forEach(id=>$(id).addEventListener("change",()=>syncGameplaySettings("lobby")));
       ["takebacksSetting","hintsSetting","suggestionsSetting"].forEach(id=>$(id).addEventListener("change",()=>syncGameplaySettings("game")));
+      $("moveAnnotationsSetting").addEventListener("change",saveMoveAnnotationSetting);
       $("launchButton").addEventListener("click",()=>{
-        $("strength").value=$("lobbyStrength").value;$("style").value=$("lobbyStyle").value;
+        $("strength").value=$("lobbyStrength").value;
         $("colorChoice").value=$("lobbyColor").value;
         if(mode==="ai")$("aiTimeControl").value=$("lobbyAiTime").value;
         else $("timeControl").value=$("lobbyTime").value;
-        styleStats();setMode(mode);startGame();
+        updateAiRating();setMode(mode);startGame();
       });
       $("musicToggle").addEventListener("click",()=>{if(musicEnabled&&!musicHasStarted)startMusicFromGesture();else setMusic(!musicEnabled);});
       $("musicVolume").addEventListener("input",event=>{setMusicVolume(event.currentTarget.value);if(Number(event.currentTarget.value)>0&&musicEnabled)startMusicFromGesture();});
@@ -5492,8 +5587,11 @@
         else showToast(completedLessons.size===lessons.length?"Course complete — keep practicing in real games":"Nice work. Revisit any lesson or keep practicing.");
       });
       loadGameplaySettings();loadAiOpeningHistory();
-      try{await loadOpeningDatabase();}
-      catch(error){console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);}
+      void loadOpeningDatabase().then(()=>{
+        const previousOpening=openingIdentity;
+        recognizeOpening();
+        if(openingIdentity!==previousOpening&&!$("gameScreen").hidden)render();
+      }).catch(error=>{console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);});
       ensureTwentyMoveLines();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();
       reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
       $("setSkillButton").addEventListener("click",setPlayerSkill);
@@ -5513,7 +5611,7 @@
       $("puzzleRetryButton").addEventListener("click",()=>void retryPuzzleLoading());
       $("exitPuzzleButton").addEventListener("click",exitPuzzle);
       $("languageSelect").addEventListener("change",event=>setLanguage(event.currentTarget.value));
-      styleStats();renderLesson();render();evaluateEnd();setMode("ai");
+      updateAiRating();renderLesson();render();evaluateEnd();setMode("ai");
       let savedLanguage="en";
       try{savedLanguage=localStorage.getItem("nightfall-chess-language-v1")==="fa"?"fa":"en";}
       catch(error){showToast(`Language preference could not be loaded: ${error.message}`);}

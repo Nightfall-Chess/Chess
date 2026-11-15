@@ -95,9 +95,27 @@ const server = createServer((request, response) => {
       response.writeHead(404).end("Not found");
       return;
     }
+    const etag = `"${stats.size.toString(16)}-${Math.trunc(stats.mtimeMs).toString(16)}"`;
+    const cacheControl = requested === "/index.html" ? "no-cache" : "public, max-age=3600";
+    const modifiedSince = request.headers["if-modified-since"];
+    const notModified = request.headers["if-none-match"] === etag
+      || (!request.headers["if-none-match"] && modifiedSince && !Number.isNaN(Date.parse(modifiedSince))
+        && Math.floor(stats.mtimeMs / 1000) * 1000 <= Date.parse(modifiedSince));
+    if (notModified) {
+      response.writeHead(304, {
+        "Cache-Control": cacheControl,
+        ETag: etag,
+        "Last-Modified": stats.mtime.toUTCString(),
+        "X-Content-Type-Options": "nosniff"
+      }).end();
+      return;
+    }
     response.writeHead(200, {
       "Content-Length": stats.size,
       "Content-Type": mimeTypes.get(extname(file).toLowerCase()) || "application/octet-stream",
+      "Cache-Control": cacheControl,
+      ETag: etag,
+      "Last-Modified": stats.mtime.toUTCString(),
       "X-Content-Type-Options": "nosniff"
     });
     createReadStream(file).pipe(response);
