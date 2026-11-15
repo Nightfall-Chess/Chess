@@ -1448,7 +1448,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=9">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=10">
 </head>
 <body>
   <main class="app">
@@ -1638,7 +1638,7 @@
         <p class="classroom-notice" id="classroomLandingStatus" role="status" aria-live="polite"></p>
       </div>
       <section class="classroom-workspace" id="classroomWorkspace" hidden>
-        <div class="classroom-room-bar"><div class="classroom-room-name"><span class="classroom-live-dot"></span><div><h2 id="classroomRoomTitle"></h2><div class="classroom-room-meta"><span id="classroomRoomIdLabel"></span><span id="classroomParticipantCount"></span></div></div></div><div class="classroom-room-actions"><button class="subtle-button" id="classroomCopyInvite" type="button">↗ Copy invite link</button><button class="subtle-button" id="classroomLeaveButton" type="button">Leave classroom</button></div></div>
+        <div class="classroom-room-bar"><div class="classroom-room-name"><span class="classroom-live-dot"></span><div><h2 id="classroomRoomTitle"></h2><div class="classroom-room-meta"><span id="classroomRoomIdLabel"></span><span id="classroomParticipantCount"></span></div></div></div><div class="classroom-room-actions"><button class="subtle-button classroom-host-only" id="classroomCopyInvite" type="button" hidden>↗ Copy invite link</button><button class="subtle-button" id="classroomLeaveButton" type="button">Leave classroom</button></div></div>
         <div class="classroom-layout">
           <section class="classroom-main-column">
             <div class="classroom-board-tools">
@@ -1656,11 +1656,13 @@
               <p class="classroom-board-hint" id="classroomBoardHint">Right-drag to draw an arrow · Right-click a square to highlight</p>
             </div>
             <section class="card classroom-history-card"><div class="card-heading"><span class="card-title">Shared move history</span><span class="eyebrow" id="classroomHistoryCount">0 MOVES</span></div><ol class="classroom-history" id="classroomMoveHistory"></ol><p class="classroom-empty" id="classroomHistoryEmpty">Moves from the shared board will appear here.</p></section>
-            <details class="card classroom-load-card" id="classroomLoadCard"><summary>Load a game or position</summary><p>Load a legal FEN position or replay a PGN on the shared board. This replaces the current room position.</p><div class="classroom-load-row"><select id="classroomLoadFormat" aria-label="Position format"><option value="pgn">PGN game</option><option value="fen">FEN position</option></select><button class="subtle-button classroom-host-only" id="classroomLoadButton" type="button" hidden>Load position</button></div><textarea id="classroomLoadInput" rows="5" spellcheck="false" placeholder="Paste PGN or FEN here" aria-label="PGN or FEN"></textarea><p class="classroom-load-status" id="classroomLoadStatus" role="status" aria-live="polite"></p></details>
+            <details class="card classroom-load-card" id="classroomLoadCard"><summary>Load a game or position</summary><p>Load a legal FEN position or replay a PGN on the shared board. This replaces the current room position.</p><div class="classroom-load-row"><select id="classroomLoadFormat" aria-label="Position format"><option value="pgn">PGN game</option><option value="fen">FEN position</option></select><button class="subtle-button classroom-host-only" id="classroomLoadButton" type="button" hidden>Load position</button></div><textarea id="classroomLoadInput" rows="5" spellcheck="false" placeholder="Paste PGN or FEN here" aria-label="PGN or FEN"></textarea><p class="classroom-load-status" id="classroomLoadStatus" role="status" aria-live="polite"></p><div class="classroom-saved-game-row"><label class="sr-only" for="classroomSavedGames">Saved classroom games</label><select id="classroomSavedGames" aria-label="Saved classroom games"><option value="">Saved games</option></select><button class="subtle-button" id="classroomRefreshGames" type="button">Refresh games</button><button class="subtle-button classroom-host-only" id="classroomSelectGame" type="button" hidden>Open selected game</button></div></details>
           </section>
           <aside class="classroom-side-column">
             <section class="card classroom-participants-card"><div class="card-heading"><span class="card-title">Participants</span><span class="classroom-count-pill" id="classroomParticipantPill">0</span></div><p class="classroom-panel-note">Connected learners and their current board permissions.</p><ul class="classroom-participants" id="classroomParticipants"></ul><div class="classroom-empty" id="classroomParticipantsEmpty">Waiting for your students to join.</div></section>
             <section class="card classroom-annotations-card"><div class="card-heading"><span class="card-title">Board annotations</span><button class="classroom-clear-annotations" id="classroomClearAnnotations" type="button">Clear all</button></div><p class="classroom-panel-note">Annotations are visible to everyone in the room.</p><ul class="classroom-annotation-list" id="classroomAnnotationList"></ul><div class="classroom-empty" id="classroomAnnotationsEmpty">Right-drag a square to sketch an idea.</div></section>
+            <section class="card classroom-analysis-card"><div class="card-heading"><span class="card-title">Engine analysis</span><span class="eyebrow">LOCAL STOCKFISH</span></div><p class="classroom-panel-note">Analysis runs privately in this browser. The Host can publish a result for everyone to see.</p><div class="classroom-analysis-actions"><button class="subtle-button" id="classroomAnalyzeButton" type="button">Analyze position</button><button class="subtle-button classroom-host-only" id="classroomPublishAnalysis" type="button" hidden disabled>Publish to room</button></div><p class="classroom-analysis-result" id="classroomPrivateAnalysis" aria-live="polite">Private analysis has not run.</p><div class="classroom-shared-analysis" id="classroomSharedAnalysis" hidden></div></section>
+            <section class="card classroom-chat-card"><div class="card-heading"><span class="card-title">Room chat</span><span class="eyebrow">MEMBERS ONLY</span></div><ol class="classroom-chat-messages" id="classroomChatMessages" aria-live="polite"></ol><p class="classroom-empty" id="classroomChatEmpty">Messages are visible to room participants.</p><form class="classroom-chat-form" id="classroomChatForm"><label class="sr-only" for="classroomChatInput">Message</label><input id="classroomChatInput" type="text" maxlength="1000" autocomplete="off" placeholder="Write a message"><button class="subtle-button" type="submit">Send</button></form></section>
             <section class="card classroom-host-card classroom-host-only" id="classroomHostControls" hidden><div class="card-heading"><span class="card-title">Host controls</span><span class="eyebrow">ROOM MANAGEMENT</span></div><label class="classroom-lock-toggle"><input id="classroomLockToggle" type="checkbox"><span>Lock classroom to new guests</span></label><p class="classroom-panel-note">Existing participants may reconnect while the room is locked.</p><button class="subtle-button classroom-close-room" id="classroomCloseButton" type="button">Close classroom</button></section>
             <section class="card classroom-info-card"><span class="eyebrow">LIVE STUDY</span><p>The host sets the position, moves, orientation, and navigation. Participants can move only the colors assigned to them. Anyone may add or remove a teaching annotation.</p><div class="classroom-info-footer"><span>Room state is validated by the server</span><span id="classroomSyncVersion">SYNC · 0</span></div></section>
           </aside>
@@ -1929,6 +1931,7 @@
       </div>
     </section>
   </div>
+  <script src="./supabase-config.js"></script>
   <script>
     (async () => {
       "use strict";
@@ -2025,6 +2028,21 @@
         "Room ID or invitation link":"شناسهٔ اتاق یا پیوند دعوت","Paste an invite link or room ID":"پیوند دعوت یا شناسهٔ اتاق را بچسبانید",
         "Enter the classroom password":"گذرواژهٔ کلاس را وارد کنید","Join classroom":"پیوستن به کلاس",
         "Recent classrooms":"کلاس‌های اخیر","SAVED ON THIS DEVICE":"ذخیره‌شده روی این دستگاه",
+        "Connecting to Supabase…":"در حال اتصال به Supabase…","Subscribing to the private room…":"در حال اتصال به اتاق خصوصی…",
+        "Starting a secure Classroom session…":"در حال آغاز نشست امن کلاس…","Restoring the latest saved room position…":"در حال بازیابی آخرین وضعیت ذخیره‌شدهٔ اتاق…",
+        "Paste an invite link or room ID":"پیوند دعوت یا شناسهٔ اتاق را بچسبانید",
+        "Analyze position":"تحلیل وضعیت","Publish to room":"انتشار برای اتاق","LOCAL STOCKFISH":"Stockfish محلی",
+        "Analysis runs privately in this browser. The Host can publish a result for everyone to see.":"تحلیل به‌صورت خصوصی در این مرورگر انجام می‌شود. میزبان می‌تواند نتیجه‌ای را برای همه منتشر کند.",
+        "Private analysis has not run.":"تحلیل خصوصی هنوز اجرا نشده است.","Saved games":"بازی‌های ذخیره‌شده",
+        "Refresh games":"تازه‌سازی بازی‌ها","Open selected game":"بازکردن بازی انتخاب‌شده",
+        "Room chat":"گفت‌وگوی اتاق","MEMBERS ONLY":"فقط اعضا","Messages are visible to room participants.":"پیام‌ها برای شرکت‌کنندگان اتاق قابل مشاهده‌اند.",
+        "Write a message":"پیامی بنویسید","Send":"ارسال","Published analysis":"تحلیل منتشرشده","Different position · ":"وضعیت متفاوت · ",
+        "Private":"خصوصی","Stockfish is analyzing locally…":"Stockfish به‌صورت محلی در حال تحلیل است…",
+        "This classroom is closed or expired.":"این کلاس بسته شده یا مهلتش پایان یافته است.",
+        "The host removed your access to this classroom.":"میزبان دسترسی شما به این کلاس را حذف کرده است.",
+        "Classroom needs a Supabase project URL and public publishable key in supabase-config.js.":"برای کلاس، نشانی پروژه و کلید عمومی Supabase را در supabase-config.js تنظیم کنید.",
+        "Anonymous sign-in failed:":"ورود ناشناس ناموفق بود:",
+        "This room is ready to share.":"این اتاق آمادهٔ اشتراک‌گذاری است.",
         "Copy invite link":"کپی پیوند دعوت","Leave classroom":"ترک کلاس","BOARD":"صفحه",
         "ANNOTATION COLOR":"رنگ نشانه","Violet":"بنفش","Gold":"طلایی","Blue":"آبی","Red":"قرمز",
         "Reset":"شروع دوباره","Live position":"وضعیت زنده","Starting position":"وضعیت آغازین",
@@ -2659,10 +2677,12 @@
       const same = (a,b) => a && b && a[0] === b[0] && a[1] === b[1];
       let state = startState(), history = [], redoStack = [], selected = null, legalTargets = [], orientation = "w", premove = null;
       const classroomSessionsKey="nightfall-classroom-sessions-v1";
-      const CLASSROOM_ROOM_ID_PATTERN=/^[A-Za-z0-9_-]{20,32}$/;
-      let classroomSocket=null,classroomRoomState=null,classroomRoomId="",classroomToken="",classroomParticipantId="";
-      let classroomReturnScreen="lobby",classroomPendingOperation=null,classroomSelectedSquare="",classroomAnnotationColor="violet";
-      let classroomManualDisconnect=false,classroomReconnectTimer=0,classroomReconnectAttempts=0,classroomPendingMove=null;
+      const CLASSROOM_ROOM_ID_PATTERN=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const CLASSROOM_INVITE_PATTERN=/^[A-Za-z0-9_-]{32}$/;
+      let classroomClient=null,classroomRealtime=null,classroomRoomState=null,classroomRoomId="",classroomParticipantId="",classroomInvitationCode="";
+      let classroomReturnScreen="lobby",classroomSelectedSquare="",classroomAnnotationColor="violet";
+      let classroomConnecting=false,classroomPendingMove=null,classroomRefreshTimer=0,classroomPrivateResult=null,classroomAnalysisController=null;
+      let classroomOnlineUsers=new Set(),classroomChatMessages=[],classroomSavedGames=[];
       let classroomPointerDrag=null,classroomAnnotationDrag=null,classroomIgnoreClickUntil=0;
       let mode = "ai", humanColor = "w", aiThinking = false, gameOver = false;
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
@@ -5236,16 +5256,6 @@
         $("onlineScreen").hidden=true;$("settingsScreen").hidden=true;$("classroomScreen").hidden=true;$("lobby").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;
       }
-      function classroomWebSocketUrl() {
-        const configured=new URLSearchParams(location.search).get("classroomServer");
-        const endpoint=configured?new URL(configured):puzzleApiUrl("/classroom");
-        if(configured&&!["ws:","wss:","http:","https:"].includes(endpoint.protocol))throw new Error("Classroom server must use ws:// or wss://.");
-        if(endpoint.protocol==="http:")endpoint.protocol="ws:";
-        else if(endpoint.protocol==="https:")endpoint.protocol="wss:";
-        else if(endpoint.protocol!=="ws:"&&endpoint.protocol!=="wss:")throw new Error("Classroom server must use ws:// or wss://.");
-        endpoint.pathname="/classroom";endpoint.search="";endpoint.hash="";
-        return endpoint.href;
-      }
       function classroomPlayerName() {
         return (playerProfile.username||$("profileName").value||"Player").trim().slice(0,24)||"Player";
       }
@@ -5273,26 +5283,11 @@
         }
         return parsed;
       }
-      function classroomSessionKey(roomId) {
-        return `nightfall-classroom-session-v1:${roomId}`;
-      }
-      function classroomReadSession(roomId) {
-        const saved=localStorage.getItem(classroomSessionKey(roomId));
-        if(!saved)return null;
-        const session=JSON.parse(saved);
-        if(!session||session.roomId!==roomId||typeof session.token!=="string"||session.token.length>128) {
-          throw new Error("Saved classroom access is invalid.");
-        }
-        return session;
-      }
       function classroomSaveRecent(room) {
         try {
           const previous=classroomReadRecent().filter(item=>item.id!==room.id);
           const recent=[{id:room.id,name:room.name,updatedAt:new Date().toISOString()},...previous].slice(0,8);
           localStorage.setItem(classroomSessionsKey,JSON.stringify(recent));
-          localStorage.setItem(classroomSessionKey(room.id),JSON.stringify({
-            roomId:room.id,token:classroomToken,participantId:classroomParticipantId,name:classroomPlayerName()
-          }));
           renderClassroomRecent();
         } catch(error) {
           console.error(error);
@@ -5316,18 +5311,9 @@
           title.dataset.noTranslate="true";
           title.textContent=room.name;detail.textContent=`${room.id.slice(0,8)} · ${isPersian?"ورود دوباره":"Reconnect"}`;
           button.append(title,detail);
-          button.addEventListener("click",()=>{
-            $("classroomJoinId").value=room.id;
-            try {
-              const session=classroomReadSession(room.id);
-              $("classroomJoinPassword").value="";
-              if(session)classroomConnect("join",{roomId:room.id,token:session.token,name:classroomPlayerName(),avatar:classroomPlayerAvatar()});
-              else $("classroomJoinId").focus();
-            } catch(error) {
-              console.error(error);
-              setClassroomNotice(`Classroom could not be reopened: ${error.message}`,"error");
-            }
-          });
+          button.addEventListener("click",()=>void classroomConnect("join",{
+            roomId:room.id,name:classroomPlayerName(),avatar:classroomPlayerAvatar()
+          }));
           container.append(button);
         }
       }
@@ -5345,176 +5331,172 @@
         renderClassroomRecent();
         const hash=new URLSearchParams(location.hash.slice(1));
         const invitedRoom=hash.get("classroom")||new URLSearchParams(location.search).get("classroom")||"";
-        if(invitedRoom&&CLASSROOM_ROOM_ID_PATTERN.test(invitedRoom)) {
+        if(invitedRoom) {
           $("classroomJoinId").value=invitedRoom;
           try {
-            const session=classroomReadSession(invitedRoom);
-            if(session)classroomConnect("join",{roomId:invitedRoom,token:session.token,name:classroomPlayerName(),avatar:classroomPlayerAvatar()});
-          } catch(error) {
-            console.error(error);
-            setClassroomNotice(`Saved classroom access could not be loaded: ${error.message}`,"error");
-          }
+            const invite=classroomParseInvite(invitedRoom);
+            void classroomConnect("join",{...invite,name:classroomPlayerName(),avatar:classroomPlayerAvatar()});
+          } catch(error) { setClassroomNotice(error.message,"error"); }
         }
       }
       function classroomParseInvite(value) {
         const candidate=String(value||"").trim();
-        if(CLASSROOM_ROOM_ID_PATTERN.test(candidate))return candidate;
+        if(CLASSROOM_ROOM_ID_PATTERN.test(candidate))return {roomId:candidate};
+        if(CLASSROOM_INVITE_PATTERN.test(candidate))return {invitationCode:candidate};
         try {
           const url=new URL(candidate,location.href);
           const query=url.searchParams.get("classroom")||url.searchParams.get("room");
           const hash=new URLSearchParams(url.hash.replace(/^#/,""));
           const room=query||hash.get("classroom")||hash.get("room");
-          if(room&&CLASSROOM_ROOM_ID_PATTERN.test(room))return room;
+          if(room&&CLASSROOM_ROOM_ID_PATTERN.test(room))return {roomId:room};
+          if(room&&CLASSROOM_INVITE_PATTERN.test(room))return {invitationCode:room};
         } catch {}
         throw new Error(isPersian?"پیوند دعوت یا شناسهٔ اتاق معتبر نیست.":"Enter a valid classroom invitation link or room ID.");
       }
-      function classroomConnect(operation,payload) {
-        if(classroomSocket&&(classroomSocket.readyState===WebSocket.OPEN||classroomSocket.readyState===WebSocket.CONNECTING)) {
+      async function classroomGetClient() {
+        if(classroomClient)return classroomClient;
+        const module=await import("./classroom-supabase.js");
+        classroomClient=await module.getClassroomClient();
+        return classroomClient;
+      }
+      async function classroomConnect(operation,payload) {
+        if(classroomConnecting) {
           setClassroomNotice(isPersian?"اتصال کلاس در حال اجراست.":"A classroom connection is already in progress.","ready");
           return;
         }
-        classroomPendingOperation={operation,payload};
-        classroomManualDisconnect=false;
-        setClassroomConnection("connecting",classroomReconnectAttempts?"Reconnecting…":"Connecting…");
-        if(!$("classroomWorkspace").hidden)setClassroomNotice(isPersian?"در حال همگام‌سازی اتاق…":"Synchronizing classroom…");
-        let endpoint;
-        try { endpoint=classroomWebSocketUrl(); }
-        catch(error) {
-          setClassroomConnection("error",error.message);
-          setClassroomNotice(error.message,"error");
-          return;
-        }
-        let socket;
-        try { socket=new WebSocket(endpoint); }
-        catch(error) {
-          setClassroomConnection("error","Classroom connection failed.");
-          setClassroomNotice(`Classroom connection failed: ${error.message}`,"error");
-          return;
-        }
-        classroomSocket=socket;
-        socket.addEventListener("open",()=>{
-          if(classroomSocket!==socket)return;
-          const pending=classroomPendingOperation;
-          if(!pending)return;
-          socket.send(JSON.stringify({
-            type:pending.operation,
-            ...pending.payload
-          }));
-          classroomPendingOperation=null;
-        });
-        socket.addEventListener("message",event=>{
-          let message;
-          try { message=JSON.parse(event.data); }
-          catch(error) {
-            console.error(error);
-            setClassroomConnection("error","Invalid classroom response.");
-            return;
-          }
-          handleClassroomMessage(message);
-        });
-        socket.addEventListener("error",()=>{
-          if(classroomSocket!==socket)return;
-          setClassroomConnection("error","Classroom connection failed.");
-        });
-        socket.addEventListener("close",()=>{
-          if(classroomSocket!==socket)return;
-          classroomSocket=null;
-          if(classroomManualDisconnect)return;
-          if(classroomRoomId&&classroomToken) {
-            setClassroomConnection("connecting","Reconnecting…");
-            setClassroomNotice("The classroom connection was interrupted. Reconnecting…");
-            classroomReconnectAttempts=Math.min(classroomReconnectAttempts+1,8);
-            const delay=Math.min(15_000,750*2**(classroomReconnectAttempts-1));
-            classroomReconnectTimer=window.setTimeout(()=>{
-              if(classroomRoomId&&classroomToken&&!classroomManualDisconnect) {
-                classroomConnect("join",{roomId:classroomRoomId,token:classroomToken,name:classroomPlayerName(),avatar:classroomPlayerAvatar()});
-              }
-            },delay);
-          } else {
-            setClassroomConnection("error","Classroom connection failed.");
-            setClassroomNotice("The classroom server could not be reached. Start the Nightfall server or configure a classroom server.","error");
-          }
-        });
-      }
-      function handleClassroomMessage(message) {
-        if(!message||typeof message!=="object")return;
-        if(message.type==="joined") {
-          classroomRoomId=message.room.id;
-          classroomToken=message.token;
-          classroomParticipantId=message.participantId;
-          classroomReconnectAttempts=0;
-          classroomRoomState=message.room;
-          classroomManualDisconnect=false;
+        classroomConnecting=true;
+        setClassroomConnection("connecting","Connecting to Supabase…");
+        setClassroomNotice("Starting a secure Classroom session…");
+        try {
+          const client=await classroomGetClient();
+          const result=await client.invoke(operation,payload);
+          classroomParticipantId=result.userId||client.userId;
+          classroomRoomState=result.room;
+          classroomRoomId=result.room.id;
+          classroomInvitationCode=result.invitationCode||payload.invitationCode||"";
+          classroomOnlineUsers=new Set([classroomParticipantId]);
           $("classroomJoinId").value=classroomRoomId;
           $("classroomWorkspace").hidden=false;$("classroomLanding").hidden=true;
-          window.history.replaceState(null,"",`${location.pathname}${location.search}#${new URLSearchParams({classroom:classroomRoomId})}`);
-          setClassroomConnection("connected","Connected");
-          setClassroomNotice("This room is ready to share.","ready");
+          const locationUrl=new URL(location.href);
+          if(classroomInvitationCode)locationUrl.hash=new URLSearchParams({classroom:classroomInvitationCode}).toString();
+          else locationUrl.hash="";
+          window.history.replaceState(null,"",locationUrl.href);
+          setClassroomConnection("connecting","Subscribing to the private room…");
+          setClassroomNotice("Restoring the latest saved room position…","ready");
           classroomSaveRecent(classroomRoomState);
           renderClassroomWorkspace();
-          return;
-        }
-        if(message.type==="snapshot") {
-          const previous=classroomRoomState;
-          classroomRoomState=message.room;
-          if(classroomPendingMove&&previous&&message.room.version!==previous.version) {
-            classroomPendingMove=null;$("classroomPromotionBackdrop").hidden=true;$("classroomPromotionBackdrop").classList.remove("open");
-          }
-          if(!$("classroomWorkspace").hidden) {
-            renderClassroomWorkspace(previous);
-            setClassroomConnection("connected","Connected");
-            setClassroomNotice("This room is ready to share.","ready");
-          }
-          return;
-        }
-        if(message.type==="error") {
-          if(classroomPendingMove) {
-            classroomPendingMove=null;$("classroomPromotionBackdrop").hidden=true;$("classroomPromotionBackdrop").classList.remove("open");
-          }
-          if(message.room) {
-            const previous=classroomRoomState;
-            classroomRoomState=message.room;
-            if(!$("classroomWorkspace").hidden)renderClassroomWorkspace(previous);
-          }
-          const text=isPersian?translateFa(message.message):message.message;
+          classroomRealtime=await client.subscribe(classroomRoomId,{
+            status:(status,error)=>{
+              if(status==="SUBSCRIBED") {
+                setClassroomConnection("connected","Connected");
+                void classroomRefresh();
+              } else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT") {
+                setClassroomConnection("error",error?.message||"Realtime connection failed.");
+                setClassroomNotice(error?.message||"Realtime connection failed.","error");
+              }
+            },
+            event:classroomHandleRealtimeEvent,
+            presence:classroomApplyPresence
+          });
+          await classroomRefresh();
+          void classroomLoadMessages();
+          void classroomLoadGames();
+        } catch(error) {
+          console.error(error);
+          const text=error.message||"Supabase Classroom connection failed.";
+          setClassroomConnection("error",text);
           setClassroomNotice(text,"error");
-          $("classroomLoadStatus").textContent=text;
-          $("classroomLoadStatus").dataset.state="error";
-          showToast(text);
           if(!classroomRoomState) {
-            setClassroomConnection("error",text);
-            if(classroomSocket)classroomDisconnect(true);
+            $("classroomWorkspace").hidden=true;$("classroomLanding").hidden=false;
           }
-          return;
-        }
-        if(message.type==="closed"||message.type==="removed") {
-          const text=isPersian?translateFa(message.message):message.message;
-          if(classroomRoomId) {
-            try {
-              localStorage.removeItem(classroomSessionKey(classroomRoomId));
-              if(message.type==="closed")localStorage.setItem(classroomSessionsKey,JSON.stringify(classroomReadRecent().filter(item=>item.id!==classroomRoomId)));
-            } catch(error) { console.error(error); }
-          }
-          classroomDisconnect(true);
-          classroomRoomState=null;classroomRoomId="";classroomToken="";classroomParticipantId="";
-          $("classroomWorkspace").hidden=true;$("classroomLanding").hidden=false;
-          window.history.replaceState(null,"",`${location.pathname}${location.search}`);
-          setClassroomConnection("offline","Not connected");
-          setClassroomNotice(text,"error");
+        } finally {
+          classroomConnecting=false;
         }
       }
-      function classroomDisconnect(manual=false) {
-        classroomManualDisconnect=manual;
-        window.clearTimeout(classroomReconnectTimer);classroomReconnectTimer=0;
-        if(classroomSocket) {
-          const socket=classroomSocket;classroomSocket=null;
-          socket.close();
+      function classroomApplySnapshot(room) {
+        if(!room||room.id!==classroomRoomId||!Number.isSafeInteger(room.version))return;
+        if(classroomRoomState&&room.version<classroomRoomState.version)return;
+        const previous=classroomRoomState;
+        room.participants=room.participants.map(person=>({...person,connected:classroomOnlineUsers.has(person.id)}));
+        classroomRoomState=room;
+        if(classroomPrivateResult&&classroomPrivateResult.positionFen!==classroomDisplayedFen(room))classroomPrivateResult=null;
+        if(classroomPendingMove&&previous&&room.version!==previous.version) {
+          classroomPendingMove=null;$("classroomPromotionBackdrop").hidden=true;$("classroomPromotionBackdrop").classList.remove("open");
+        }
+        if(!$("classroomWorkspace").hidden) {
+          renderClassroomWorkspace(previous);
+          setClassroomConnection("connected","Connected");
+          setClassroomNotice("This room is ready to share.","ready");
+        }
+        if(previous&&previous.gameId!==room.gameId)void classroomLoadGames();
+        if(room.closed)classroomHandleTerminal("closed");
+      }
+      async function classroomRefresh() {
+        if(!classroomClient||!classroomRoomId)return;
+        try {
+          const result=await classroomClient.invoke("snapshot",{roomId:classroomRoomId});
+          classroomApplySnapshot(result.room);
+        } catch(error) {
+          console.error(error);
+          if(error.code==="MEMBERSHIP_REQUIRED"||error.code==="ROOM_CLOSED")classroomHandleTerminal(error.code==="ROOM_CLOSED"?"closed":"removed");
+          else {
+            setClassroomConnection("error",error.message);
+            setClassroomNotice(error.message,"error");
+          }
+        }
+      }
+      function classroomHandleRealtimeEvent(message) {
+        if(message.type==="state"&&Number(message.payload?.version)>Number(classroomRoomState?.version)) {
+          window.clearTimeout(classroomRefreshTimer);
+          classroomRefreshTimer=window.setTimeout(()=>void classroomRefresh(),25);
+        } else if(message.type==="members") {
+          window.clearTimeout(classroomRefreshTimer);
+          classroomRefreshTimer=window.setTimeout(()=>void classroomRefresh(),25);
+        } else if(message.type==="chat") {
+          void classroomLoadMessages();
+        } else if(message.type==="removed"&&message.payload?.targetUserId===classroomParticipantId) {
+          classroomHandleTerminal("removed");
+        } else if(message.type==="closed") {
+          classroomHandleTerminal("closed");
+        }
+      }
+      function classroomApplyPresence(presenceState) {
+        const online=new Set();
+        for(const [key,metas] of Object.entries(presenceState||{})) {
+          if(Array.isArray(metas)&&metas.some(meta=>meta?.userId===key))online.add(key);
+        }
+        classroomOnlineUsers=online;
+        if(classroomRoomState) {
+          classroomRoomState.participants=classroomRoomState.participants.map(person=>({...person,connected:online.has(person.id)}));
+          classroomRenderParticipants(classroomRoomState);
+        }
+      }
+      function classroomHandleTerminal(type) {
+        const closed=type==="closed";
+        const text=closed?"This classroom is closed or expired.":"The host removed your access to this classroom.";
+        classroomDisconnect();
+        classroomRoomState=null;classroomRoomId="";classroomParticipantId="";classroomInvitationCode="";
+        classroomOnlineUsers.clear();classroomPrivateResult=null;
+        $("classroomWorkspace").hidden=true;$("classroomLanding").hidden=false;
+        window.history.replaceState(null,"",`${location.pathname}${location.search}`);
+        setClassroomConnection("offline","Not connected");
+        setClassroomNotice(text,"error");
+      }
+      function classroomDisconnect() {
+        window.clearTimeout(classroomRefreshTimer);classroomRefreshTimer=0;
+        if(classroomAnalysisController)classroomAnalysisController.abort();
+        classroomAnalysisController=null;
+        if(classroomRealtime) {
+          const subscription=classroomRealtime;classroomRealtime=null;
+          void subscription.unsubscribe().catch(error=>console.error("Classroom Realtime cleanup failed:",error));
         }
       }
       function leaveClassroom() {
-        classroomDisconnect(true);
+        classroomDisconnect();
+        classroomPrivateResult=null;classroomChatMessages=[];classroomSavedGames=[];
         classroomRoomState=null;classroomSelectedSquare="";classroomPendingMove=null;
-        classroomRoomId="";classroomToken="";classroomParticipantId="";
+        classroomRoomId="";classroomParticipantId="";classroomInvitationCode="";
+        classroomOnlineUsers.clear();
         $("classroomWorkspace").hidden=true;$("classroomLanding").hidden=false;
         setClassroomConnection("offline","Not connected");
         $("classroomScreen").hidden=true;
@@ -5523,31 +5505,53 @@
         $("classroomLandingStatus").textContent="";
       }
       function classroomSend(type,payload={}) {
-        if(!classroomSocket||classroomSocket.readyState!==WebSocket.OPEN||!classroomRoomState) {
+        if(!classroomClient||!classroomRoomState) {
           const text=isPersian?"اتصال کلاس فعال نیست.":"The classroom is not connected.";
           setClassroomNotice(text,"error");showToast(text);return false;
         }
-        const requestId=crypto.randomUUID().replaceAll("-","");
-        classroomSocket.send(JSON.stringify({
-          type,baseVersion:classroomRoomState.version,requestId,...payload
-        }));
+        const requestId=crypto.randomUUID();
+        const operation={...payload};
+        if(type==="annotation") {
+          operation.annotationAction=operation.action;
+          delete operation.action;
+        }
+        void classroomClient.invoke("mutate",{
+          roomId:classroomRoomId,operation:type==="publish-analysis"?"publish-analysis":type,
+          baseVersion:classroomRoomState.version,requestId,...operation
+        }).then(result=>{
+          classroomApplySnapshot(result.room);
+          if(type==="load"||type==="reset")void classroomLoadGames();
+        }).catch(error=>{
+          console.error("Classroom action failed:",error);
+          if(type==="move"||type==="load") {
+            classroomPendingMove=null;$("classroomPromotionBackdrop").hidden=true;$("classroomPromotionBackdrop").classList.remove("open");
+          }
+          setClassroomNotice(error.message,"error");
+          $("classroomLoadStatus").textContent=error.message;
+          $("classroomLoadStatus").dataset.state="error";
+          showToast(error.message);
+          if(error.code==="STALE_VERSION")void classroomRefresh();
+          if(error.code==="MEMBERSHIP_REQUIRED"||error.code==="ROOM_CLOSED")classroomHandleTerminal(error.code==="ROOM_CLOSED"?"closed":"removed");
+        });
         return true;
       }
       function classroomSaveInviteToClipboard() {
-        if(!classroomRoomId)throw new Error(isPersian?"کلاسی برای اشتراک‌گذاری وجود ندارد.":"No classroom is available to share.");
-        const url=new URL(location.href);
-        url.hash=new URLSearchParams({classroom:classroomRoomId}).toString();
-        if(!navigator.clipboard?.writeText) {
-          const error=new Error(isPersian?"این مرورگر اجازهٔ کپی پیوند را نمی‌دهد.":"This browser does not allow copying the invitation link.");
-          showToast(error.message);
-          return Promise.reject(error);
-        }
-        return navigator.clipboard.writeText(url.href).then(()=>{
+        return (async()=>{
+          if(!classroomRoomId||!classroomClient)throw new Error("No classroom is available to share.");
+          if(!classroomIsHost())throw new Error("Only the classroom host can create an invitation link.");
+          if(!classroomInvitationCode) {
+            const result=await classroomClient.invoke("rotate-invite",{roomId:classroomRoomId});
+            classroomInvitationCode=result.invitationCode;
+          }
+          const url=new URL(location.href);
+          url.hash=new URLSearchParams({classroom:classroomInvitationCode}).toString();
+          if(!navigator.clipboard?.writeText)throw new Error("This browser does not allow copying the invitation link.");
+          await navigator.clipboard.writeText(url.href);
           showToast(isPersian?"پیوند دعوت کپی شد.":"Invite link copied.");
           return url.href;
-        }).catch(error=>{
-          console.error(error);
-          showToast(isPersian?"کپی پیوند اتاق ناموفق بود.":"Room link could not be copied.");
+        })().catch(error=>{
+          console.error("Classroom invite could not be copied:",error);
+          showToast(error.message);
           throw error;
         });
       }
@@ -5559,33 +5563,23 @@
           setClassroomNotice(isPersian?"برای کلاس نامی بنویسید.":"Enter a classroom name.","error");
           return;
         }
-        classroomRoomId="";classroomToken="";classroomParticipantId="";classroomRoomState=null;
-        classroomConnect("create",{
+        classroomRoomId="";classroomInvitationCode="";classroomParticipantId="";classroomRoomState=null;
+        void classroomConnect("create",{
           roomName,name:classroomPlayerName(),avatar:classroomPlayerAvatar(),password:$("classroomCreatePassword").value
         });
       }
       function joinClassroom(event) {
         event.preventDefault();
-        let roomId;
-        try { roomId=classroomParseInvite($("classroomJoinId").value); }
+        let invite;
+        try { invite=classroomParseInvite($("classroomJoinId").value); }
         catch(error) {
           setClassroomNotice(error.message,"error");
           $("classroomJoinId").focus();
           return;
         }
-        classroomRoomId=roomId;
         const password=$("classroomJoinPassword").value;
-        try {
-          const session=classroomReadSession(roomId);
-          classroomToken=session?.token||"";
-        } catch(error) {
-          console.error(error);
-          setClassroomNotice(`Saved classroom access could not be loaded: ${error.message}`,"error");
-          return;
-        }
-        classroomConnect("join",{
-          roomId,name:classroomPlayerName(),avatar:classroomPlayerAvatar(),password,
-          ...(classroomToken?{token:classroomToken}:{})
+        void classroomConnect("join",{
+          ...invite,name:classroomPlayerName(),avatar:classroomPlayerAvatar(),password
         });
       }
       function classroomFenBoard(fen) {
@@ -5839,6 +5833,7 @@
         classroomRenderParticipants(room);
         classroomRenderHistory(room);
         classroomRenderAnnotations(room);
+        classroomRenderAnalysis(room);
         classroomRenderBoard(room,classroomDisplayedFen(room));
         if(animate)animate();
       }
@@ -5997,6 +5992,133 @@
           $("classroomLoadStatus").dataset.state="pending";
         }
       }
+      function classroomEngineState(fen) {
+        const fields=fen.trim().split(/\s+/);
+        if(fields.length<4)throw new Error("The shared FEN position is invalid.");
+        const board=classroomFenBoard(fen).map(row=>row.map(piece=>piece||null));
+        const rights=fields[2];
+        const ep=fields[3]==="-"?null:[8-Number(fields[3][1]),"abcdefgh".indexOf(fields[3][0])];
+        return {
+          board,turn:fields[1],castle:{K:rights.includes("K"),Q:rights.includes("Q"),k:rights.includes("k"),q:rights.includes("q")},
+          ep,halfmove:Number(fields[4]||0),fullmove:Number(fields[5]||1)
+        };
+      }
+      function classroomEvaluationText(analysis,fen) {
+        const info={scoreType:analysis.scoreType,score:analysis.score};
+        return engineEvaluationText(info,fen.split(" ")[1]||"w","w");
+      }
+      async function classroomAnalyzePosition() {
+        if(!classroomRoomState)return;
+        if(classroomAnalysisController)classroomAnalysisController.abort();
+        const controller=new AbortController();
+        classroomAnalysisController=controller;
+        const fen=classroomDisplayedFen(classroomRoomState);
+        $("classroomPrivateAnalysis").textContent=isPersian?"موتور در حال تحلیل محلی است…":"Stockfish is analyzing locally…";
+        $("classroomAnalyzeButton").disabled=true;
+        try {
+          const result=await stockfishSearch(classroomEngineState(fen),{depth:12,multiPV:3,unrestricted:true,signal:controller.signal});
+          if(controller.signal.aborted||classroomAnalysisController!==controller
+            ||!classroomRoomState||classroomDisplayedFen(classroomRoomState)!==fen)return;
+          const info=result.info;
+          const analysis={
+            depth:info.depth||12,scoreType:info.scoreType,score:info.score,positionFen:fen,
+            lines:result.lines.slice(0,3).map(line=>({
+              scoreType:line.scoreType,score:line.score,depth:line.depth||info.depth||12,pv:line.pv
+            }))
+          };
+          classroomPrivateResult=analysis;
+          classroomRenderAnalysis(classroomRoomState);
+        } catch(error) {
+          if(error.name==="AbortError")return;
+          console.error("Private Classroom Stockfish analysis failed:",error);
+          $("classroomPrivateAnalysis").textContent=`Stockfish analysis failed: ${error.message}`;
+          showToast(`Stockfish analysis failed: ${error.message}`);
+        } finally {
+          if(classroomAnalysisController===controller) {
+            classroomAnalysisController=null;
+            $("classroomAnalyzeButton").disabled=false;
+          }
+        }
+      }
+      function classroomRenderAnalysis(room) {
+        const own=classroomPrivateResult;
+        $("classroomPrivateAnalysis").textContent=own
+          ?`${isPersian?"ارزیابی خصوصی":"Private"} · ${classroomEvaluationText(own,own.positionFen)} · depth ${own.depth} · ${(own.lines[0]?.pv||[]).slice(0,5).join(" ")}`
+          :(isPersian?"تحلیل خصوصی هنوز اجرا نشده است.":"Private analysis has not run.");
+        $("classroomPublishAnalysis").disabled=!own||!classroomIsHost(room);
+        const container=$("classroomSharedAnalysis"),analysis=room.publishedAnalysis;
+        container.replaceChildren();
+        container.hidden=!analysis;
+        if(!analysis)return;
+        const title=document.createElement("strong"),details=document.createElement("span");
+        const samePosition=analysis.positionFen===classroomDisplayedFen(room);
+        title.textContent=`${isPersian?"تحلیل منتشرشده":"Published analysis"} · ${classroomEvaluationText(analysis,analysis.positionFen||room.fen)} · depth ${analysis.depth}`;
+        details.textContent=`${samePosition?"":"Different position · "}${(analysis.lines?.[0]?.pv||[]).slice(0,8).join(" ")}`;
+        container.append(title,details);
+      }
+      async function classroomLoadMessages() {
+        if(!classroomClient||!classroomRoomId)return;
+        try {
+          const result=await classroomClient.invoke("messages",{roomId:classroomRoomId});
+          classroomChatMessages=result.messages;
+          const list=$("classroomChatMessages");
+          list.replaceChildren();
+          $("classroomChatEmpty").hidden=classroomChatMessages.length>0;
+          for(const message of classroomChatMessages) {
+            const item=document.createElement("li"),name=document.createElement("strong"),body=document.createElement("span"),time=document.createElement("time");
+            item.className=`classroom-chat-message${message.user_id===classroomParticipantId?" own-message":""}`;
+            name.dataset.noTranslate="true";name.textContent=message.display_name;
+            body.textContent=message.body;
+            time.dateTime=message.created_at;time.textContent=new Date(message.created_at).toLocaleTimeString(isPersian?"fa-IR":undefined,{hour:"2-digit",minute:"2-digit"});
+            item.append(name,body,time);list.append(item);
+          }
+          list.scrollTop=list.scrollHeight;
+        } catch(error) {
+          console.error("Classroom chat could not be loaded:",error);
+          setClassroomNotice(`Room chat could not be loaded: ${error.message}`,"error");
+        }
+      }
+      async function classroomSendChat(event) {
+        event.preventDefault();
+        const input=$("classroomChatInput"),body=input.value.trim();
+        if(!body||!classroomClient||!classroomRoomId)return;
+        const button=$("classroomChatForm").querySelector("button");
+        button.disabled=true;
+        try {
+          await classroomClient.invoke("message",{roomId:classroomRoomId,body,requestId:crypto.randomUUID()});
+          input.value="";
+          await classroomLoadMessages();
+        } catch(error) {
+          console.error("Classroom message could not be sent:",error);
+          setClassroomNotice(error.message,"error");showToast(error.message);
+        } finally {
+          button.disabled=false;
+        }
+      }
+      async function classroomLoadGames() {
+        if(!classroomClient||!classroomRoomId)return;
+        try {
+          const result=await classroomClient.invoke("games",{roomId:classroomRoomId});
+          classroomSavedGames=result.games;
+          const select=$("classroomSavedGames"),selected=classroomRoomState?.selectedGameId;
+          select.replaceChildren();
+          const placeholder=document.createElement("option");placeholder.value="";placeholder.textContent=isPersian?"بازی‌های ذخیره‌شده":"Saved games";select.append(placeholder);
+          for(const game of classroomSavedGames) {
+            const option=document.createElement("option");option.value=game.id;
+            const date=new Date(game.updated_at||game.created_at).toLocaleString(isPersian?"fa-IR":undefined,{dateStyle:"short",timeStyle:"short"});
+            option.textContent=`${date} · ${game.moves.length} ${isPersian?"حرکت":"moves"}`;
+            option.selected=game.id===selected;select.append(option);
+          }
+          $("classroomSelectGame").disabled=!select.value;
+        } catch(error) {
+          console.error("Saved Classroom games could not be loaded:",error);
+          setClassroomNotice(`Saved games could not be loaded: ${error.message}`,"error");
+        }
+      }
+      function classroomSelectSavedGame() {
+        const gameId=$("classroomSavedGames").value;
+        if(gameId)classroomSend("select-game",{gameId});
+      }
       function classroomAskClose() {
         $("classroomCloseDialog").hidden=false;
         $("classroomCloseDialog").classList.add("open");
@@ -6029,6 +6151,16 @@
         $("classroomConfirmClose").addEventListener("click",()=>classroomCloseDialog(true));
         $("classroomClearAnnotations").addEventListener("click",()=>classroomSend("annotation",{action:"clear"}));
         $("classroomLoadButton").addEventListener("click",classroomLoadPosition);
+        $("classroomAnalyzeButton").addEventListener("click",()=>void classroomAnalyzePosition());
+        $("classroomPublishAnalysis").addEventListener("click",()=>{
+          if(classroomPrivateResult)classroomSend("publish-analysis",{analysis:classroomPrivateResult});
+        });
+        $("classroomChatForm").addEventListener("submit",event=>void classroomSendChat(event));
+        $("classroomRefreshGames").addEventListener("click",()=>void classroomLoadGames());
+        $("classroomSelectGame").addEventListener("click",classroomSelectSavedGame);
+        $("classroomSavedGames").addEventListener("change",()=>{
+          $("classroomSelectGame").disabled=!$("classroomSavedGames").value;
+        });
         $("classroomCancelPromotion").addEventListener("click",()=>{
           classroomPendingMove=null;$("classroomPromotionBackdrop").hidden=true;$("classroomPromotionBackdrop").classList.remove("open");
         });

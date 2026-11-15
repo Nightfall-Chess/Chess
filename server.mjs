@@ -3,7 +3,6 @@ import { createServer } from "node:http";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPuzzleDataset } from "./puzzle-dataset.mjs";
-import { attachClassroom } from "./classroom.mjs";
 
 const root = resolve(fileURLToPath(new URL(".", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
@@ -130,8 +129,6 @@ const server = createServer((request, response) => {
   }
 });
 
-attachClassroom(server);
-
-server.listen(port, process.env.HOST || "0.0.0.0", () => {
+server.listen(port, process.env.HOST || "127.0.0.1", () => {
   console.log(`Nightfall Chess available at http://127.0.0.1:${port}`);
 });

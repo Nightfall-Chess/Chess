@@ -922,6 +922,25 @@ html[lang="fa"] .settings-nav-button.active, html[lang="fa"] .lesson-item.active
 .classroom-load-row button { min-height: 34px; font-size: 9px; }
 .classroom-load-card textarea { display: block; width: 100%; min-height: 92px; padding: 9px; resize: vertical; border: 1px solid #ffffff16; border-radius: 8px; background: #0b0f18; color: #d7d4e4; font-family: ui-monospace, Consolas, monospace; font-size: 9px; line-height: 1.55; }
 .classroom-load-status { min-height: 14px; margin: 7px 0 0; color: #9095a8; font-size: 9px; }
+.classroom-saved-game-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.classroom-saved-game-row select { min-width: 120px; min-height: 34px; flex: 1 1 150px; font-size: 9px; }
+.classroom-saved-game-row button { min-height: 34px; padding: 7px 9px; font-size: 9px; }
+.classroom-analysis-card, .classroom-chat-card { display: grid; gap: 8px; }
+.classroom-analysis-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.classroom-analysis-actions button { min-height: 34px; font-size: 9px; }
+.classroom-analysis-result, .classroom-shared-analysis { margin: 0; color: #c9c4da; font-size: 9px; line-height: 1.65; overflow-wrap: anywhere; }
+.classroom-shared-analysis { display: grid; gap: 3px; padding: 9px; border: 1px solid #d8bd8330; border-radius: 8px; background: #d8bd830b; }
+.classroom-shared-analysis strong { color: #e2d2a7; font-weight: 600; }
+.classroom-chat-messages { display: grid; max-height: 230px; gap: 7px; margin: 0; padding: 0 3px 0 0; overflow-y: auto; list-style: none; }
+.classroom-chat-message { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 8px; padding: 8px 9px; border: 1px solid #ffffff0d; border-radius: 8px; background: #0b0f18; }
+.classroom-chat-message strong { overflow: hidden; color: #d3c8ff; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.classroom-chat-message span { grid-column: 1 / -1; color: #c2c2d0; font-size: 10px; line-height: 1.55; overflow-wrap: anywhere; }
+.classroom-chat-message time { color: #81869a; font-size: 8px; }
+.classroom-chat-message.own-message { border-color: #b7a3ff20; background: #b7a3ff08; }
+.classroom-chat-form { display: flex; gap: 6px; }
+.classroom-chat-form input { min-width: 0; min-height: 36px; flex: 1; padding: 8px 10px; border: 1px solid #ffffff16; border-radius: 8px; background: #0b0f18; color: #e2dfed; font-size: 10px; }
+.classroom-chat-form button { min-width: 50px; min-height: 36px; padding: 6px 9px; font-size: 9px; }
 .classroom-screen .card { border-radius: 14px; }
 html[lang="fa"] .classroom-page-head, html[lang="fa"] .classroom-welcome, html[lang="fa"] .classroom-entry-card, html[lang="fa"] .classroom-room-bar, html[lang="fa"] .classroom-participant, html[lang="fa"] .classroom-load-card { text-align: right; }
 html[lang="fa"] .classroom-annotation-layer, html[lang="fa"] .classroom-board { direction: ltr; }
@@ -959,6 +978,7 @@ html[lang="fa"] .classroom-info-footer { direction: ltr; }
   .classroom-side-column { grid-template-columns: minmax(0, 1fr); }
   .classroom-info-card { grid-column: auto; }
   .classroom-history { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .classroom-saved-game-row button { flex: 1 1 auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .classroom-connection[data-state="connecting"] i { animation: none; }

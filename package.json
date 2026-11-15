@@ -12,7 +12,6 @@
     "test": "node --test"
   },
   "dependencies": {
-    "chess.js": "^1.4.0",
-    "ws": "^8.23.0"
+    "chess.js": "^1.4.0"
   }
 }
