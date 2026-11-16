@@ -22,6 +22,7 @@ async function initialize() {
     data = { session: signed.data.session };
   }
   const userId = data.session.user.id;
+  await supabase.realtime.setAuth(data.session.access_token);
   async function invoke(action, payload = {}) {
     const { data, error } = await supabase.functions.invoke("online", { body: { action, ...payload } });
     if (error) {
@@ -45,7 +46,7 @@ async function initialize() {
     resign: roomId => invoke("resign", { roomId }),
     async subscribe(roomId, onChange, onStatus = () => {}) {
       const channel = supabase.channel(`online:${roomId}`, {
-        config: { private: false }
+        config: { private: true }
       });
       channel.on("broadcast", { event: "state" }, message => onChange(message.payload))
         .on("broadcast", { event: "joined" }, message => onChange({ ...(message.payload || {}), force: true }));
