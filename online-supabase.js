@@ -45,7 +45,7 @@ async function initialize() {
     resign: roomId => invoke("resign", { roomId }),
     async subscribe(roomId, onChange, onStatus = () => {}) {
       const channel = supabase.channel(`online:${roomId}`, {
-        config: { private: true, presence: { key: userId } }
+        config: { private: false }
       });
       channel.on("broadcast", { event: "state" }, message => onChange(message.payload))
         .on("broadcast", { event: "joined" }, message => onChange(message.payload));
