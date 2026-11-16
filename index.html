@@ -6909,7 +6909,7 @@
         onlineVersion=Number(room.version)||0;
         const built=onlineBuildHistory(room.moves);
         history=built.entries;redoStack=[];state=built.position;
-        selected=null;legalTargets=[];premove=null;orientation=humanColor=room.myColor||humanColor;
+        selected=null;legalTargets=[];premove=null;
         onlinePlayers=Array.isArray(room.players)?room.players:[];
         gameOver=Boolean(room.result);matchActive=room.status==="playing"&&!gameOver;
         if(gameOver&&onlineRefreshTimer){clearInterval(onlineRefreshTimer);onlineRefreshTimer=0;}
@@ -6935,6 +6935,7 @@
           const api=await ensureOnlineApi(),result=await api.snapshot(onlineRoomId);
           const room=result.room;
           if(!room)return;
+          if(room.myColor==="w"||room.myColor==="b")onlineMyColor=room.myColor;
           if(room.status==="waiting") {
             $("createRoomStatus").textContent=isPersian?"کد را برای حریف بفرستید؛ منتظر پیوستن او هستیم.":"Share the code and wait for your opponent to join.";
           } else if($("gameScreen").hidden) {
@@ -6962,7 +6963,7 @@
             clearInterval(onlineRefreshTimer);onlineRefreshTimer=0;return;
           }
           void syncOnlineRoom(true);
-        },2500);
+        },5000);
         onlineSubscriptionRoomId=roomId;
         const pending=(async()=>{
           const api=await ensureOnlineApi();
@@ -6986,9 +6987,16 @@
         finally { if(onlineWatchPromise===pending)onlineWatchPromise=null; }
       }
       let onlineJoinNoticeRoomId="";
+      let onlineMyColor="";
       async function startOnlineMatch(room) {
-        const isFirstJoinNotice=room.myColor==="w"&&Array.isArray(room.players)&&room.players.length===2&&onlineJoinNoticeRoomId!==room.id;
-        onlineRoomId=room.id;mode="online";humanColor=room.myColor;orientation=humanColor;onlinePlayers=room.players||[];
+        if(mode==="online"&&onlineRoomId===room.id&&!$("gameScreen").hidden) {
+          applyOnlineSnapshot(room);
+          return;
+        }
+        const ownColor=onlineMyColor||room.myColor||humanColor;
+        if(ownColor==="w"||ownColor==="b")onlineMyColor=ownColor;
+        const isFirstJoinNotice=ownColor==="w"&&Array.isArray(room.players)&&room.players.length===2&&onlineJoinNoticeRoomId!==room.id;
+        onlineRoomId=room.id;mode="online";humanColor=onlineMyColor;orientation=humanColor;onlinePlayers=room.players||[];
         cancelAIRequest();stopClock();clockOn=false;clocks={w:0,b:0};resultRecorded=false;lastGameResult="";
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;
         $("onlineScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
@@ -7024,7 +7032,7 @@
         button.disabled=true;status.textContent=isPersian?"در حال ساخت اتاق امن…":"Creating a secure room…";
         try {
           const api=await ensureOnlineApi(),result=await api.create({name:classroomPlayerName()});
-          const room=result.room;const generatedCode=String(result.invitationCode||"").trim().toUpperCase();if(!/^[A-Z0-9]{7}$/.test(generatedCode))throw new Error("Server returned an invalid room code (expected exactly 7 characters).");roomInviteCode=generatedCode;onlineRoomId=room.id;
+          const room=result.room;onlineMyColor=room.myColor||"";const generatedCode=String(result.invitationCode||"").trim().toUpperCase();if(!/^[A-Z0-9]{7}$/.test(generatedCode))throw new Error("Server returned an invalid room code (expected exactly 7 characters).");roomInviteCode=generatedCode;onlineRoomId=room.id;
           $("roomCodeValue").textContent=roomInviteCode;$("createdRoom").hidden=false;
           $("copyInviteButton").disabled=false;$("shareInviteButton").disabled=false;
           status.textContent=isPersian?"اتاق ساخته شد؛ کد را برای حریف بفرستید.":"Room created. Share this code with your opponent.";
@@ -7043,7 +7051,7 @@
         button.disabled=true;status.textContent=isPersian?"در حال اتصال به اتاق…":"Connecting to room…";
         try {
           const api=await ensureOnlineApi(),result=await api.join({invitationCode:code,name:classroomPlayerName()});
-          $("joinRoomCode").value=code;status.dataset.state="ready";
+          $("joinRoomCode").value=code;status.dataset.state="ready";onlineMyColor=result.room.myColor||"";
           await startOnlineMatch(result.room);
         } catch(error) {
           console.error("Online room join failed:",error);
