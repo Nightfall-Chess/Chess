@@ -294,6 +294,7 @@ declare
   v_member public.classroom_room_members%rowtype;
   v_target uuid;
   v_move_color text;
+  v_allowed_permission text;
   v_next_version bigint;
 begin
   if coalesce(auth.jwt() ->> 'role', '') <> 'service_role' then
@@ -319,8 +320,9 @@ begin
 
   if p_action = 'move' then
     v_move_color := split_part(v_state.fen, ' ', 2);
-    if v_member.role <> 'host' and v_member.permission not in ('control', 'both')
-      and v_member.permission <> case when v_move_color = 'w' then 'white' else 'black' end then
+    v_allowed_permission := case when v_move_color = 'w' then 'white' else 'black' end;
+    if v_member.role <> 'host'
+      and v_member.permission not in ('control', 'both', v_allowed_permission) then
       raise exception 'MOVE_NOT_PERMITTED';
     end if;
   elsif p_action <> 'annotation' and v_member.role <> 'host' then
