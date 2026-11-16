@@ -6879,7 +6879,7 @@
       }
       async function ensureOnlineApi() {
         if(!onlineApi) {
-          onlineApi=import("./online-supabase.js?v=online-fix-20261116")
+          onlineApi=import("./online-supabase.js?v=online-private-realtime-20261116")
             .catch(error=>{
               console.warn("GitHub Pages module load failed; using CDN fallback:",error);
               return import("https://cdn.jsdelivr.net/gh/Nightfall-Chess/Chess@main/online-supabase.js");
