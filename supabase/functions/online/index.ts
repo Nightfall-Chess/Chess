@@ -164,7 +164,7 @@ async function main(req: Request) {
     } else {
       throw new Error("UNKNOWN_ACTION");
     }
-    if (event && eventRoom) await broadcast(db, eventRoom, event, { at: Date.now() });
+    if (event && eventRoom) EdgeRuntime.waitUntil(broadcast(db, eventRoom, event, { at: Date.now() }));
     return reply(200, data);
   } catch (error) {
     const message = error instanceof Error ? error.message : "DATABASE_ERROR";
