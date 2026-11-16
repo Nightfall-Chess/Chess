@@ -530,7 +530,4 @@ END $$;
 DROP FUNCTION IF EXISTS public.is_classroom_member(uuid);
 
 CREATE INDEX IF NOT EXISTS classroom_rooms_owner_idx ON public.classroom_rooms(owner_id);
-CREATE INDEX IF NOT EXISTS classroom_room_messages_user_idx ON public.classroom_room_messages(user_id);
-CREATE INDEX IF NOT EXISTS classroom_room_games_white_user_idx ON public.classroom_room_games(white_user_id);
-CREATE INDEX IF NOT EXISTS classroom_room_games_black_user_idx ON public.classroom_room_games(black_user_id);
-CREATE INDEX IF NOT EXISTS classroom_room_state_updated_by_idx ON public.classroom_room_state(updated_by);
+CREATE INDEX IF NOT EXISTS classroom_room_games_created_by_idx ON public.classroom_room_games(created_by);
