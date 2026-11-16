@@ -2776,7 +2776,7 @@
       const classroomOwnEvents=new Set();
       let classroomOnlineUsers=new Set(),classroomChatMessages=[],classroomSavedGames=[];
       let classroomPointerDrag=null,classroomAnnotationDrag=null,classroomIgnoreClickUntil=0;
-      let onlineApi=null,onlineSubscription=null,onlineSubscriptionRoomId="",onlineRoomId="",onlineVersion=0,onlineSyncBusy=false,onlineSnapshotBusy=false,onlineRefreshTimer=0,onlinePlayers=[];
+      let onlineApi=null,onlineSubscription=null,onlineSubscriptionRoomId="",onlineWatchPromise=null,onlineRoomId="",onlineVersion=0,onlineSyncBusy=false,onlineSnapshotBusy=false,onlineRefreshTimer=0,onlinePlayers=[];
       let mode = "ai", humanColor = "w", aiThinking = false, gameOver = false;
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
       const stockfishSearchCache=new Map();
@@ -6943,28 +6943,38 @@
         }
       }
       async function watchOnlineRoom(roomId) {
+        if(onlineSubscription&&onlineSubscriptionRoomId===roomId)return onlineSubscription;
+        if(onlineWatchPromise&&onlineSubscriptionRoomId===roomId)return onlineWatchPromise;
+        if(onlineWatchPromise)await onlineWatchPromise.catch(()=>{});
         if(onlineRefreshTimer)clearInterval(onlineRefreshTimer);
         onlineRefreshTimer=window.setInterval(()=>{
           if(onlineRoomId!==roomId)return;
-          if($("gameScreen").hidden&&$("onlineScreen").hidden||gameOver) {
+          if(($("gameScreen").hidden&&$("onlineScreen").hidden)||gameOver) {
             clearInterval(onlineRefreshTimer);onlineRefreshTimer=0;return;
           }
           void syncOnlineRoom(true);
         },1800);
-        const api=await ensureOnlineApi();
-        if(onlineSubscription)await onlineSubscription.unsubscribe().catch(()=>{});
-        onlineSubscription=null;onlineSubscriptionRoomId="";
-        const subscription=await api.subscribe(roomId,payload=>{
-          if(payload?.room&&Number(payload.version)>onlineVersion) {
-            if($("gameScreen").hidden)void startOnlineMatch(payload.room);
-            else applyOnlineSnapshot(payload.room);
-          } else if(payload?.force||Number(payload?.version)>onlineVersion||$("gameScreen").hidden) {
-            void syncOnlineRoom();
-          }
-        },(status,error)=>{
-          if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Online realtime status:",status,error);
-        });
-        onlineSubscription=subscription;onlineSubscriptionRoomId=roomId;
+        onlineSubscriptionRoomId=roomId;
+        const pending=(async()=>{
+          const api=await ensureOnlineApi();
+          if(onlineSubscription)await onlineSubscription.unsubscribe().catch(()=>{});
+          onlineSubscription=null;
+          const subscription=await api.subscribe(roomId,payload=>{
+            if(payload?.room&&Number(payload.version)>onlineVersion) {
+              if($("gameScreen").hidden)void startOnlineMatch(payload.room);
+              else applyOnlineSnapshot(payload.room);
+            } else if(payload?.force||Number(payload.version)>onlineVersion||$("gameScreen").hidden) {
+              void syncOnlineRoom();
+            }
+          },(status,error)=>{
+            if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Online realtime status:",status,error);
+          });
+          onlineSubscription=subscription;
+          return subscription;
+        })();
+        onlineWatchPromise=pending;
+        try { return await pending; }
+        finally { if(onlineWatchPromise===pending)onlineWatchPromise=null; }
       }
       async function startOnlineMatch(room) {
         onlineRoomId=room.id;mode="online";humanColor=room.myColor;orientation=humanColor;onlinePlayers=room.players||[];
