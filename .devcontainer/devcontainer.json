@@ -12,5 +12,8 @@
   },
   "postCreateCommand": "npm install",
   "postStartCommand": "bash scripts/codespaces-start.sh",
-  "postAttachCommand": "gh codespace ports visibility 4173:public -c \"$CODESPACE_NAME\""
+  "postAttachCommand": "gh codespace ports visibility 4173:public -c \"$CODESPACE_NAME\"",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
 }
