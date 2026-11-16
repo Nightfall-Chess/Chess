@@ -1,0 +1,16 @@
+{
+  "name": "Nightfall Chess",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "forwardPorts": [
+    4173
+  ],
+  "portsAttributes": {
+    "4173": {
+      "label": "Nightfall Chess game server",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "npm install",
+  "postStartCommand": "bash scripts/codespaces-start.sh",
+  "postAttachCommand": "gh codespace ports visibility 4173:public -c \"$CODESPACE_NAME\""
+}
