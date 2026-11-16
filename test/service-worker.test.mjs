@@ -62,7 +62,22 @@ test("service worker pre-caches the app shell, leaves puzzle APIs uncached, and 
 
   assert.ok(harness.precached.includes(`${harness.scope}index.html`));
   assert.ok(harness.precached.includes(`${harness.scope}opening-index.mjs`));
-  assert.ok(harness.precached.some(url => url.endsWith("stockfish-19-lite-single.wasm")));
+  // Large files must not slow down the first page load while the worker installs.
+  assert.equal(harness.precached.some(url => url.endsWith(".wasm") || url.endsWith("openings.json")), false);
+
+  const activation = [];
+  harness.listeners.get("activate")({ waitUntil(promise) { activation.push(promise); } });
+  await Promise.all(activation);
+  const wasmUrl = `${harness.scope}assets/stockfish/stockfish-19-lite-single.wasm`;
+  assert.equal(harness.cached.has(wasmUrl), true);
+  assert.equal(harness.cached.has(`${harness.scope}openings.json`), true);
+
+  let audioIntercepted = false;
+  harness.listeners.get("fetch")({
+    request: new Request(`${harness.scope}Music/song.mp3`),
+    respondWith() { audioIntercepted = true; }
+  });
+  assert.equal(audioIntercepted, false);
 
   let puzzleApiIntercepted = false;
   harness.listeners.get("fetch")({
