@@ -198,7 +198,7 @@ async function main(request: Request) {
 
   try {
     const result = await handleAction(admin, userId, body);
-    if (result.broadcast) await broadcast(admin, result.broadcast.roomId, result.broadcast.event, result.broadcast.payload);
+    if (result.broadcast) EdgeRuntime.waitUntil(broadcast(admin, result.broadcast.roomId, result.broadcast.event, result.broadcast.payload));
     return response(200, result.data);
   } catch (error) {
     const code = databaseError(error as { message?: string; code?: string });
