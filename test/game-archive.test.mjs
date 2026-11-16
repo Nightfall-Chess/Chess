@@ -29,9 +29,8 @@ class FakeTransaction {
       get: key => this.#request(() => structuredClone(records.get(key))),
       getAll: () => this.#request(() => [...records.values()].map(record => structuredClone(record))),
       put: value => this.#request(() => {
-        const key = value.id ?? value.key;
-        records.set(key, structuredClone(value));
-        return key;
+        records.set(value.id, structuredClone(value));
+        return value.id;
       }),
       delete: key => this.#request(() => records.delete(key))
     };
@@ -108,14 +107,12 @@ test("archive actions retain record identity, persist favorites, cache analysis,
   await archive.saveGame(game);
   await archive.saveGame({ ...game, favorite: true });
   await archive.saveGame({ id: "game-two", plies: 0, entries: [] });
+  await archive.saveAchievement({ id: "wins:1", earnedAt: "2025-01-01T00:00:00.000Z" });
   await archive.saveGameAnalysis("game-one", 0, { label: "Good", accuracy: 91 });
-  await archive.savePreference("audio", { effectsVolume: 42 });
-  await archive.saveAchievementProgress({ firstWin: { level: 1, earnedAt: "2025-01-01" } });
 
   assert.equal((await archive.getGame("game-one")).favorite, true);
   assert.deepEqual((await archive.getGame("game-one")).entries[0].analysis, { label: "Good", accuracy: 91 });
-  assert.deepEqual(await archive.getPreference("audio"), { effectsVolume: 42 });
-  assert.deepEqual(await archive.getAchievementProgress(), { firstWin: { level: 1, earnedAt: "2025-01-01" } });
+  assert.deepEqual(await archive.listAchievements(), [{ id: "wins:1", earnedAt: "2025-01-01T00:00:00.000Z" }]);
   assert.deepEqual((await archive.listGames()).map(record => record.id).sort(), ["game-one", "game-two"]);
   await archive.deleteGame("game-one");
   assert.equal(await archive.getGame("game-one"), undefined);
@@ -133,4 +130,17 @@ test("Game Review keeps eight semantic columns and prevents rows becoming CSS gr
   assert.match(css, /\.analysis-table tr\.analysis-row\s*\{\s*display:\s*table-row;/);
   assert.match(html, /id="analysisPlayerFilter"/);
   assert.match(html, /id="analysisClassificationFilter"/);
+});
+
+test("achievement dialog and audio controls are connected to accessible actions", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /achievementIsland"\)\.addEventListener\("click",openAchievementDetails\)/);
+  assert.match(html, /closeAchievementDetails"\)\.addEventListener\("click",closeAchievementDetails\)/);
+  assert.ok(html.includes('if(event.key==="Escape"){closeAchievementDetails();return;}'));
+  assert.match(html, /gameVolume"\)\.addEventListener\("input"/);
+  assert.match(html, /uiVolume"\)\.addEventListener\("input"/);
+  assert.match(html, /achievementVolume"\)\.addEventListener\("input"/);
+  assert.match(html, /masterMuteToggle"\)\.addEventListener\("click"/);
+  assert.match(html, /achievementDetailsBackdrop"[^>]+role="dialog"[^>]+aria-modal="true"/);
 });

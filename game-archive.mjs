@@ -18,17 +18,11 @@ function openDatabase() {
       if (!database.objectStoreNames.contains("moments")) {
         database.createObjectStore("moments", { keyPath: "id" });
       }
-      if (!database.objectStoreNames.contains("preferences")) {
-        database.createObjectStore("preferences", { keyPath: "key" });
-      }
       if (!database.objectStoreNames.contains("achievements")) {
-        database.createObjectStore("achievements", { keyPath: "key" });
+        database.createObjectStore("achievements", { keyPath: "id" });
       }
     };
-    request.onsuccess = () => {
-      request.result.onversionchange = () => request.result.close();
-      resolve(request.result);
-    };
+    request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error || new Error("Could not open the game archive."));
     request.onblocked = () => reject(new Error("The game archive is busy in another tab. Close older Nightfall tabs and retry."));
   }).catch(error => {
@@ -100,26 +94,10 @@ export function deleteMoment(id) {
   return storeRequest("moments", "readwrite", store => store.delete(id));
 }
 
-export async function getPreference(key) {
-  const record = await storeRequest("preferences", "readonly", store => store.get(key));
-  return record?.value;
+export function listAchievements() {
+  return storeRequest("achievements", "readonly", store => store.getAll());
 }
 
-export function savePreference(key, value) {
-  if (typeof key !== "string" || !key) {
-    return Promise.reject(new TypeError("A preference key is required."));
-  }
-  return storeRequest("preferences", "readwrite", store => store.put({ key, value, updatedAt: Date.now() }));
-}
-
-export async function getAchievementProgress() {
-  const record = await storeRequest("achievements", "readonly", store => store.get("progress"));
-  return record?.value ?? {};
-}
-
-export function saveAchievementProgress(value) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return Promise.reject(new TypeError("Achievement progress must be an object."));
-  }
-  return storeRequest("achievements", "readwrite", store => store.put({ key: "progress", value, updatedAt: Date.now() }));
+export function saveAchievement(achievement) {
+  return storeRequest("achievements", "readwrite", store => store.put(achievement));
 }
