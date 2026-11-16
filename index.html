@@ -6878,7 +6878,15 @@
         }
       }
       async function ensureOnlineApi() {
-        if(!onlineApi) onlineApi=(await import("./online-supabase.js")).getOnlineClient();
+        if(!onlineApi) {
+          onlineApi=import("./online-supabase.js?v=online-fix-20261116")
+            .catch(error=>{
+              console.warn("GitHub Pages module load failed; using CDN fallback:",error);
+              return import("https://cdn.jsdelivr.net/gh/Nightfall-Chess/Chess@main/online-supabase.js");
+            })
+            .then(module=>module.getOnlineClient())
+            .catch(error=>{onlineApi=null;throw error;});
+        }
         return onlineApi;
       }
       function onlineSquare(row,col){return `${"abcdefgh"[col]}${8-row}`;}
@@ -6977,7 +6985,9 @@
         try { return await pending; }
         finally { if(onlineWatchPromise===pending)onlineWatchPromise=null; }
       }
+      let onlineJoinNoticeRoomId="";
       async function startOnlineMatch(room) {
+        const isFirstJoinNotice=room.myColor==="w"&&Array.isArray(room.players)&&room.players.length===2&&onlineJoinNoticeRoomId!==room.id;
         onlineRoomId=room.id;mode="online";humanColor=room.myColor;orientation=humanColor;onlinePlayers=room.players||[];
         cancelAIRequest();stopClock();clockOn=false;clocks={w:0,b:0};resultRecorded=false;lastGameResult="";
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;
@@ -6985,6 +6995,10 @@
         $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=false;
         $("analysisBackdrop").classList.remove("open");analysisShown=false;gameStartedAt=new Date();
         showGameInfoTab("moves");applyOnlineSnapshot(room);playEventSound("gameStart");
+        if(isFirstJoinNotice) {
+          onlineJoinNoticeRoomId=room.id;
+          showToast(isPersian?"حریف وارد اتاق شد؛ بازی شروع شد.":"Your opponent joined. The game has started.");
+        }
         if(!onlineSubscription||onlineSubscriptionRoomId!==room.id) {
           try { await watchOnlineRoom(room.id); }
           catch(error) { console.error("Online Realtime subscription failed; polling fallback remains active:",error);showToast(isPersian?"اتصال زنده برقرار نشد؛ همگام‌سازی پشتیبان فعال است.":"Realtime is unavailable; automatic sync fallback is active."); }
