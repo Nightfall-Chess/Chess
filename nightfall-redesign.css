@@ -158,6 +158,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .lobby-nav-button[data-lobby-page="play"]::before { content: "♟"; }
 .lobby-nav-button[data-lobby-page="puzzles"]::before { content: "♞"; }
 .lobby-nav-button[data-lobby-page="progress"]::before { content: "◷"; }
+.lobby-nav-button[data-lobby-page="achievements"]::before { content: "✦"; }
 .settings-nav-button[data-settings-panel="profile"]::before { content: "♙"; }
 .settings-nav-button[data-settings-panel="gameplay"]::before { content: "↗"; }
 .settings-nav-button[data-settings-panel="appearance"]::before { content: "▦"; }
@@ -271,6 +272,11 @@ input[type="range"] { accent-color: var(--accent); }
 .profile-stat span { color: #969bad; font-size: 10px; }
 #lobby[data-page="progress"] .lobby-dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 #lobby[data-page="progress"] .profile-stats { grid-column: 1 / -1; margin: 0; }
+#lobby[data-page="achievements"] .lobby-grid { display: none; }
+#lobby[data-page="achievements"] .lobby-dashboard { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+#lobby[data-page="achievements"] .lobby-dashboard > :not(.profile-stats):not(#journeyCard) { display: none; }
+#lobby[data-page="achievements"] .profile-stats { grid-column: 1; }
+.achievement-details-button { flex: 0 0 auto; min-height: 34px; padding: 6px 10px; font-size: 10px; }
 .profile-performance, .profile-learning { padding: 20px; }
 .profile-recent-games { grid-column: 1 / -1; padding: 20px; }
 .recent-game-list { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
@@ -649,7 +655,8 @@ html[lang="fa"] #gameScreen.layout > .side-panel { border-right: 1px solid #b7a3
   margin: 0 auto;
 }
 #lobby[data-page="puzzles"] .home-shortcuts,
-#lobby[data-page="progress"] .home-shortcuts { display: none; }
+#lobby[data-page="progress"] .home-shortcuts,
+#lobby[data-page="achievements"] .home-shortcuts { display: none; }
 .home-shortcut {
   display: grid;
   grid-template-columns: 35px minmax(0, 1fr) 12px;

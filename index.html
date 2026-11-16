@@ -1448,7 +1448,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=20">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=21">
 </head>
 <body>
   <main class="app">
@@ -1490,6 +1490,7 @@
         <button class="lobby-nav-button active" type="button" data-lobby-page="play" aria-current="page">Play</button>
         <button class="lobby-nav-button" type="button" data-lobby-page="puzzles">Puzzles</button>
         <button class="lobby-nav-button" type="button" data-lobby-page="progress">Progress</button>
+        <button class="lobby-nav-button" type="button" data-lobby-page="achievements">Achievements</button>
       </nav>
       <section class="home-shortcuts" aria-label="Quick access">
         <button class="home-shortcut" id="homeAiButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">♟</span><span><strong>Play against AI</strong><small>Choose your challenge</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
@@ -1583,7 +1584,7 @@
           <p class="note" id="profileLearningCopy">Completed lessons are saved on this device.</p>
         </section>
         <section class="card journey-card" id="journeyCard" aria-labelledby="journeyTitle">
-          <div class="card-heading"><span class="card-title" id="journeyTitle" tabindex="-1">Your chess journey</span><span class="eyebrow">FROM YOUR SAVED GAMES</span></div>
+          <div class="card-heading"><span class="card-title" id="journeyTitle" tabindex="-1">Your chess journey</span><button type="button" class="subtle-button achievement-details-button" id="showAchievementDetails">View all achievements</button></div>
           <div class="journey-metrics" id="journeyMetrics"></div>
           <div class="journey-trend" id="accuracyTrend" role="img" aria-label="Recent game accuracy trend"></div>
           <p class="note" id="journeyInsight">Finish and review games to reveal real performance trends.</p>
@@ -2073,7 +2074,7 @@
         "Practice at your own pace.":"با آرامش و گام‌به‌گام تمرین کنید.","Opening explorer":"کاوش گشایش‌ها",
         "Review openings from real master games.":"گشایش‌ها را از بازی‌های واقعی استادان مرور کنید.","MOONLIT STUDY":"مطالعه زیر نور ماه",
         "THE OPENING MOVE":"حرکت آغازین","01 — 08":"۰۱ — ۰۸",
-        "Classroom":"کلاس شطرنج","NIGHTFALL · LIVE STUDY":"شب‌نشینی · آموزش زنده",
+        "Classroom":"کلاس شطرنج","♧ Classroom":"♧ کلاس شطرنج","NIGHTFALL · LIVE STUDY":"شب‌نشینی · آموزش زنده",
         "Player":"بازیکن","Latest position":"آخرین وضعیت","Annotation color":"رنگ نشانه",
         "A shared chessboard for teaching, exploring, and learning together.":"صفحه‌ای مشترک برای آموزش، بررسی و یادگیری شطرنج در کنار هم.",
         "Not connected":"متصل نیست","Connecting…":"در حال اتصال…","Connected":"متصل شد","Reconnecting…":"اتصال دوباره…",
@@ -2215,7 +2216,7 @@
         "Board theme":"پوستهٔ صفحه","Piece style":"سبک مهره","LIVE PREVIEW":"پیش‌نمایش زنده","Preview":"پیش‌نمایش","Sage":"سبز ملایم","Arctic blue":"آبی یخی","Walnut":"گردویی",
         "Classic symbols":"نمادهای کلاسیک","Lichess classic":"کلاسیک لیچس","Lichess outline":"خطی لیچس","FOUR INCLUDED TRACKS":"چهار قطعهٔ موجود",
         "Starting track":"قطعهٔ آغازین","Volume":"بلندی صدا","Music continues through the included tracks in order and loops back to the beginning.":"موسیقی قطعه‌های موجود را به‌ترتیب پخش می‌کند و پس از پایان دوباره از ابتدا آغاز می‌شود.",
-        "Play":"بازی","Puzzles":"معماها","Progress":"پیشرفت","← Back":"← بازگشت","← Back to menu":"← بازگشت به فهرست",
+        "Play":"بازی","Puzzles":"معماها","Progress":"پیشرفت","Achievements":"دستاوردها","View all achievements":"نمایش همهٔ دستاوردها","← Back":"← بازگشت","← Back to menu":"← بازگشت به فهرست",
         "Solve puzzle":"حل معما","Rating":"درجه","STREAK":"رشته","TIME":"زمان","COLLECTION":"مجموعه","Forward →":"جلو →","Retry loading":"تلاش دوباره برای بارگیری",
         "Loading the Lichess puzzle collection…":"در حال بارگیری مجموعهٔ معماهای لیچس…","Lichess puzzle dataset could not be loaded:":"مجموعهٔ معماهای لیچس بارگیری نشد:",
         "Play on the chessboard":"روی صفحهٔ شطرنج بازی کنید","Chess puzzle":"معمای شطرنج",
@@ -5739,7 +5740,7 @@
         renderLessonList();
       }
       function switchLobbyPage(page) {
-        if(!["play","puzzles","progress"].includes(page))return;
+        if(!["play","puzzles","progress","achievements"].includes(page))return;
         $("lobby").dataset.page=page;
         document.querySelectorAll("[data-lobby-page]").forEach(button=>{
           const active=button.dataset.lobbyPage===page;
@@ -6940,33 +6941,9 @@
         else { humanColor="w";orientation="w"; }
         const seconds=Number(mode==="ai"?$("aiTimeControl").value:$("timeControl").value);
         clockOn=seconds>0;clocks={w:seconds,b:seconds};clockStamp=Date.now();
-      loadGameplaySettings();loadAiOpeningHistory();
-      let openingWarmStarted=false;
-      function warmOpeningDatabase() {
-        if(openingWarmStarted)return;
-        openingWarmStarted=true;
-        void loadOpeningDatabase().then(()=>{
-          const previousOpening=openingIdentity;
-          recognizeOpening();
-          if(openingIdentity!==previousOpening&&!$("gameScreen").hidden)render();
-          if(!$("trainingScreen").hidden)renderQuickReviews($("openingSearch").value);
-        }).catch(error=>{openingWarmStarted=false;console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);});
-      }
-      function whenBrowserIdle(task,timeout) {
-        if("requestIdleCallback" in window)requestIdleCallback(task,{timeout});
-        else setTimeout(task,Math.min(timeout,1500));
-      }
-      window.addEventListener("load",()=>{
-        setTimeout(()=>{
-          whenBrowserIdle(warmOpeningDatabase,3000);
-          if(!navigator.connection?.saveData)whenBrowserIdle(()=>{void ensureStockfish().catch(error=>console.warn("Stockfish preload failed; it will be retried when needed.",error));},8000);
-        },1200);
-      },{once:true});
-      for(const eventName of ["pointerenter","focus","pointerdown"]) {
-        $("lobbyAiMode")?.addEventListener(eventName,()=>{warmOpeningDatabase();void ensureStockfish().catch(()=>{});},{once:true,passive:true});
-        $("trainingTop")?.addEventListener(eventName,warmOpeningDatabase,{once:true,passive:true});
-      }
-      ensureTwentyMoveLines();void loadRecentGames();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();
+        if(mode==="ai")void ensureStockfish().catch(error=>console.warn("Stockfish warm-up failed:",error));
+        render();evaluateEnd();startClock();
+        playEventSound("gameStart");
         if(mode==="ai"&&state.turn!==humanColor) scheduleAI();
         showToast(mode==="ai"?`New game · ${humanColor==="w"?"You play White":"You play Black"}`:"New local game");
       }
@@ -7842,6 +7819,7 @@
       $("masterMuteToggle").addEventListener("click",()=>setMasterMuted(!masterMuted));
       $("previewSoundButton").addEventListener("click",()=>playEventSound("brilliant"));
       $("achievementIsland").addEventListener("click",openAchievementDetails);
+      $("showAchievementDetails").addEventListener("click",openAchievementDetails);
       $("closeAchievementDetails").addEventListener("click",closeAchievementDetails);
       $("achievementDetailsBackdrop").addEventListener("click",event=>{if(event.target===$("achievementDetailsBackdrop"))closeAchievementDetails();});
       document.addEventListener("keydown",event=>{
@@ -7928,7 +7906,6 @@
         else showToast(completedLessons.size===lessons.length?"Course complete — keep practicing in real games":"Nice work. Revisit any lesson or keep practicing.");
       });
       loadGameplaySettings();loadAiOpeningHistory();
-      loadGameplaySettings();loadAiOpeningHistory();
       let openingWarmStarted=false;
       function warmOpeningDatabase() {
         if(openingWarmStarted)return;
@@ -7954,7 +7931,8 @@
         $("lobbyAiMode")?.addEventListener(eventName,()=>{warmOpeningDatabase();void ensureStockfish().catch(()=>{});},{once:true,passive:true});
         $("trainingTop")?.addEventListener(eventName,warmOpeningDatabase,{once:true,passive:true});
       }
-      ensureTwentyMoveLines();void loadRecentGames();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();      reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
+      ensureTwentyMoveLines();void loadRecentGames();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();
+      reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
       $("setSkillButton").addEventListener("click",setPlayerSkill);
       $("puzzleHintButton").addEventListener("click",showPuzzleHint);
       $("nextPuzzleButton").addEventListener("click",nextPuzzle);

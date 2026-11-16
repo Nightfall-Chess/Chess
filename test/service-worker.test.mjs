@@ -12,7 +12,7 @@ async function createWorkerHarness() {
   const scope = `${origin}/Chess/`;
   const cache = {
     async addAll(requests) {
-      precached.push(...requests.map(request => request.url));
+      precached.push(...requests.map(request => request.url || request.href));
     },
     async match(request) {
       return cached.get(request.url);
@@ -60,7 +60,7 @@ test("service worker pre-caches the app shell, leaves puzzle APIs uncached, and 
   harness.listeners.get("install")(install);
   await install.promise;
 
-  assert.ok(harness.precached.includes(`${harness.scope}index.html`));
+  assert.ok(harness.precached.includes(`${harness.scope}index.html`), `Precacher received: ${harness.precached.join(", ")}`);
   assert.ok(harness.precached.includes(`${harness.scope}opening-book.mjs`));
   // Large files must not slow down the first page load while the worker installs.
   assert.equal(harness.precached.some(url => url.endsWith(".wasm") || url.endsWith("openings.json")), false);

@@ -23,7 +23,9 @@ test("offline cache version matches the stylesheet and includes app, study, and 
 
 test("offline fetch policy excludes APIs and cross-origin requests", async () => {
   const worker = await readFile(new URL("../service-worker.js", import.meta.url), "utf8");
-  assert.match(worker, /url\.origin\s*!==\s*self\.location\.origin\s*\|\|\s*url\.pathname\.includes\("\/api\/"\)/);
-  assert.match(worker, /request\.mode\s*===\s*"navigate"/);
-  assert.match(worker, /IMMUTABLE_ASSET\.test\(url\.pathname\)/);
+  assert.match(worker, /url\.origin\s*!==\s*self\.location\.origin\s*\|\|\s*isPuzzleApi\(url\)/);
+  assert.ok(worker.includes("function isPuzzleApi(url)"));
+  assert.ok(worker.includes("api\\/puzzles"));
+  assert.match(worker, /staleWhileRevalidate\(event,\s*runtimeCache,\s*request\)/);
+  assert.match(worker, /networkFirst\(staticCache,\s*request\)/);
 });

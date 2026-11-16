@@ -5,7 +5,7 @@ const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./nightfall-redesign.css?v=20",
+  "./nightfall-redesign.css?v=21",
   "./game-archive.mjs",
   "./achievements.mjs",
   "./opening-book.mjs",
