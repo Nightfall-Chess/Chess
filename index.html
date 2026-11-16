@@ -7968,6 +7968,19 @@
       $("exitPuzzleButton").addEventListener("click",exitPuzzle);
       $("languageSelect").addEventListener("change",event=>setLanguage(event.currentTarget.value));
       setupClassroomEvents();
+      // Capture Classroom navigation before other page-level click handlers.
+      // This keeps the entry point reliable even if a bubbling handler intercepts the button.
+      document.addEventListener("click",event=>{
+        const target=event.target instanceof Element?event.target.closest("#classroomTop"):null;
+        if(!target)return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        try{openClassroom();}
+        catch(error){
+          console.error("Could not open Classroom:",error);
+          showToast(isPersian?"باز کردن کلاس با خطا روبه‌رو شد. کنسول را بررسی کنید.":`Could not open Classroom: ${error.message||error}`);
+        }
+      },true);
       updateAiRating();renderLesson();render();evaluateEnd();setMode("ai");
       let savedLanguage="en";
       try{savedLanguage=localStorage.getItem("nightfall-chess-language-v1")==="fa"?"fa":"en";}
