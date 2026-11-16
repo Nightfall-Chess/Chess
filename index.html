@@ -1448,7 +1448,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=10">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=11">
 </head>
 <body>
   <main class="app">
@@ -1960,11 +1960,13 @@
             <div class="best-line-actions"><button class="subtle-button" id="bestLinePrevious" type="button">← Previous</button><span id="bestLineNotation"></span><button class="subtle-button" id="bestLineNext" type="button">Next →</button><button class="subtle-button" id="bestLineReturn" type="button">Return to game</button></div>
           </section>
           <div class="analysis-filter-row">
-            <label for="analysisFilter">Show</label><select id="analysisFilter"><option value="all">All moves</option><option value="mistakes">Mistakes & blunders</option><option value="best">Best & brilliant</option><option value="w">White only</option><option value="b">Black only</option></select>
+            <label for="analysisPlayerFilter" data-review-filter-label="player">Player</label><select id="analysisPlayerFilter"><option value="all" data-review-filter-option="allPlayers">Both players</option><option value="w" data-review-filter-option="white">White</option><option value="b" data-review-filter-option="black">Black</option></select>
+            <label for="analysisClassificationFilter" data-review-filter-label="classification">Classification</label><select id="analysisClassificationFilter"><option value="all" data-review-filter-option="allMoves">All moves</option><option value="Brilliant">Brilliant</option><option value="Great">Great</option><option value="Best">Best</option><option value="Excellent">Excellent</option><option value="Good">Good</option><option value="Book">Book</option><option value="Inaccuracy">Inaccuracy</option><option value="Mistake">Mistake</option><option value="Blunder">Blunder</option><option value="Miss">Miss</option></select>
           </div>
           <div class="analysis-table-wrap">
-            <table class="analysis-table">
-              <thead><tr><th>Move</th><th>Played</th><th>Class</th><th>Before</th><th>After</th><th>Loss</th><th>Best alternative</th><th>Review</th></tr></thead>
+            <table class="analysis-table" aria-label="Move-by-move game review">
+              <colgroup><col><col><col><col><col><col><col><col></colgroup>
+              <thead id="analysisHeaders"><tr><th scope="col" data-review-column="move">Move</th><th scope="col" data-review-column="played">Played</th><th scope="col" data-review-column="classification">Classification</th><th scope="col" data-review-column="before">Evaluation Before</th><th scope="col" data-review-column="after">Evaluation After</th><th scope="col" data-review-column="loss">Centipawn Loss</th><th scope="col" data-review-column="best">Best Alternative</th><th scope="col" data-review-column="actions">Review Actions</th></tr></thead>
               <tbody class="analysis-list" id="analysisList"></tbody>
             </table>
           </div>
@@ -7033,45 +7035,61 @@
       function renderGameAnalysis(grades,result,progress=null) {
         const digit=value=>isPersian?String(value).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]):value;
         const labels=["Brilliant","Great","Best","Excellent","Good","Book","Inaccuracy","Mistake","Blunder","Miss"];
-        const counts=grades.reduce((total,grade)=>{total[grade.label]=(total[grade.label]||0)+1;return total;},{});
+        const headers=isPersian
+          ?{move:"حرکت",played:"بازی‌شده",classification:"طبقه‌بندی",before:"ارزیابی پیش از حرکت",after:"ارزیابی پس از حرکت",loss:"افت سانتی‌پیاده",best:"بهترین جایگزین",actions:"اقدام‌ها"}
+          :{move:"Move",played:"Played",classification:"Classification",before:"Evaluation Before",after:"Evaluation After",loss:"Centipawn Loss",best:"Best Alternative",actions:"Review Actions"};
+        $("analysisHeaders").querySelectorAll("[data-review-column]").forEach(header=>{
+          header.textContent=headers[header.dataset.reviewColumn];
+        });
+        const filterLabels=isPersian
+          ?{player:"بازیکن",classification:"طبقه‌بندی",allPlayers:"هر دو بازیکن",white:"سفید",black:"سیاه",allMoves:"همهٔ حرکت‌ها"}
+          :{player:"Player",classification:"Classification",allPlayers:"Both players",white:"White",black:"Black",allMoves:"All moves"};
+        document.querySelectorAll("[data-review-filter-label]").forEach(label=>{
+          label.textContent=filterLabels[label.dataset.reviewFilterLabel];
+        });
+        document.querySelectorAll("[data-review-filter-option]").forEach(option=>{
+          option.textContent=filterLabels[option.dataset.reviewFilterOption];
+        });
+        $("analysisClassificationFilter").querySelectorAll("option:not([value='all'])").forEach(option=>{
+          option.textContent=isPersian?(faText[option.value]||option.value):option.value;
+        });
         $("analysisResult").textContent=isPersian?translateFa(result):result;
-        const badges=labels.filter(label=>counts[label]).map(label=>`<span class="analysis-stat"><b>${digit(counts[label])}</b>${isPersian?(faText[label]||label):label}</span>`);
-        if(progress)badges.unshift(`<span class="analysis-stat"><b>${digit(progress.completed)} / ${digit(progress.total)}</b>${isPersian?"حرکت تحلیل‌شده":"moves analyzed"}</span>`);
-        if(progress?.failures)badges.push(`<span class="analysis-stat analysis-error"><b>${digit(progress.failures)}</b>${isPersian?"تحلیل ناموفق":"analysis errors"}</span>`);
-        for(const color of ["w","b"]) {
+        const playerReports=["w","b"].map(color=>{
           const own=grades.filter(grade=>grade.entry.before.turn===color);
           const accuracy=own.length?Math.round(own.reduce((sum,grade)=>sum+grade.accuracy,0)/own.length):null;
           const name=isPersian?(color==="w"?"سفید":"سیاه"):(color==="w"?"White":"Black");
-          badges.push(`<span class="analysis-stat"><b>${accuracy===null?"—":`${digit(accuracy)}${isPersian?"٪":"%"}`}</b>${name} · ${isPersian?"دقت تخمینی":"accuracy"}</span>`);
-          badges.push(`<span class="analysis-stat"><b>${digit(own.length)}</b>${name} · ${isPersian?"حرکت":"moves"}</span>`);
-          for(const label of labels) {
+          const labelCounts=labels.map(label=>{
             const count=own.filter(grade=>grade.label===label).length;
-            if(count)badges.push(`<span class="analysis-stat"><b>${digit(count)}</b>${name} · ${isPersian?(faText[label]||label):label}</span>`);
-          }
-        }
-        $("analysisSummary").innerHTML=badges.join("")||`<span class="analysis-stat">${isPersian?"حرکتی برای مرور نیست":"No moves to review"}</span>`;
+            return `<span class="analysis-player-count"><b>${digit(count)}</b>${escapeHtml(isPersian?(faText[label]||label):label)}</span>`;
+          }).join("");
+          return `<section class="analysis-player-report" aria-label="${escapeHtml(name)} ${isPersian?"گزارش عملکرد":"performance report"}"><div class="analysis-player-head"><strong>${escapeHtml(name)}</strong><span>${isPersian?"دقت":"Accuracy"} <b>${accuracy===null?"—":`${digit(accuracy)}${isPersian?"٪":"%"}`}</b></span><span>${digit(own.length)} ${isPersian?"حرکت":"moves"}</span></div><div class="analysis-player-counts">${labelCounts}</div></section>`;
+        }).join("");
+        const progressSummary=progress
+          ?`<span class="analysis-progress">${isPersian?"تحلیل‌شده":"Analyzed"} ${digit(progress.completed)} / ${digit(progress.total)}${progress.failures?` · ${digit(progress.failures)} ${isPersian?"ناموفق":"failed"}`:""}</span>`
+          :"";
+        $("analysisSummary").innerHTML=`${progressSummary}${playerReports}`;
         renderEvaluationGraph(grades);
         const turningPoint=grades.filter(grade=>["Blunder","Mistake","Miss","Inaccuracy"].includes(grade.label)).sort((a,b)=>b.loss-a.loss)[0];
         const tip=turningPoint
           ?(isPersian?`<strong>پیشنهاد موتور:</strong> در حرکت ${digit(Math.floor(turningPoint.index/2)+1)}، ${turningPoint.bestSan} به‌جای ${turningPoint.entry.san} ارزیابی بهتری داشت.`:`<strong>Engine suggestion:</strong> On move ${Math.floor(turningPoint.index/2)+1}, ${turningPoint.bestSan} kept a better evaluation than ${turningPoint.entry.san}.`)
           :(isPersian?"<strong>تحلیل موتور:</strong> حرکت‌های بازی با موتور Stockfish بررسی شده‌اند.":"<strong>Engine review:</strong> Every played position was checked with Stockfish.");
         $("analysisTips").innerHTML=tip;
-        const filter=$("analysisFilter").value,gradeByIndex=new Map(grades.map(grade=>[grade.index,grade]));
+        const playerFilter=$("analysisPlayerFilter").value,classificationFilter=$("analysisClassificationFilter").value;
+        const gradeByIndex=new Map(grades.map(grade=>[grade.index,grade]));
         $("analysisList").innerHTML=history.map((entry,index)=>{
           const grade=gradeByIndex.get(index),color=entry.before.turn;
-          if((filter==="w"||filter==="b")&&filter!==color)return "";
-          if(filter==="mistakes"&&(!grade||!["Inaccuracy","Mistake","Blunder","Miss"].includes(grade.label)))return "";
-          if(filter==="best"&&(!grade||!["Brilliant","Great","Best"].includes(grade.label)))return "";
+          if(playerFilter!=="all"&&playerFilter!==color)return "";
+          if(classificationFilter!=="all"&&grade?.label!==classificationFilter)return "";
           const moveNumber=Math.floor(index/2)+1,played=escapeHtml(entry.san);
           if(!grade) {
             const status=entry.analysisError?(isPersian?"ناموفق":"Unavailable"):(isPersian?"در حال تحلیل":"Analyzing");
-            return `<tr class="analysis-row" data-index="${index}" aria-current="false"><td>${digit(moveNumber)}.${color==="w"?"":"… "}</td><td>${played}</td><td><span class="grade ${entry.analysisError?"bad":"pending"}">${status}</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td><button class="subtle-button" type="button" data-review-action="jump" data-index="${index}">${isPersian?"رفتن":"Jump"}</button></td></tr>`;
+            return `<tr class="analysis-row" data-index="${index}" tabindex="0" aria-current="false"><td>${digit(moveNumber)}.${color==="w"?"":"… "}</td><td>${played}</td><td><span class="grade ${entry.analysisError?"bad":"pending"}">${status}</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td><button class="subtle-button" type="button" data-review-action="jump" data-index="${index}" aria-label="${isPersian?`رفتن به حرکت ${digit(moveNumber)} ${entry.san}`:`Jump to move ${moveNumber} ${entry.san}`}">${isPersian?"رفتن":"Jump"}</button></td></tr>`;
           }
           const beforeText=engineEvaluationText(grade.rootInfo,entry.before.turn);
           const afterText=grade.evaluationText;
           const lossText=grade.loss>=90000?(isPersian?"مات":"Mate"):`${digit(Math.round(grade.loss))} cp`;
           const retry=grade.quality==="bad"?`<button class="subtle-button" type="button" data-review-action="retry" data-index="${index}">${isPersian?"تلاش دوباره":"Retry"}</button>`:"";
-          return `<tr class="analysis-row${["Mistake","Blunder","Miss"].includes(grade.label)?" critical-move":""}" data-index="${index}" aria-current="${analysisPositionIndex===index?"true":"false"}"><td>${digit(moveNumber)}.${color==="w"?"":"… "}</td><td>${played}</td><td><span class="grade ${grade.quality}">${isPersian?(faText[grade.label]||grade.label):grade.label}</span></td><td>${beforeText}</td><td>${afterText}</td><td>${lossText}</td><td>${escapeHtml(grade.bestSan)}</td><td><div class="review-move-actions"><button class="subtle-button" type="button" data-review-action="jump" data-index="${index}">${isPersian?"رفتن":"Jump"}</button><button class="subtle-button" type="button" data-review-action="best" data-index="${index}">${isPersian?"بهترین حرکت":"Show best"}</button>${retry}</div></td></tr>`;
+          return `<tr class="analysis-row${["Mistake","Blunder","Miss"].includes(grade.label)?" critical-move":""}" data-index="${index}" tabindex="0" aria-current="${analysisPositionIndex===index?"true":"false"}"><td>${digit(moveNumber)}.${color==="w"?"":"… "}</td><td>${played}</td><td><span class="grade ${grade.quality}">${isPersian?(faText[grade.label]||grade.label):grade.label}</span></td><td>${beforeText}</td><td>${afterText}</td><td>${lossText}</td><td>${escapeHtml(grade.bestSan)}</td><td><div class="review-move-actions"><button class="subtle-button" type="button" data-review-action="jump" data-index="${index}" aria-label="${isPersian?`رفتن به حرکت ${digit(moveNumber)} ${entry.san}`:`Jump to move ${moveNumber} ${entry.san}`}">${isPersian?"رفتن":"Jump"}</button><button class="subtle-button" type="button" data-review-action="best" data-index="${index}" aria-label="${isPersian?`نمایش بهترین خط پیش از حرکت ${digit(moveNumber)}`:`Show best line before move ${moveNumber}`}">${isPersian?"بهترین حرکت":"Show Best"}</button>${retry}</div></td></tr>`;
         }).join("");
       }
       async function analyzePosition(position,signal) {
@@ -7085,7 +7103,7 @@
         const entries=history.slice();
         engineAnalysisGrades=[];engineAnalysisResult=result;
         stopReviewAutoplay();reviewSuggestion=null;reviewSuggestionPly=0;
-        $("bestLinePanel").hidden=true;$("analysisFilter").value="all";
+        $("bestLinePanel").hidden=true;$("analysisPlayerFilter").value="all";$("analysisClassificationFilter").value="all";
         $("analysisResult").textContent=result;
         $("analysisSummary").textContent=isPersian?"Stockfish در حال تحلیل حرکت‌هاست…":"Stockfish is analyzing the moves…";
         $("analysisTips").textContent="";$("analysisList").replaceChildren();$("evaluationGraph").replaceChildren();
@@ -7487,7 +7505,8 @@
       $("saveCurrentMomentButton").addEventListener("click",()=>{void saveCurrentMoment();});
       $("momentList").addEventListener("click",event=>{void handleMomentAction(event);});
       $("dailyChallengeButton").addEventListener("click",()=>{void startDailyChallenge();});
-      $("analysisFilter").addEventListener("change",()=>renderGameAnalysis(engineAnalysisGrades,engineAnalysisResult));
+      $("analysisPlayerFilter").addEventListener("change",()=>renderGameAnalysis(engineAnalysisGrades,engineAnalysisResult));
+      $("analysisClassificationFilter").addEventListener("change",()=>renderGameAnalysis(engineAnalysisGrades,engineAnalysisResult));
       $("analysisList").addEventListener("click",event=>{
         const row=event.target.closest("tr[data-index]");
         if(!row)return;
@@ -7495,6 +7514,12 @@
         if(action==="best")showBestLine(index);
         else if(action==="retry")startReviewRetry(index);
         else showReviewPosition(index);
+      });
+      $("analysisList").addEventListener("keydown",event=>{
+        const row=event.target.closest("tr[data-index]");
+        if(!row||event.target!==row||(event.key!=="Enter"&&event.key!==" "))return;
+        event.preventDefault();
+        showReviewPosition(Number(row.dataset.index));
       });
       $("evaluationGraph").addEventListener("click",event=>{
         const point=event.target.closest("[data-index]");
