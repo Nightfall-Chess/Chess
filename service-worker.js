@@ -1,4 +1,4 @@
-const CACHE_VERSION = "nightfall-v22";
+const CACHE_VERSION = "nightfall-v23";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
