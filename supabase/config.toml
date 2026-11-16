@@ -1,4 +1,4 @@
-project_id = "nightfall-chess"
+project_id = "ltvbaicwzdjeqayygcwz"
 
 [functions.classroom]
 verify_jwt = true
