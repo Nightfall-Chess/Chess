@@ -6935,14 +6935,33 @@
         else { humanColor="w";orientation="w"; }
         const seconds=Number(mode==="ai"?$("aiTimeControl").value:$("timeControl").value);
         clockOn=seconds>0;clocks={w:seconds,b:seconds};clockStamp=Date.now();
-<<<<<<< HEAD
-        if(mode==="ai")void ensureStockfish().catch(error=>console.warn("Stockfish warm-up failed:",error));
-        render(); evaluateEnd(); startClock();
-        playEventSound("gameStart");
-=======
-        if(mode==="ai"){warmOpeningDatabase();void ensureStockfish().catch(error=>console.warn("Stockfish warm-up failed:",error));}
-        render(); evaluateEnd(); startClock();playEventSound("gameStart");
->>>>>>> 82566ede208c26fa4a3ae5a5c1ff6ea38107bf0b
+      loadGameplaySettings();loadAiOpeningHistory();
+      let openingWarmStarted=false;
+      function warmOpeningDatabase() {
+        if(openingWarmStarted)return;
+        openingWarmStarted=true;
+        void loadOpeningDatabase().then(()=>{
+          const previousOpening=openingIdentity;
+          recognizeOpening();
+          if(openingIdentity!==previousOpening&&!$("gameScreen").hidden)render();
+          if(!$("trainingScreen").hidden)renderQuickReviews($("openingSearch").value);
+        }).catch(error=>{openingWarmStarted=false;console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);});
+      }
+      function whenBrowserIdle(task,timeout) {
+        if("requestIdleCallback" in window)requestIdleCallback(task,{timeout});
+        else setTimeout(task,Math.min(timeout,1500));
+      }
+      window.addEventListener("load",()=>{
+        setTimeout(()=>{
+          whenBrowserIdle(warmOpeningDatabase,3000);
+          if(!navigator.connection?.saveData)whenBrowserIdle(()=>{void ensureStockfish().catch(error=>console.warn("Stockfish preload failed; it will be retried when needed.",error));},8000);
+        },1200);
+      },{once:true});
+      for(const eventName of ["pointerenter","focus","pointerdown"]) {
+        $("lobbyAiMode")?.addEventListener(eventName,()=>{warmOpeningDatabase();void ensureStockfish().catch(()=>{});},{once:true,passive:true});
+        $("trainingTop")?.addEventListener(eventName,warmOpeningDatabase,{once:true,passive:true});
+      }
+      ensureTwentyMoveLines();void loadRecentGames().then(()=>loadAchievementProgress());loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();
         if(mode==="ai"&&state.turn!==humanColor) scheduleAI();
         showToast(mode==="ai"?`New game · ${humanColor==="w"?"You play White":"You play Black"}`:"New local game");
       }
