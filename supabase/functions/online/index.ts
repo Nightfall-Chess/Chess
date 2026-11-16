@@ -180,7 +180,7 @@ async function main(req: Request) {
     } else {
       throw new Error("UNKNOWN_ACTION");
     }
-    if (event && eventRoom) EdgeRuntime.waitUntil(broadcast(db, eventRoom, event, { version: Number((data as any).room?.version) || 0, force: body.action === "resign", at: Date.now() }));
+    if (event && eventRoom) EdgeRuntime.waitUntil(broadcast(db, eventRoom, event, { version: Number((data as any).room?.version) || 0, room: (data as any).room || null, force: body.action === "resign", at: Date.now() }));
     return reply(200, data);
   } catch (error) {
     const message = error instanceof Error ? error.message : "DATABASE_ERROR";
