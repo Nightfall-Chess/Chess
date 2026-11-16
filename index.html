@@ -1625,7 +1625,7 @@
         <section class="card online-card">
           <h2>Join a friend's room</h2>
           <p>Enter the invitation code. Room codes are checked locally; a live connection will be available when an online server is added.</p>
-          <div class="field"><label class="field-label" for="joinRoomCode">Room code</label><input id="joinRoomCode" type="text" inputmode="text" autocomplete="off" maxlength="12" placeholder="e.g. H7K4Q2"></div>
+          <div class="field"><label class="field-label" for="joinRoomCode">Room code</label><input id="joinRoomCode" type="text" inputmode="text" autocomplete="off" maxlength="7" placeholder="e.g. H7K4Q2A"></div>
           <button class="primary-button" id="joinRoomButton" type="button">Join room</button>
           <p class="room-status" id="joinRoomStatus" aria-live="polite">Enter a code to check the room.</p>
         </section>
@@ -2775,7 +2775,7 @@
       let classroomConnecting=false,classroomPendingMove=null,classroomRefreshTimer=0,classroomPrivateResult=null,classroomAnalysisController=null;
       let classroomOnlineUsers=new Set(),classroomChatMessages=[],classroomSavedGames=[];
       let classroomPointerDrag=null,classroomAnnotationDrag=null,classroomIgnoreClickUntil=0;
-      let onlineApi=null,onlineSubscription=null,onlineRoomId="",onlineVersion=0,onlineSyncBusy=false;
+      let onlineApi=null,onlineSubscription=null,onlineRoomId="",onlineVersion=0,onlineSyncBusy=false,onlinePlayers=[];
       let mode = "ai", humanColor = "w", aiThinking = false, gameOver = false;
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
       const stockfishSearchCache=new Map();
@@ -5107,11 +5107,14 @@
         const isAI=mode==="ai"&&color!==humanColor;
         const isProfileSide=puzzleMode?color===puzzleColor:mode==="ai"?color===humanColor:color===orientation;
         const isPuzzleOpponent=puzzleMode&&!isProfileSide, isWhite=color==="w", active=state.turn===color&&!gameOver;
+        const onlinePlayer=onlinePlayers.find(player=>player.color===color);
         const name=isAI?isPersian?"هوش مصنوعی":"AI"
+          :mode==="online"?(onlinePlayer?.display_name||(isPersian?"حریف آنلاین":"Online opponent"))
           :isProfileSide?playerProfile.username
             :isPuzzleOpponent?isPersian?"حریف معما":"Puzzle opponent"
               :isPersian?"مهمان محلی":"Local guest";
         const detail=isAI?isPersian?`${$("strength").value} درجه`:`${$("strength").value} rating`
+          :mode==="online"?(isProfileSide?(isPersian?"شما":"You"):(isPersian?"بازیکن آنلاین":"Online player"))
           :isProfileSide?isPersian?"نمایهٔ شما":"Your profile"
             :isPersian?"بازیکن محلی":"Local player";
         const openingInfo=openingForPlayer(color);
@@ -6894,10 +6897,12 @@
         const built=onlineBuildHistory(room.moves);
         history=built.entries;redoStack=[];state=built.position;
         selected=null;legalTargets=[];premove=null;orientation=humanColor=room.myColor||humanColor;
+        onlinePlayers=Array.isArray(room.players)?room.players:[];
         gameOver=Boolean(room.result);matchActive=room.status==="playing"&&!gameOver;
         const alreadyRecorded=resultRecorded&&lastGameResult===room.result;
         resultRecorded=alreadyRecorded;lastGameResult=room.result||"";
-        if(gameOver&&!resultRecorded) {
+        const justFinished=gameOver&&!resultRecorded;
+        if(justFinished) {
           const winnerColor=/^White wins/i.test(room.result)?"w":/^Black wins/i.test(room.result)?"b":null;
           recordGameResult(room.result,winnerColor);
         }
@@ -6907,7 +6912,7 @@
           :(isPersian?(state.turn===humanColor?"نوبت شماست":"نوبت حریف است"):(state.turn===humanColor?"Your turn":"Opponent's turn")));
         $("newGameCard").hidden=!gameOver;$("newGameTop").hidden=!gameOver;$("resetButton").hidden=true;
         $("reviewGameButton").hidden=!gameOver||!history.length;$("exportPgnButton").hidden=!gameOver||!history.length;$("goMenuButton").hidden=false;
-        if(gameOver) {matchActive=false;stopClock();playGameEnd(room.result,room.result.startsWith("White")?"w":"b");}
+        if(gameOver) {matchActive=false;stopClock();if(justFinished)playGameEnd(room.result,room.result.startsWith("White")?"w":"b");}
       }
       async function syncOnlineRoom() {
         if(!onlineRoomId)return;
@@ -6932,7 +6937,7 @@
         });
       }
       async function startOnlineMatch(room) {
-        onlineRoomId=room.id;mode="online";humanColor=room.myColor;orientation=humanColor;
+        onlineRoomId=room.id;mode="online";humanColor=room.myColor;orientation=humanColor;onlinePlayers=room.players||[];
         cancelAIRequest();stopClock();clockOn=false;clocks={w:0,b:0};resultRecorded=false;lastGameResult="";
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;
         $("onlineScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
