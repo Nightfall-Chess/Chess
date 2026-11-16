@@ -63,7 +63,7 @@ async function snapshot(db: any, id: string, userId: string) {
   return { ...roomResult.data, ...stateResult.data, players: playersResult.data, myColor: player.color, myName: player.display_name };
 }
 async function broadcast(db: any, id: string, event: string, payload: Obj) {
-  const channel = db.channel(`online:${id}`, { config: { private: true } });
+  const channel = db.channel(`online:${id}`, { config: { private: false } });
   try {
     await new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error("Realtime subscribe timeout")), 8000);
