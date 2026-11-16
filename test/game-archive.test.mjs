@@ -29,8 +29,9 @@ class FakeTransaction {
       get: key => this.#request(() => structuredClone(records.get(key))),
       getAll: () => this.#request(() => [...records.values()].map(record => structuredClone(record))),
       put: value => this.#request(() => {
-        records.set(value.id, structuredClone(value));
-        return value.id;
+        const key = value.id ?? value.key;
+        records.set(key, structuredClone(value));
+        return key;
       }),
       delete: key => this.#request(() => records.delete(key))
     };
@@ -108,9 +109,13 @@ test("archive actions retain record identity, persist favorites, cache analysis,
   await archive.saveGame({ ...game, favorite: true });
   await archive.saveGame({ id: "game-two", plies: 0, entries: [] });
   await archive.saveGameAnalysis("game-one", 0, { label: "Good", accuracy: 91 });
+  await archive.savePreference("audio", { effectsVolume: 42 });
+  await archive.saveAchievementProgress({ firstWin: { level: 1, earnedAt: "2025-01-01" } });
 
   assert.equal((await archive.getGame("game-one")).favorite, true);
   assert.deepEqual((await archive.getGame("game-one")).entries[0].analysis, { label: "Good", accuracy: 91 });
+  assert.deepEqual(await archive.getPreference("audio"), { effectsVolume: 42 });
+  assert.deepEqual(await archive.getAchievementProgress(), { firstWin: { level: 1, earnedAt: "2025-01-01" } });
   assert.deepEqual((await archive.listGames()).map(record => record.id).sort(), ["game-one", "game-two"]);
   await archive.deleteGame("game-one");
   assert.equal(await archive.getGame("game-one"), undefined);

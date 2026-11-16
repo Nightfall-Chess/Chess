@@ -142,9 +142,15 @@
     .move-current { color: var(--accent); }
     .board-move-button { display: flex; align-items: center; gap: 6px; width: 100%; padding: 2px 3px; border: 0; border-radius: 4px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
     .move-quality { margin-left: auto; padding: 1px 5px; border-radius: 5px; background: #ffffff0b; color: var(--muted); font-size: 9px; font-weight: 600; white-space: nowrap; }
-    .move-quality.best, .move-quality.excellent, .move-quality.good, .move-quality.great, .move-quality.brilliant, .move-quality.book { background: #96ce5420; color: #c9e69a; }
-    .move-quality.mid { background: #edbb5b20; color: #f0c66f; }
-    .move-quality.bad { background: #e66c6420; color: #ff9188; }
+    .move-quality.best { background: #4bc5a526; color: #8de8ce; }
+    .move-quality.excellent { background: #96ce5420; color: #c9e69a; }
+    .move-quality.good { background: #a7c98217; color: #b7cf9d; }
+    .move-quality.great { background: #7bbdff20; color: #a8d1ff; }
+    .move-quality.brilliant { background: #d8bd8330; color: #f2d78e; }
+    .move-quality.book { background: #91a6ee20; color: #c2caff; }
+    .move-quality.inaccuracy, .move-quality.mid { background: #edbb5b20; color: #f0c66f; }
+    .move-quality.mistake { background: #ed8b9b20; color: #ffb0ac; }
+    .move-quality.blunder, .move-quality.miss, .move-quality.bad { background: #e66c6424; color: #ff9188; }
     .move-quality.pending { animation: quality-pulse 1.2s ease-in-out infinite alternate; }
     .move-evaluation { color: #aab4aa; font-size: 9px; font-variant-numeric: tabular-nums; white-space: nowrap; }
     @keyframes quality-pulse { to { opacity: .45; } }
@@ -1340,6 +1346,11 @@
     .settings-audio-controls .field { min-width: min(230px, 100%); margin: 0; }
     .settings-audio-controls .music-volume-control { width: 100%; min-height: 38px; }
     .settings-audio-controls .music-volume-control input { flex: 1; width: auto; }
+    .sound-setting-row { display: grid; width: 100%; grid-template-columns: minmax(150px, .75fr) minmax(160px, 1fr) auto; align-items: end; gap: 8px; padding: 9px; border: 1px solid var(--line); border-radius: 10px; background: #101411; }
+    .sound-setting-row .field { min-width: 0; }
+    .sound-setting-row .sound-toggle, .sound-setting-row .sound-preview { min-height: 38px; }
+    .sound-preview { white-space: nowrap; }
+    @media (max-width: 520px) { .sound-setting-row { grid-template-columns: minmax(0, 1fr) auto; } .sound-setting-row .field { grid-column: 1 / -1; grid-row: 2; } }
     .theme-settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .theme-option-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; max-height: 230px; margin-top: 7px; padding: 3px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 9px; background: #121613; }
     .theme-option { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 48px; padding: 5px 7px; border: 1px solid transparent; border-radius: 7px; background: #191e1a; color: var(--muted); text-align: left; cursor: pointer; }
@@ -1448,7 +1459,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=16">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=19">
 </head>
 <body>
   <main class="app">
@@ -1737,10 +1748,23 @@
               <button class="sound-toggle" id="musicToggle" type="button" aria-pressed="true">♫ Music on</button>
               <label class="field"><span class="field-label">Starting track</span><select id="musicTrack" aria-label="Starting music track"><option value="electric-1">Electric Melody 1</option><option value="electric-2">Electric Melody 2</option><option value="warm-1">Warm Overdrive Sustain 1</option><option value="warm-2">Warm Overdrive Sustain 2</option></select></label>
               <label class="field"><span class="field-label">Volume</span><span class="music-volume-control"><span aria-hidden="true">♫</span><input id="musicVolume" type="range" min="0" max="100" step="1" value="75" aria-label="Music volume"><output id="musicVolumeValue" for="musicVolume">75%</output></span></label>
-              <button class="sound-toggle" id="effectsToggle" type="button" aria-pressed="true">♬ Effects on</button>
-              <button class="sound-toggle" id="uiSoundsToggle" type="button" aria-pressed="true">♩ UI sounds on</button>
+              <div class="sound-setting-row">
+                <button class="sound-toggle" id="effectsToggle" type="button" aria-pressed="true">♬ Game sounds on</button>
+                <label class="field"><span class="field-label" for="effectsVolume">Game sounds volume</span><span class="music-volume-control"><input id="effectsVolume" type="range" min="0" max="100" step="1" value="58" aria-label="Game sound volume"><output id="effectsVolumeValue" for="effectsVolume">58%</output></span></label>
+                <button class="subtle-button sound-preview" type="button" data-sound-preview="move">Preview</button>
+              </div>
+              <div class="sound-setting-row">
+                <button class="sound-toggle" id="uiSoundsToggle" type="button" aria-pressed="true">♩ Interface sounds on</button>
+                <label class="field"><span class="field-label" for="uiSoundVolume">Interface sounds volume</span><span class="music-volume-control"><input id="uiSoundVolume" type="range" min="0" max="100" step="1" value="22" aria-label="Interface sound volume"><output id="uiSoundVolumeValue" for="uiSoundVolume">22%</output></span></label>
+                <button class="subtle-button sound-preview" type="button" data-sound-preview="menuOpen">Preview</button>
+              </div>
+              <div class="sound-setting-row">
+                <button class="sound-toggle" id="achievementSoundsToggle" type="button" aria-pressed="true">✦ Achievement sounds on</button>
+                <label class="field"><span class="field-label" for="achievementVolume">Achievement sounds volume</span><span class="music-volume-control"><input id="achievementVolume" type="range" min="0" max="100" step="1" value="42" aria-label="Achievement sound volume"><output id="achievementVolumeValue" for="achievementVolume">42%</output></span></label>
+                <button class="subtle-button sound-preview" type="button" data-sound-preview="achievement">Preview</button>
+              </div>
             </div>
-            <p class="note">Music continues through the included tracks in order and loops back to the beginning.</p>
+            <p class="note">Music and synthesized sound effects are generated or played locally. Each sound group has its own mute, volume, and preview control.</p>
           </section>
           <section class="card settings-panel" data-settings-content="language" hidden>
             <div class="card-heading"><span class="card-title">Language</span><span class="eyebrow">INTERFACE</span></div>
@@ -2425,7 +2449,7 @@
         const ep=position.ep?`${"abcdefgh"[position.ep[1]]}${8-position.ep[0]}`:"-";
         return `${board} ${position.turn} ${castle} ${ep} ${position.halfmove||0} ${position.fullmove||1}`;
       }
-      let openingIdentity=null,openingByColor={w:null,b:null},openingDatabasePromise=null;
+      let openingIdentity=null,openingByColor={w:null,b:null},openingDatabasePromise=null,openingIndexApi=null,openingBookMovesByPrefix=new Map();
       const openingDatabaseByPosition=new Map();
       const openingPersianTerms={
         "accepted":"پذیرفته‌شده","advance":"پیشروی","attack":"حمله","attacking":"حمله‌ای","defense":"دفاع","defence":"دفاع",
@@ -2460,9 +2484,12 @@
             if(!/^[A-E]\d{2}$/.test(entry.e)||typeof entry.n!=="string"||!entry.n||!Array.isArray(entry.m)||!entry.m.length||!/^[^ ]+ [wb] [KQkq-]+$/.test(entry.p)||entry.m.some(move=>typeof move!=="string"||!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(move))) {
               throw new Error(`Opening database record ${index+1} is invalid.`);
             }
-            const records=openingDatabaseByPosition.get(entry.p)||[];
-            records.push(entry);openingDatabaseByPosition.set(entry.p,records);
           }
+          openingIndexApi=await import("./opening-index.mjs");
+          const indexes=openingIndexApi.buildOpeningIndexes(data.entries);
+          openingDatabaseByPosition.clear();
+          for(const [key,records] of indexes.positions)openingDatabaseByPosition.set(key,records);
+          openingBookMovesByPrefix=indexes.movesByPrefix;
           return data.entries.length;
         })().catch(error=>{openingDatabasePromise=null;throw error;});
         return openingDatabasePromise;
@@ -2482,14 +2509,12 @@
         return `${letters[eco[0]]} ${digits}`;
       }
       function recognizeOpening() {
-        if(history.length<2||!openingDatabaseByPosition.size)return;
+        if(history.length<2||!openingIndexApi||!openingDatabaseByPosition.size)return;
         let bestMatch=null;
         for(let ply=2;ply<=history.length;ply++) {
           const position=history[ply-1].after,key=stateToFen(position).split(" ").slice(0,3).join(" ");
-          const matches=(openingDatabaseByPosition.get(key)||[]).filter(entry=>entry.m.length===ply&&entry.m.every((move,index)=>move===moveToUci(history[index].move)));
-          if(!matches.length)continue;
-          matches.sort((a,b)=>a.e.localeCompare(b.e)||a.n.localeCompare(b.n));
-          bestMatch={...matches[0],position:key,ply};
+          const match=openingIndexApi.recognizeOpeningPosition(openingDatabaseByPosition,key,ply);
+          if(match)bestMatch={...match,position:key,ply};
         }
         if(bestMatch) {
           openingIdentity={eco:bestMatch.e,name:bestMatch.n,nameFa:openingNameInPersian(bestMatch.n),position:bestMatch.position,ply:bestMatch.ply};
@@ -2558,12 +2583,8 @@
       function ecoOpeningBookMove(position,rating) {
         const maxPlies=rating<700?4:rating<1000?6:rating<1400?8:12;
         if(history.length>=maxPlies||!openingDatabaseByPosition.size)return null;
-        const prefix=history.map(entry=>moveToUci(entry.move)),candidates=new Map();
-        for(const entries of openingDatabaseByPosition.values())for(const entry of entries) {
-          if(entry.m.length<=prefix.length||!prefix.every((move,index)=>entry.m[index]===move))continue;
-          const next=entry.m[prefix.length];
-          candidates.set(next,(candidates.get(next)||0)+1);
-        }
+        const prefix=history.map(entry=>moveToUci(entry.move));
+        const candidates=openingIndexApi?.bookMoveCandidates(openingBookMovesByPrefix,prefix)||new Map();
         const legal=legalMoves(position).flatMap(move=>move.promotion?["q","r","b","n"].map(promoteTo=>({...move,promoteTo})):[move]);
         const ranked=[...candidates].filter(([uci])=>legal.some(move=>moveToUci(move)===uci)).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
         if(!ranked.length)return null;
@@ -2757,7 +2778,8 @@
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
       const stockfishSearchCache=new Map();
       let clocks = { w: 0, b: 0 }, clockOn = false, clockStamp = Date.now(), toastTimer;
-      let aiTimer = null, analysisShown = false, resultRecorded = false, lastGameResult = "", audioContext = null, audioResumePromise = null, effectsBus = null, uiBus = null, musicVolume = .75, musicStyle = "electric-1", musicEnabled = true, effectsEnabled = true, uiSoundsEnabled = true, musicHasStarted = false, musicRequest = 0,musicIslandTimer=null;
+      let aiTimer = null, analysisShown = false, resultRecorded = false, lastGameResult = "", audioContext = null, audioResumePromise = null, effectsBus = null, uiBus = null, achievementBus = null, musicVolume = .75, effectsVolume = .58, uiSoundVolume = .22, achievementVolume = .42, musicStyle = "electric-1", musicEnabled = true, effectsEnabled = true, uiSoundsEnabled = true, achievementSoundsEnabled = true, musicHasStarted = false, musicRequest = 0,musicIslandTimer=null,audioPreferencesRevision=0,audioPreferenceTimer=null;
+      let achievementProgress={},achievementProgressLoaded=false,achievementProgressApi=null,achievementNotificationQueue=[],achievementNotificationActive=false;
       let matchActive = false, boardAnimating = false, trainingReturn = "lobby", currentLesson = 0, quizAnswered = false, gameStartedAt=new Date();
       const gameplaySettings={takebacks:true,hints:true,suggestions:true,moveAnnotations:true};
       let aiRequestVersion=0,assistanceGeneration=0,moveSuggestion=null,roomInviteCode="",aiSearchController=null;
@@ -2810,8 +2832,20 @@
         entry.analysisTimer=window.setTimeout(()=>{
           entry.analysisTimer=null;
           if(!history.includes(entry)||puzzleMode)return;
-          void analyzeMoveEntry(entry).then(()=>{
-            if(history.includes(entry)||redoStack.includes(entry))renderMoves();
+          void analyzeMoveEntry(entry).then(analysis=>{
+            if(!history.includes(entry)&&!redoStack.includes(entry))return;
+            renderMoves();
+            const archiveId=activeArchiveId,savedIndex=entry.ply;
+            if(archiveId) {
+              const savedGame=recentGames.find(game=>game.id===archiveId);
+              if(savedGame?.entries[savedIndex])savedGame.entries[savedIndex].analysis=analysis;
+              void archiveApiPromise.then(archive=>archive.saveGameAnalysis(archiveId,savedIndex,analysis)).catch(error=>{
+                console.error("Move analysis could not be cached:",error);
+                showToast(`Move analysis could not be cached: ${error.message}`);
+              });
+            }
+            if(history.at(-1)===entry)showMoveQualityFeedback(entry,analysis);
+            renderJourney();
           }).catch(error=>{
             if(error.name==="AbortError")return;
             entry.analysisStatus="error";
@@ -2830,6 +2864,24 @@
           }
           entry.analysisController?.abort();
         }
+      }
+      function showMoveQualityFeedback(entry,analysis) {
+        const quality=analysis.quality;
+        if(!["brilliant","inaccuracy","mistake","blunder","miss"].includes(quality)
+          ||$("gameScreen").hidden||reviewPreviewIndex!==null||stateToFen(state)!==stateToFen(entry.after))return;
+        if(boardAnimating) {
+          clearTimeout(entry.feedbackTimer);
+          entry.feedbackTimer=window.setTimeout(()=>showMoveQualityFeedback(entry,analysis),120);
+          return;
+        }
+        const square=$("board").querySelector(`.square[data-row="${entry.move.to[0]}"][data-col="${entry.move.to[1]}"]`);
+        if(!square)return;
+        const className=`quality-feedback-${quality}`;
+        square.classList.add(className);
+        window.setTimeout(()=>square.classList.remove(className),1250);
+        emitParticles(quality,square);
+        if(quality==="brilliant")playEventSound("brilliant");
+        else if(quality==="mistake"||quality==="blunder")playEventSound(quality);
       }
       function cancelAIRequest() {
         aiRequestVersion++;
@@ -3819,6 +3871,7 @@
           const expected=puzzleMove(currentPuzzle.solutionMoves[puzzleCursor]);
           if(!same(m.from,expected.from)||!same(m.to,expected.to)||(expected.promoteTo&&m.promoteTo!==expected.promoteTo)) {
             selected=null;legalTargets=[];renderBoard();
+            playEventSound("puzzleFailure");
             puzzleWrongAttempts++;
             changeScore(-3);renderProfileStats();renderPuzzle();
             $("puzzleGameFeedback").textContent=isPersian?"حرکت قانونی است، اما ادامهٔ ثبت‌شدهٔ معما چیز دیگری می‌خواهد. دوباره تلاش کنید.":"That move is legal, but it is not the puzzle continuation. Try again.";
@@ -3835,7 +3888,7 @@
         recognizeOpening();
         reviewPreviewIndex=null;
         const check=inCheck(after,after.turn),checkmate=check&&!legalMoves(after).length;
-        playMoveSound(!!before.board[m.to[0]][m.to[1]]||m.enPassant,check,checkmate);
+        playMoveSound(m,before,check,checkmate);
         render();
         if(puzzleMode) {
           puzzleCursor++;
@@ -3854,6 +3907,7 @@
       function completePuzzle() {
         if(puzzleSolved)return;
         puzzleSolved=true;
+        playEventSound("puzzleSuccess");
         emitParticles("puzzle",$("puzzleGameCard"));
         if(dailyChallengeMode) {
           const day=new Date().toISOString().slice(0,10),days=completedDailyChallenges();
@@ -4287,6 +4341,93 @@
           showToast(`Game could not be saved to the archive: ${error.message}`);
         }
       }
+      function achievementDefinitions(analyzed) {
+        const checkmates=recentGames.filter(game=>/checkmate/i.test(game.resultText||"")).length;
+        const brilliant=analyzed.filter(item=>item.analysis.label==="Brilliant").length;
+        return [
+          {key:"wins",value:recentGames.filter(game=>game.outcome==="win").length,stages:[[1,"First victory","نخستین پیروزی"],[5,"Five victories","پنج پیروزی"],[25,"25 victories","۲۵ پیروزی"],[100,"100 victories","۱۰۰ پیروزی"]]},
+          {key:"games",value:recentGames.length,stages:[[1,"First completed game","نخستین بازی کامل"],[10,"10 completed games","۱۰ بازی کامل"],[50,"50 completed games","۵۰ بازی کامل"],[100,"100 completed games","۱۰۰ بازی کامل"]]},
+          {key:"checkmates",value:checkmates,stages:[[1,"First checkmate","نخستین مات"],[5,"Five checkmates","پنج مات"],[25,"25 checkmates","۲۵ مات"]]},
+          {key:"brilliant",value:brilliant,stages:[[1,"Brilliant move","حرکت درخشان"],[5,"Five brilliant moves","پنج حرکت درخشان"],[10,"10 brilliant moves","۱۰ حرکت درخشان"]]},
+          {key:"puzzles",value:profileStats.puzzlesSolved,stages:[[1,"First puzzle solved","نخستین معمای حل‌شده"],[10,"10 puzzles solved","۱۰ معمای حل‌شده"],[50,"50 puzzles solved","۵۰ معمای حل‌شده"],[100,"100 puzzles solved","۱۰۰ معمای حل‌شده"]]},
+          {key:"streak",value:profileStats.bestWinStreak,stages:[[3,"Three-win streak","رشتهٔ سه‌بردی"],[5,"Five-win streak","رشتهٔ پنج‌بردی"],[10,"10-win streak","رشتهٔ ۱۰ بردی"]]},
+          {key:"academy",value:completedLessons.size,stages:[[1,"First lesson complete","نخستین درس کامل"],[10,"10 lessons complete","۱۰ درس کامل"],[25,"25 lessons complete","۲۵ درس کامل"],[lessons.length,"Academy complete","پایان آکادمی"]]}
+        ];
+      }
+      function persistAchievementProgress() {
+        void archiveApiPromise.then(archive=>archive.saveAchievementProgress(achievementProgress))
+          .catch(error=>{console.error(error);showToast(`Achievement progress could not be saved: ${error.message}`);});
+      }
+      function queueAchievementNotification(notification) {
+        achievementNotificationQueue.push(notification);
+        if(achievementNotificationActive)return;
+        const showNext=()=>{
+          if(!achievementNotificationQueue.length){achievementNotificationActive=false;return;}
+          if(document.hidden){window.setTimeout(showNext,8000);return;}
+          achievementNotificationActive=true;
+          const item=achievementNotificationQueue.shift();
+          showToast(isPersian?`دستاورد جدید · ${item.fa}`:`Achievement earned · ${item.name}`);
+          playEventSound("achievement");
+          window.setTimeout(()=>{achievementNotificationActive=false;showNext();},3400);
+        };
+        window.setTimeout(showNext,650);
+      }
+      function syncAchievementProgress(definitions,notify=true) {
+        if(!achievementProgressLoaded||!achievementProgressApi)return;
+        const result=achievementProgressApi.advanceAchievementProgress(definitions,achievementProgress);
+        achievementProgress=result.progress;
+        if(result.changed)persistAchievementProgress();
+        if(notify)result.notifications.forEach(item=>queueAchievementNotification({name:item.title,fa:item.titleFa}));
+      }
+      async function loadAchievementProgress() {
+        try {
+          const [archive,api]=await Promise.all([archiveApiPromise,import("./achievement-progress.mjs")]);
+          const saved=await archive.getAchievementProgress();
+          if(!saved||typeof saved!=="object"||Array.isArray(saved))throw new Error("Saved achievement progress is invalid.");
+          for(const [key,record] of Object.entries(saved)) {
+            if(!/^[a-z]+$/.test(key)||!record||!Number.isSafeInteger(record.level)||record.level<0
+              ||!Array.isArray(record.earnedAt)||record.earnedAt.some(date=>typeof date!=="string"||!Number.isFinite(Date.parse(date)))) {
+              throw new Error("Saved achievement progress is invalid.");
+            }
+          }
+          achievementProgressApi=api;
+          achievementProgress=saved;
+          achievementProgressLoaded=true;
+          if(!Object.keys(saved).length) {
+            const analyzed=recentGames.flatMap(game=>(game.entries||[]).filter(entry=>entry.analysis).map(entry=>({game,analysis:entry.analysis,index:entry.ply})));
+            syncAchievementProgress(achievementDefinitions(analyzed),false);
+          }
+          renderJourney();
+        } catch(error) {
+          console.error(error);
+          showToast(`Achievement progress could not be loaded: ${error.message}`);
+        }
+      }
+      function renderAchievements(definitions) {
+        const list=$("achievementList");
+        if(!achievementProgressLoaded) {
+          list.innerHTML=`<span class="note">${isPersian?"در حال بارگیری دستاوردها…":"Loading achievement progress…"}</span>`;
+          return;
+        }
+        syncAchievementProgress(definitions);
+        list.innerHTML=definitions.map(definition=>{
+          const progress=achievementProgress[definition.key]||{level:0,earnedAt:[]};
+          const earned=progress.level>0,level=Math.min(progress.level,definition.stages.length);
+          const currentStage=earned?definition.stages[level-1]:definition.stages[0];
+          const nextStage=definition.stages[level];
+          const target=nextStage?.[0]??definition.stages.at(-1)[0];
+          const percent=Math.min(100,Math.round(definition.value/target*100));
+          const title=isPersian?currentStage[2]:currentStage[1];
+          const next=nextStage?(isPersian?nextStage[2]:nextStage[1]):"";
+          const date=earned&&progress.earnedAt[level-1]
+            ?new Date(progress.earnedAt[level-1]).toLocaleDateString(isPersian?"fa-IR":undefined,{month:"short",day:"numeric",year:"numeric"})
+            :"";
+          const count=isPersian?digitPersian(definition.value):definition.value;
+          const targetCount=isPersian?digitPersian(target):target;
+          const tier=isPersian?`${digitPersian(level)} / ${digitPersian(definition.stages.length)} مرحله`:`Tier ${level} / ${definition.stages.length}`;
+          return `<article class="achievement-progress${earned?" earned":""}"><div class="achievement-progress-head"><strong>${earned?"✦":"◇"} ${escapeHtml(title)}</strong><span>${tier}</span></div><div class="achievement-progress-track" role="progressbar" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100" aria-label="${escapeHtml(title)}"><span style="width:${percent}%"></span></div><small>${date?`${isPersian?"تکمیل‌شده":"Earned"} · ${escapeHtml(date)}`:next?`${count} / ${targetCount} · ${isPersian?"بعدی":"Next"}: ${escapeHtml(next)}`:`${count} / ${targetCount} · ${isPersian?"کامل":"Complete"}`}</small></article>`;
+        }).join("");
+      }
       function renderJourney() {
         if(!$("journeyMetrics"))return;
         const analyzed=recentGames.flatMap(game=>(game.entries||[]).filter(entry=>entry.analysis).map(entry=>({game,analysis:entry.analysis,index:entry.ply})));
@@ -4330,17 +4471,7 @@
         $("journeyInsight").textContent=analyzed.length
           ?(isPersian?`بر پایهٔ ${digitPersian(analyzed.length)} حرکت تحلیل‌شدهٔ Stockfish. مراحل به‌صورت تقریبی بر پایهٔ شمارهٔ حرکت گروه‌بندی می‌شوند.`:`Based on ${analyzed.length} Stockfish-analyzed moves. Phase groupings are approximate and based on move number.`)
           :(isPersian?"پس از مرور بازی‌ها، روند دقت و کیفیت حرکت‌های واقعی شما اینجا نمایش داده می‌شود.":"Review completed games to build accuracy trends and move-quality insights from real analysis.");
-        const achievements=[];
-        if(recentGames.some(game=>game.outcome==="win"))achievements.push(isPersian?"نخستین پیروزی":"First victory");
-        if(recentGames.some(game=>/checkmate/i.test(game.resultText||"")))achievements.push(isPersian?"نخستین مات":"First checkmate");
-        if(analyzed.some(item=>item.analysis.label==="Brilliant"))achievements.push(isPersian?"حرکت درخشان":"Brilliant move");
-        if(recentGames.length>=10)achievements.push(isPersian?"۱۰ بازی":"10 completed games");
-        if(profileStats.puzzlesSolved>=10)achievements.push(isPersian?"۱۰ معما":"10 puzzles solved");
-        if(profileStats.bestWinStreak>=3)achievements.push(isPersian?"رشتهٔ سه‌بردی":"Three-win streak");
-        if(completedLessons.size>=lessons.length)achievements.push(isPersian?"پایان آکادمی":"Academy complete");
-        $("achievementList").innerHTML=achievements.length
-          ?achievements.map(name=>`<span class="achievement-badge">✦ ${escapeHtml(name)}</span>`).join("")
-          :`<span class="note">${isPersian?"نشان‌ها پس از رسیدن به دستاوردهای واقعی نمایش داده می‌شوند.":"Milestones appear here when earned through play and study."}</span>`;
+        renderAchievements(achievementDefinitions(analyzed));
       }
       async function loadMoments() {
         try {
@@ -4442,7 +4573,7 @@
         const scoreChange=mode==="ai"
           ?Math.round(24*(outcome-1/(1+Math.pow(10,(Number($("strength").value)-profileStats.rating)/400))))
           :isDraw?3:won?14:-10;
-        if(won)emitParticles("victory",$("board"));
+        if(won&&!/^checkmate/i.test(result))emitParticles("victory",$("board"));
         changeScore(scoreChange);
         if(isDraw) {
           profileStats.draws++;profileStats.winStreak=0;
@@ -4453,6 +4584,7 @@
           profileStats.losses++;profileStats.winStreak=0;
         }
         recordRecentGame(isDraw?"draw":won?"win":"loss");
+        playEventSound(/^checkmate/i.test(result)?"checkmate":/resign/i.test(result)?"resignation":isDraw?"draw":won?"victory":"defeat");
         markDailyActivity("game");
       }
       function renderProfileStats() {
@@ -4618,7 +4750,6 @@
           if(!analysisShown&&history.length) {
             analysisShown=true;
             setTimeout(()=>{if(analysisShown&&gameOver)showAnalysis(res.text);},350);
-            playEndSound();
           }
           render();
         }
@@ -4712,6 +4843,7 @@
           positions.push(applyMove(positions.at(-1),move));
         }
         if(!moves.length)return;
+        playEventSound("bestMove");
         reviewSuggestion={index,positions,moves,sans};
         reviewSuggestionPly=0;analysisPositionIndex=index-1;
         $("bestLineTitle").textContent=isPersian?"بهترین ادامه":"Best continuation";
@@ -4755,7 +4887,7 @@
       }
       function startReviewRetry(index) {
         const grade=engineAnalysisGrades.find(item=>item.index===index),entry=history[index];
-        if(!grade||!entry||grade.quality!=="bad")return;
+        if(!grade||!entry||!["inaccuracy","mistake","blunder","miss"].includes(grade.quality))return;
         const solution=(grade.bestLine?.length?grade.bestLine:[grade.bestUci]).filter(uci=>/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(uci));
         if(!solution.length)return;
         currentPuzzle={
@@ -4939,7 +5071,7 @@
             const checkmate=!legalMoves(state).length;
             kingSquare.classList.add(checkmate?"checkmate-flash":"check-flash");
             window.setTimeout(()=>kingSquare.classList.remove("check-flash","checkmate-flash"),checkmate?1700:1200);
-            if(!checkmate)emitParticles("check",kingSquare);
+            emitParticles(checkmate?"checkmate":"check",kingSquare);
           }
         }
       }
@@ -5230,7 +5362,7 @@
               const projected=copyState(state);projected.turn=queueColor;
               selected=[r,c];legalTargets=legalMoves(projected).filter(move=>same(move.from,selected));renderBoard();return;
             }
-            selected=null;legalTargets=[];renderBoard();return;
+            selected=null;legalTargets=[];renderBoard();playEventSound("illegal");return;
           }
           if(p&&colorOf(p)===queueColor) {
             const projected=copyState(state);projected.turn=queueColor;
@@ -5246,7 +5378,7 @@
             saveMove(match); return;
           }
           if(p&&colorOf(p)===state.turn) { selectSquare(r,c); return; }
-          selected=null; legalTargets=[]; renderBoard(); return;
+          selected=null; legalTargets=[]; renderBoard();playEventSound("illegal");return;
         }
         if(p&&colorOf(p)===state.turn) selectSquare(r,c);
       }
@@ -5327,16 +5459,23 @@
         $("promotionBackdrop").classList.add("open");
       }
       const particlePresets={
-        move:{count:3,colors:["#b7a3ff","#8eb6ff"],spread:26,size:3,duration:480},
+        move:{count:9,colors:["#f4efff","#8eb6ff","#d8bd83"],spread:58,size:8,duration:1200},
         capture:{count:11,colors:["#ed8b9b","#f1d5a5","#f4efff"],spread:82,size:5,duration:720},
         check:{count:13,colors:["#d8bd83","#f4e3ad","#b7a3ff"],spread:102,size:5,duration:820},
+        checkmate:{count:24,colors:["#ff8078","#f4efff","#d8bd83"],spread:88,size:6,duration:1400},
         promotion:{count:15,colors:["#b7a3ff","#d8bd83","#8eb6ff"],spread:116,size:5,duration:880},
+        brilliant:{count:14,colors:["#f2d78e","#fff1bb","#b7a3ff"],spread:86,size:5,duration:920},
+        inaccuracy:{count:7,colors:["#f0c66f","#e7ad6c"],spread:46,size:4,duration:640},
+        mistake:{count:9,colors:["#ffb0ac","#ed8b9b","#f1c19b"],spread:58,size:4,duration:720},
+        blunder:{count:12,colors:["#ff8178","#ed8b9b","#f4efff"],spread:76,size:5,duration:860},
+        miss:{count:10,colors:["#ff8178","#b7a3ff","#f4efff"],spread:66,size:4,duration:780},
         victory:{count:34,colors:["#d8bd83","#b7a3ff","#8eb6ff","#f4efff"],spread:180,size:6,duration:1180},
         puzzle:{count:24,colors:["#b7a3ff","#8eb6ff","#d8bd83"],spread:150,size:5,duration:1000}
       };
       function emitParticles(kind,anchor=null) {
         const layer=$("particleLayer"),preset=particlePresets[kind];
         if(!layer||!preset||matchMedia("(prefers-reduced-motion: reduce)").matches||typeof Element.prototype.animate!=="function")return;
+        if(kind==="checkmate")layer.classList.add("checkmate-active");
         const bounds=anchor instanceof Element?anchor.getBoundingClientRect():null;
         const centerX=bounds?bounds.left+bounds.width/2:innerWidth/2;
         const centerY=bounds?bounds.top+bounds.height/2:innerHeight/2;
@@ -5344,6 +5483,7 @@
           const particle=document.createElement("i"),angle=Math.random()*Math.PI*2;
           const distance=preset.spread*(.35+Math.random()*.65),size=preset.size*(.6+Math.random()*.8);
           const dx=Math.cos(angle)*distance,dy=Math.sin(angle)*distance-distance*.22;
+          const rotation=Math.random()*240-120;
           particle.className=`particle particle-${index%3}`;
           particle.style.left=`${centerX}px`;particle.style.top=`${centerY}px`;
           particle.style.setProperty("--particle-color",preset.colors[index%preset.colors.length]);
@@ -5351,11 +5491,12 @@
           layer.append(particle);
           const duration=preset.duration*(.75+Math.random()*.5),animation=particle.animate([
             {opacity:0,transform:"translate(-50%,-50%) scale(.25) rotate(0deg)"},
-            {opacity:1,offset:.12},
-            {opacity:0,transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.05) rotate(${Math.random()*240-120}deg)`}
+            {opacity:1,offset:.12,transform:"translate(-50%,-50%) scale(1.15) rotate(0deg)"},
+            {opacity:.85,offset:.58,transform:`translate(calc(-50% + ${dx*.55}px),calc(-50% + ${dy*.55}px)) scale(1) rotate(${rotation*.55}deg)`},
+            {opacity:0,transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.2) rotate(${rotation}deg)`}
           ],{duration,easing:"cubic-bezier(.16,.76,.28,1)",fill:"forwards"});
           let cleanupTimer=0;
-          const cleanup=()=>{clearTimeout(cleanupTimer);particle.remove();};
+          const cleanup=()=>{clearTimeout(cleanupTimer);particle.remove();if(kind==="checkmate"&&!layer.querySelector(".particle"))layer.classList.remove("checkmate-active");};
           cleanupTimer=window.setTimeout(cleanup,duration+100);
           animation.onfinish=cleanup;
           animation.oncancel=cleanup;
@@ -6773,7 +6914,7 @@
         $("statusDot").classList.remove("warning");
         $("newGameCard").hidden=false;$("newGameTop").hidden=false;$("resetButton").hidden=false;
         $("reviewGameButton").hidden=!history.length;$("exportPgnButton").hidden=!history.length;$("goMenuButton").hidden=false;
-        analysisShown=true;render();showToast(isPersian?"تسلیم تأیید شد":result);playEndSound();
+        analysisShown=true;render();showToast(isPersian?"تسلیم تأیید شد":result);
         window.setTimeout(()=>{if(gameOver&&lastGameResult===result)void showAnalysis(result);},180);
       }
       function startGame() {
@@ -6792,7 +6933,7 @@
         const seconds=Number(mode==="ai"?$("aiTimeControl").value:$("timeControl").value);
         clockOn=seconds>0;clocks={w:seconds,b:seconds};clockStamp=Date.now();
         if(mode==="ai")void ensureStockfish().catch(error=>console.warn("Stockfish warm-up failed:",error));
-        render(); evaluateEnd(); startClock();
+        render(); evaluateEnd(); startClock();playEventSound("gameStart");
         if(mode==="ai"&&state.turn!==humanColor) scheduleAI();
         showToast(mode==="ai"?`New game · ${humanColor==="w"?"You play White":"You play Black"}`:"New local game");
       }
@@ -6834,8 +6975,9 @@
         if(!AudioContextClass) { showToast("Audio is not supported by this browser"); return null; }
         if(!audioContext) {
           audioContext=new AudioContextClass();
-          effectsBus=audioContext.createGain();effectsBus.gain.value=.8;effectsBus.connect(audioContext.destination);
-          uiBus=audioContext.createGain();uiBus.gain.value=uiSoundsEnabled?.18:0;uiBus.connect(audioContext.destination);
+          effectsBus=audioContext.createGain();effectsBus.gain.value=effectsEnabled?1:0;effectsBus.connect(audioContext.destination);
+          uiBus=audioContext.createGain();uiBus.gain.value=uiSoundsEnabled?1:0;uiBus.connect(audioContext.destination);
+          achievementBus=audioContext.createGain();achievementBus.gain.value=achievementSoundsEnabled?1:0;achievementBus.connect(audioContext.destination);
         }
         return audioContext;
       }
@@ -6848,16 +6990,111 @@
         if(!musicEnabled||musicVolume===0||musicHasStarted&&!$("backgroundMusic").paused)return;
         void startMusic();
       }
-      function tone(frequency,duration,type="sine",volume=.025,delay=0,channel="effects") {
+      function soundChannelVolume(channel) {
+        return channel==="interface"?uiSoundVolume:channel==="achievement"?achievementVolume:effectsVolume;
+      }
+      function tone(frequency,duration,type="sine",volume=.025,delay=0,channel="game",endFrequency=frequency,preview=false) {
         const ctx=ensureAudio(); if(!ctx)return;
         if(ctx.state==="suspended")void resumeAudio(ctx);
         const start=ctx.currentTime+delay, oscillator=ctx.createOscillator(), gain=ctx.createGain();
         oscillator.type=type; oscillator.frequency.setValueAtTime(frequency,start);
+        if(endFrequency!==frequency)oscillator.frequency.exponentialRampToValueAtTime(endFrequency,start+duration);
         gain.gain.setValueAtTime(.0001,start);
-        gain.gain.exponentialRampToValueAtTime(volume,start+(channel==="ui"?Math.min(.025,duration/2):.075));
+        const attack=channel==="interface"?Math.min(.012,duration/2):Math.min(.035,duration/2);
+        gain.gain.exponentialRampToValueAtTime(volume*soundChannelVolume(channel),start+attack);
         gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
-        oscillator.connect(gain);gain.connect(channel==="ui"?uiBus:effectsBus);
+        oscillator.connect(gain);
+        gain.connect(preview?audioContext.destination:channel==="interface"?uiBus:channel==="achievement"?achievementBus:effectsBus);
         oscillator.start(start);oscillator.stop(start+duration+.04);
+      }
+      const soundPatterns={
+        move:{channel:"game",notes:[[340,.075,"sine",.09,0,295],[820,.035,"triangle",.024,.012,700]]},
+        capture:{channel:"game",notes:[[245,.13,"triangle",.11,0,175],[490,.09,"sine",.045,.025,330]]},
+        captureCheck:{channel:"game",notes:[[245,.12,"triangle",.09,0,175],[587.33,.13,"sine",.055,.105,698]]},
+        check:{channel:"game",notes:[[392,.12,"triangle",.07,0,470],[587,.14,"sine",.065,.105,698]]},
+        checkmate:{channel:"game",notes:[[523.25,.25,"sine",.07,0],[659.25,.26,"triangle",.065,.13],[783.99,.3,"sine",.075,.27],[1046.5,.42,"triangle",.08,.44]]},
+        castle:{channel:"game",notes:[[330,.1,"triangle",.07,0],[440,.1,"sine",.065,.08],[554.37,.14,"sine",.055,.16]]},
+        promotion:{channel:"game",notes:[[392,.12,"sine",.055,0],[523.25,.13,"triangle",.065,.08],[659.25,.14,"sine",.07,.16],[783.99,.22,"triangle",.075,.24]]},
+        illegal:{channel:"game",notes:[[175,.09,"sawtooth",.045,0,130],[130,.12,"triangle",.045,.07,98]]},
+        gameStart:{channel:"game",notes:[[293.66,.14,"sine",.045,0],[440,.18,"triangle",.05,.1]]},
+        victory:{channel:"game",notes:[[392,.16,"sine",.045,0],[493.88,.18,"triangle",.05,.13],[587.33,.2,"sine",.055,.27],[783.99,.3,"triangle",.065,.43]]},
+        defeat:{channel:"game",notes:[[392,.16,"sine",.045,0,349],[329.63,.19,"triangle",.04,.13,293.66],[261.63,.28,"sine",.04,.29,220]]},
+        draw:{channel:"game",notes:[[392,.2,"sine",.045,0],[349.23,.26,"triangle",.04,.19]]},
+        resignation:{channel:"game",notes:[[440,.12,"triangle",.045,0,349.23],[293.66,.28,"sine",.05,.12,196]]},
+        bestMove:{channel:"game",notes:[[659.25,.12,"sine",.045,0],[880,.18,"triangle",.05,.09]]},
+        brilliant:{channel:"game",notes:[[587.33,.1,"sine",.045,0],[783.99,.11,"triangle",.05,.08],[987.77,.2,"sine",.055,.16]]},
+        mistake:{channel:"game",notes:[[293.66,.13,"triangle",.05,0,246.94]]},
+        blunder:{channel:"game",notes:[[246.94,.13,"sawtooth",.045,0,196],[196,.2,"triangle",.05,.1,146.83]]},
+        puzzleSuccess:{channel:"game",notes:[[523.25,.11,"sine",.04,0],[659.25,.16,"triangle",.05,.1],[783.99,.23,"sine",.055,.21]]},
+        puzzleFailure:{channel:"game",notes:[[246.94,.12,"triangle",.04,0,196],[196,.16,"sine",.035,.1]]},
+        buttonClick:{channel:"interface",notes:[[520,.035,"sine",.04,0,470]]},
+        menuOpen:{channel:"interface",notes:[[392,.06,"sine",.035,0],[587.33,.08,"triangle",.03,.045]]},
+        menuClose:{channel:"interface",notes:[[587.33,.06,"sine",.03,0,493.88]]},
+        dropdown:{channel:"interface",notes:[[440,.04,"sine",.035,0],[554.37,.06,"triangle",.03,.04]]},
+        notification:{channel:"interface",notes:[[659.25,.07,"sine",.035,0],[783.99,.1,"triangle",.035,.06]]},
+        achievement:{channel:"achievement",notes:[[523.25,.14,"sine",.055,0],[659.25,.15,"triangle",.06,.12],[783.99,.18,"sine",.065,.25],[1046.5,.31,"triangle",.07,.39]]}
+      };
+      function playEventSound(event,preview=false) {
+        const pattern=soundPatterns[event];
+        if(!pattern)throw new Error(`Unknown sound event: ${event}`);
+        const channel=pattern.channel;
+        if(!preview&&((channel==="game"&&!effectsEnabled)||(channel==="interface"&&!uiSoundsEnabled)||(channel==="achievement"&&!achievementSoundsEnabled)))return;
+        for(const [frequency,duration,type,volume,delay,endFrequency] of pattern.notes) {
+          tone(frequency,duration,type,volume,delay,channel,endFrequency??frequency,preview);
+        }
+      }
+      function audioPreferenceSnapshot() {
+        return {
+          musicVolume:Math.round(musicVolume*100),musicStyle,musicEnabled,
+          effectsVolume:Math.round(effectsVolume*100),effectsEnabled,
+          uiSoundVolume:Math.round(uiSoundVolume*100),uiSoundsEnabled,
+          achievementVolume:Math.round(achievementVolume*100),achievementSoundsEnabled
+        };
+      }
+      function applyAudioPreferences(saved) {
+        if(!saved||typeof saved!=="object"||Array.isArray(saved))throw new Error("Saved audio preferences are invalid.");
+        const volumeKeys=["musicVolume","effectsVolume","uiSoundVolume","achievementVolume"];
+        if(volumeKeys.some(key=>!Number.isInteger(saved[key])||saved[key]<0||saved[key]>100)
+          ||!Object.hasOwn(musicTracks,saved.musicStyle)
+          ||["musicEnabled","effectsEnabled","uiSoundsEnabled","achievementSoundsEnabled"].some(key=>typeof saved[key]!=="boolean")) {
+          throw new Error("Saved audio preferences are invalid.");
+        }
+        musicStyle=saved.musicStyle;
+        $("musicTrack").value=musicStyle;
+        setMusicVolume(saved.musicVolume,false);
+        setSoundVolume("game",saved.effectsVolume,false);
+        setSoundVolume("interface",saved.uiSoundVolume,false);
+        setSoundVolume("achievement",saved.achievementVolume,false);
+        setMusic(saved.musicEnabled,false);
+        setEffects(saved.effectsEnabled,false);
+        setUiSounds(saved.uiSoundsEnabled,false);
+        setAchievementSounds(saved.achievementSoundsEnabled,false);
+      }
+      function persistAudioPreferences() {
+        audioPreferencesRevision++;
+        const snapshot=audioPreferenceSnapshot();
+        try{localStorage.setItem("nightfall-chess-audio-preferences-v2",JSON.stringify(snapshot));}
+        catch(error){showToast(`Audio preferences could not be saved locally: ${error.message}`);}
+        clearTimeout(audioPreferenceTimer);
+        audioPreferenceTimer=setTimeout(()=>{
+          void archiveApiPromise.then(archive=>archive.savePreference("audio",audioPreferenceSnapshot()))
+            .catch(error=>{console.error(error);showToast(`Audio preferences could not be saved: ${error.message}`);});
+        },250);
+      }
+      async function loadAudioPreferencesFromArchive() {
+        const revision=audioPreferencesRevision;
+        try {
+          const archive=await archiveApiPromise,saved=await archive.getPreference("audio");
+          if(saved===undefined) {
+            await archive.savePreference("audio",audioPreferenceSnapshot());
+            return;
+          }
+          if(revision!==audioPreferencesRevision)return;
+          applyAudioPreferences(saved);
+        } catch(error) {
+          console.error(error);
+          showToast(`Audio preferences could not be loaded: ${error.message}`);
+        }
       }
       const musicTracks={
         "electric-1":"Music/song-0.mp3",
@@ -6872,8 +7109,11 @@
         $("musicVolume").value=String(Math.round(percent));
         $("musicVolumeValue").value=`${Math.round(percent)}%`;
         $("backgroundMusic").volume=musicVolume;
-        if(persist)try{localStorage.setItem("nightfall-chess-music-volume-v1",String(Math.round(percent)));}
-        catch(error){showToast(`Music volume could not be saved: ${error.message}`);}
+        if(persist) {
+          try{localStorage.setItem("nightfall-chess-music-volume-v1",String(Math.round(percent)));}
+          catch(error){showToast(`Music volume could not be saved: ${error.message}`);}
+          persistAudioPreferences();
+        }
       }
       function loadMusicSettings() {
         try {
@@ -6885,6 +7125,8 @@
           else if(savedStyle==="starlight")musicStyle="electric-2";
           musicEnabled=localStorage.getItem("nightfall-chess-music-enabled-v1")!=="false";
           if(localStorage.getItem("nightfall-chess-ui-sounds-v1")==="false")uiSoundsEnabled=false;
+          const savedPreferences=localStorage.getItem("nightfall-chess-audio-preferences-v2");
+          if(savedPreferences!==null)applyAudioPreferences(JSON.parse(savedPreferences));
         } catch(error) {
           showToast(`Audio settings could not be loaded: ${error.message}`);
         }
@@ -6892,13 +7134,14 @@
         $("musicToggle").setAttribute("aria-pressed",String(musicEnabled));
         $("musicToggle").textContent=musicEnabled?"♫ Music on":"♫ Music off";
         $("backgroundMusic").volume=musicVolume;
-        setUiSounds(uiSoundsEnabled,false);
+        syncSoundControls();
       }
       function setMusicStyle(style) {
         if(!Object.hasOwn(musicTracks,style))throw new Error(`Unknown music track: ${style}`);
         musicStyle=style;
         try{localStorage.setItem("nightfall-chess-music-style-v1",style);}
         catch(error){showToast(`Music track could not be saved: ${error.message}`);}
+        persistAudioPreferences();
         musicRequest++;musicHasStarted=false;
         const audio=$("backgroundMusic");
         audio.pause();audio.currentTime=0;audio.removeAttribute("src");audio.load();
@@ -6929,13 +7172,14 @@
           if(request===musicRequest&&musicEnabled)showToast(`Music could not start: ${error.message}`);
         }
       }
-      function setMusic(enabled) {
+      function setMusic(enabled,persist=true) {
         musicEnabled=enabled;
         $("musicToggle").setAttribute("aria-pressed",String(enabled));
         $("musicToggle").textContent=enabled?"♫ Music on":"♫ Music off";
         try{localStorage.setItem("nightfall-chess-music-enabled-v1",String(enabled));}
         catch(error){showToast(`Music setting could not be saved: ${error.message}`);}
-        if(enabled)void startMusic();
+        if(persist)persistAudioPreferences();
+        if(enabled&&persist)void startMusic();
         else {musicRequest++;musicHasStarted=false;$("backgroundMusic").pause();}
       }
       function advanceMusicTrack() {
@@ -6944,62 +7188,75 @@
         $("musicTrack").value=musicStyle;
         try{localStorage.setItem("nightfall-chess-music-style-v1",musicStyle);}
         catch(error){showToast(`Music track could not be saved: ${error.message}`);}
+        persistAudioPreferences();
         musicHasStarted=false;musicRequest++;
         void startMusic();
       }
-      function setEffects(enabled) {
+      function setSoundVolume(channel,value,persist=true) {
+        const percent=Math.max(0,Math.min(100,Number(value)));
+        if(!Number.isFinite(percent))return;
+        const config=channel==="game"?["effectsVolume","effectsVolumeValue"]:channel==="interface"?["uiSoundVolume","uiSoundVolumeValue"]:channel==="achievement"?["achievementVolume","achievementVolumeValue"]:null;
+        if(!config)throw new Error(`Unknown sound channel: ${channel}`);
+        if(channel==="game")effectsVolume=percent/100;
+        else if(channel==="interface")uiSoundVolume=percent/100;
+        else achievementVolume=percent/100;
+        $(config[0]).value=String(Math.round(percent));
+        $(config[1]).value=`${Math.round(percent)}%`;
+        if(persist)persistAudioPreferences();
+      }
+      function syncSoundControls() {
+        $("effectsToggle").setAttribute("aria-pressed",String(effectsEnabled));
+        $("effectsToggle").textContent=effectsEnabled?"♬ Game sounds on":"♬ Game sounds muted";
+        $("uiSoundsToggle").setAttribute("aria-pressed",String(uiSoundsEnabled));
+        $("uiSoundsToggle").textContent=uiSoundsEnabled?"♩ Interface sounds on":"♩ Interface sounds muted";
+        $("achievementSoundsToggle").setAttribute("aria-pressed",String(achievementSoundsEnabled));
+        $("achievementSoundsToggle").textContent=achievementSoundsEnabled?"✦ Achievement sounds on":"✦ Achievement sounds muted";
+        setSoundVolume("game",effectsVolume*100,false);
+        setSoundVolume("interface",uiSoundVolume*100,false);
+        setSoundVolume("achievement",achievementVolume*100,false);
+      }
+      function setEffects(enabled,persist=true) {
         effectsEnabled=enabled;
-        $("effectsToggle").setAttribute("aria-pressed",String(enabled));
-        $("effectsToggle").textContent=enabled?"♬ Effects on":"♬ Effects off";
+        syncSoundControls();
+        if(persist)persistAudioPreferences();
       }
       function setUiSounds(enabled,persist=true) {
         uiSoundsEnabled=enabled;
-        $("uiSoundsToggle").setAttribute("aria-pressed",String(enabled));
-        $("uiSoundsToggle").textContent=enabled?"♩ UI sounds on":"♩ UI sounds off";
-        if(uiBus&&audioContext)uiBus.gain.setTargetAtTime(enabled ? .18 : 0,audioContext.currentTime,.035);
+        syncSoundControls();
         if(persist)try{localStorage.setItem("nightfall-chess-ui-sounds-v1",String(enabled));}
         catch(error){showToast(`UI sound setting could not be saved: ${error.message}`);}
+        if(persist)persistAudioPreferences();
+      }
+      function setAchievementSounds(enabled,persist=true) {
+        achievementSoundsEnabled=enabled;
+        syncSoundControls();
+        if(persist)persistAudioPreferences();
       }
       function playUiClick(event) {
-        if(!uiSoundsEnabled||!(event.target instanceof Element)||event.target.closest(".square, #board, canvas, audio"))return;
-        if(!event.target.closest("button, summary, select, input, [role='button'], [role='menuitem']"))return;
-        tone(540,.055,"sine",.012,0,"ui");
+        if(!(event.target instanceof Element)||event.target.closest(".square, #board, canvas, audio"))return;
+        const control=event.target.closest("button, summary, [role='button'], [role='menuitem']");
+        if(!control||control.matches("[disabled], [aria-disabled='true']"))return;
+        if(control.matches(".sound-preview"))return;
+        if(control.matches("summary"))playEventSound(control.parentElement?.open?"menuClose":"menuOpen");
+        else playEventSound("buttonClick");
       }
-      function playMoveSound(capture,check,checkmate=false) {
-        if(!effectsEnabled)return;
-        if(checkmate) {
-          [659.25,783.99,987.77,783.99].forEach((note,index)=>tone(note,.34,"sine",.055,index*.16));
-          return;
-        }
-        const note=check?523:capture?392:293.66;
-        tone(note,.24,"sine",.075);
-        tone(note*1.5,capture ? 0.28 : 0.18,"triangle",capture ? 0.04 : 0.025,.025);
-        if(check)tone(659.25,.25,"sine",.045,.1);
-      }
-      function playEndSound() {
-        if(!effectsEnabled)return;
-        [392,493.88,587.33].forEach((note,index)=>tone(note,.38,"sine",.024,index*.2));
+      function playMoveSound(move,before,check,checkmate=false) {
+        if(checkmate&&!puzzleMode)return;
+        const captured=!!before.board[move.to[0]][move.to[1]]||move.enPassant;
+        const event=checkmate?"checkmate":move.castle?"castle":move.promoteTo?"promotion":captured&&check?"captureCheck":captured?"capture":check?"check":"move";
+        playEventSound(event);
       }
       function classifyCentipawnLoss(loss) {
         if(loss<=10)return {label:"Best",quality:"best"};
         if(loss<=25)return {label:"Excellent",quality:"excellent"};
         if(loss<=50)return {label:"Good",quality:"good"};
-        if(loss<=100)return {label:"Inaccuracy",quality:"mid"};
-        if(loss<=200)return {label:"Mistake",quality:"bad"};
-        return {label:"Blunder",quality:"bad"};
+        if(loss<=100)return {label:"Inaccuracy",quality:"inaccuracy"};
+        if(loss<=200)return {label:"Mistake",quality:"mistake"};
+        return {label:"Blunder",quality:"blunder"};
       }
-      let openingMoveLinesCache=null;
       function isOpeningBookMove(entry) {
-        if(!openingDatabaseByPosition.size)return false;
-        if(!openingMoveLinesCache) {
-          const uniqueLines=new Map();
-          for(const records of openingDatabaseByPosition.values()) {
-            for(const record of records)uniqueLines.set(record.m.join(" "),record.m);
-          }
-          openingMoveLinesCache=[...uniqueLines.values()];
-        }
-        const move=moveToUci(entry.move),prefix=entry.prefix||[];
-        return openingMoveLinesCache.some(line=>line.length>entry.ply&&line[entry.ply]===move&&prefix.every((played,index)=>line[index]===played));
+        if(!openingIndexApi)return false;
+        return openingIndexApi.isBookMove(openingBookMovesByPrefix,entry.prefix||[],moveToUci(entry.move));
       }
       function isEngineBackedSacrifice(entry,after,actualScore,loss) {
         if(loss>10||actualScore<100||entry.before.board[entry.move.to[0]][entry.move.to[1]])return false;
@@ -7032,7 +7289,7 @@
           const playedBest=moveToUci(entry.move)===root.best;
           let classification=classifyCentipawnLoss(loss);
           const missedForcedMate=root.info.scoreType==="mate"&&root.info.score>0&&actualScore<90000;
-          if(missedForcedMate)classification={label:"Miss",quality:"bad"};
+          if(missedForcedMate)classification={label:"Miss",quality:"miss"};
           else if(loss<=15&&isOpeningBookMove(entry))classification={label:"Book",quality:"book"};
           else if(playedBest&&isEngineBackedSacrifice(entry,after,actualScore,loss))classification={label:"Brilliant",quality:"brilliant"};
           else if(playedBest&&loss<=10&&(margin>=150||(root.info.scoreType==="mate"&&root.info.score>0)))classification={label:"Great",quality:"great"};
@@ -7143,7 +7400,7 @@
           const afterText=grade.evaluationText;
           const lossText=grade.loss>=90000?(isPersian?"مات":"Mate"):`${digit(Math.round(grade.loss))} cp`;
           const bestAlternative=grade.bestUci===moveToUci(entry.move)?"—":grade.bestSan;
-          const retry=grade.quality==="bad"?`<button class="subtle-button" type="button" data-review-action="retry" data-index="${index}">${isPersian?"تلاش دوباره":"Retry"}</button>`:"";
+          const retry=["inaccuracy","mistake","blunder","miss"].includes(grade.quality)?`<button class="subtle-button" type="button" data-review-action="retry" data-index="${index}">${isPersian?"تلاش دوباره":"Retry"}</button>`:"";
           return `<tr class="analysis-row${["Mistake","Blunder","Miss"].includes(grade.label)?" critical-move":""}" data-index="${index}" tabindex="0" aria-current="${analysisPositionIndex===index?"true":"false"}"><td>${digit(moveNumber)}.${color==="w"?"":"… "}</td><td>${played}</td><td><span class="grade ${grade.quality}">${isPersian?(faText[grade.label]||grade.label):grade.label}</span></td><td>${beforeText}</td><td>${afterText}</td><td>${lossText}</td><td>${escapeHtml(bestAlternative)}</td><td><div class="review-move-actions"><button class="subtle-button" type="button" data-review-action="jump" data-index="${index}" aria-label="${isPersian?`رفتن به حرکت ${digit(moveNumber)} ${entry.san}`:`Jump to move ${moveNumber} ${entry.san}`}">${isPersian?"رفتن":"Jump"}</button><button class="subtle-button" type="button" data-review-action="best" data-index="${index}" aria-label="${isPersian?`نمایش بهترین خط پیش از حرکت ${digit(moveNumber)}`:`Show best line before move ${moveNumber}`}">${isPersian?"بهترین حرکت":"Show Best"}</button>${retry}</div></td></tr>`;
         }).join("");
       }
@@ -7412,7 +7669,6 @@
             if(!analysisShown) {
               analysisShown=true;
               setTimeout(()=>{if(gameOver&&analysisShown)showAnalysis(lastGameResult);},350);
-              playEndSound();
             }
           }
           renderPlayers();
@@ -7547,6 +7803,18 @@
       $("musicTrack").addEventListener("change",event=>setMusicStyle(event.currentTarget.value));
       $("effectsToggle").addEventListener("click",()=>setEffects(!effectsEnabled));
       $("uiSoundsToggle").addEventListener("click",()=>setUiSounds(!uiSoundsEnabled));
+      $("achievementSoundsToggle").addEventListener("click",()=>setAchievementSounds(!achievementSoundsEnabled));
+      $("effectsVolume").addEventListener("input",event=>setSoundVolume("game",event.currentTarget.value));
+      $("uiSoundVolume").addEventListener("input",event=>setSoundVolume("interface",event.currentTarget.value));
+      $("achievementVolume").addEventListener("input",event=>setSoundVolume("achievement",event.currentTarget.value));
+      document.addEventListener("click",event=>{
+        playUiClick(event);
+        const preview=event.target.closest?.("[data-sound-preview]");
+        if(preview)playEventSound(preview.dataset.soundPreview,true);
+      },{capture:true});
+      document.addEventListener("change",event=>{
+        if(event.target instanceof HTMLSelectElement)playEventSound("dropdown");
+      },{capture:true});
       $("backgroundMusic").addEventListener("ended",event=>{
         if(!musicEnabled||musicVolume===0)return;
         advanceMusicTrack();
@@ -7603,10 +7871,30 @@
       const setReviewSide=side=>{reviewStudySide=side;renderQuickReview();if(currentLesson>=CORE_LESSON_COUNT){const openingIndex=currentLesson-CORE_LESSON_COUNT,scenario=getOpeningScenarios(openingIndex)[currentOpeningScenario];if(scenario.move)currentOpeningScenarioPly=scenario.ply;renderOpeningScenarios();}};
       $("reviewAsWhite").addEventListener("click",()=>setReviewSide("w"));
       $("reviewAsBlack").addEventListener("click",()=>setReviewSide("b"));
-      document.addEventListener("pointerdown",event=>{playUiClick(event);startMusicFromGesture();},{capture:true,passive:true});
+      async function registerOfflineSupport() {
+        if(!("serviceWorker" in navigator)||!["http:","https:"].includes(location.protocol))return;
+        try {
+          const scope=new URL("./",document.baseURI).pathname;
+          const registration=await navigator.serviceWorker.register(new URL("./service-worker.js",document.baseURI),{scope});
+          await registration.update();
+        } catch(error) {
+          console.error("Offline support could not be initialized:",error);
+          showToast(`Offline support could not be initialized: ${error.message}`);
+        }
+      }
+      async function requestPersistentStorage() {
+        if(!navigator.storage||typeof navigator.storage.persist!=="function")return;
+        try {
+          const granted=await navigator.storage.persist();
+          if(!granted)console.info("Persistent storage was not granted; the browser may evict local data under storage pressure.");
+        } catch(error) {
+          console.error("Persistent storage request failed:",error);
+          showToast(`Persistent storage could not be requested: ${error.message}`);
+        }
+      }
+      document.addEventListener("pointerdown",()=>startMusicFromGesture(),{capture:true,passive:true});
       document.addEventListener("keydown",event=>{
         startMusicFromGesture();
-        if((event.key==="Enter"||event.key===" ")&&event.target.closest?.("button, summary, select, input, [role='button'], [role='menuitem']"))playUiClick(event);
       },{capture:true});
       $("closeAnalysis").addEventListener("click",()=>{$("analysisBackdrop").classList.remove("open");analysisGeneration++;stopReviewAutoplay();});
       $("analysisBackdrop").addEventListener("click",event=>{if(event.target===$("analysisBackdrop")){$("analysisBackdrop").classList.remove("open");analysisGeneration++;stopReviewAutoplay();}});
@@ -7626,7 +7914,7 @@
         if(openingIdentity!==previousOpening&&!$("gameScreen").hidden)render();
         if(!$("trainingScreen").hidden)renderQuickReviews($("openingSearch").value);
       }).catch(error=>{console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);});
-      ensureTwentyMoveLines();loadRecentGames();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();renderJourney();renderDailyChallenge();
+      ensureTwentyMoveLines();void loadRecentGames().then(()=>loadAchievementProgress());loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();
       reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
       $("setSkillButton").addEventListener("click",setPlayerSkill);
       $("puzzleHintButton").addEventListener("click",showPuzzleHint);
