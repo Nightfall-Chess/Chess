@@ -6904,6 +6904,7 @@
         selected=null;legalTargets=[];premove=null;orientation=humanColor=room.myColor||humanColor;
         onlinePlayers=Array.isArray(room.players)?room.players:[];
         gameOver=Boolean(room.result);matchActive=room.status==="playing"&&!gameOver;
+        if(gameOver&&onlineRefreshTimer){clearInterval(onlineRefreshTimer);onlineRefreshTimer=0;}
         const alreadyRecorded=resultRecorded&&lastGameResult===room.result;
         resultRecorded=alreadyRecorded;lastGameResult=room.result||"";
         const justFinished=gameOver&&!resultRecorded;
@@ -6949,11 +6950,11 @@
         if(onlineRefreshTimer)clearInterval(onlineRefreshTimer);
         onlineRefreshTimer=window.setInterval(()=>{
           if(onlineRoomId!==roomId)return;
-          if(($("gameScreen").hidden&&$("onlineScreen").hidden)||gameOver) {
+          if($("gameScreen").hidden&&$("onlineScreen").hidden) {
             clearInterval(onlineRefreshTimer);onlineRefreshTimer=0;return;
           }
           void syncOnlineRoom(true);
-        },1800);
+        },2500);
         onlineSubscriptionRoomId=roomId;
         const pending=(async()=>{
           const api=await ensureOnlineApi();
