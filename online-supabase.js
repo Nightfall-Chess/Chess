@@ -65,7 +65,14 @@ async function initialize() {
         await supabase.removeChannel(channel);
         throw err;
       });
-      return {\n        broadcast: async room => {\n          const payload = { version: Number(room?.version) || 0, room };\n          const result = await channel.send({ type: "broadcast", event: "state", payload });\n          if (result !== "ok") throw new Error(`Realtime broadcast failed: ${result}`);\n        },\n        unsubscribe: () => supabase.removeChannel(channel)\n      };
+      return {
+        broadcast: async room => {
+          const payload = { version: Number(room?.version) || 0, room };
+          const result = await channel.send({ type: "broadcast", event: "state", payload });
+          if (result !== "ok") throw new Error(`Realtime broadcast failed: ${result}`);
+        },
+        unsubscribe: () => supabase.removeChannel(channel)
+      };
     }
   };
 }
