@@ -7923,16 +7923,7 @@
         else showToast(completedLessons.size===lessons.length?"Course complete — keep practicing in real games":"Nice work. Revisit any lesson or keep practicing.");
       });
       loadGameplaySettings();loadAiOpeningHistory();
-<<<<<<< HEAD
-      void loadOpeningDatabase().then(()=>{
-        const previousOpening=openingIdentity;
-        recognizeOpening();
-        if(openingIdentity!==previousOpening&&!$("gameScreen").hidden)render();
-        if(!$("trainingScreen").hidden)renderQuickReviews($("openingSearch").value);
-      }).catch(error=>{console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);});
-      void registerOfflineSupport();void requestPersistentStorage();
-      ensureTwentyMoveLines();loadRecentGames();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();renderJourney();renderDailyChallenge();
-=======
+      loadGameplaySettings();loadAiOpeningHistory();
       let openingWarmStarted=false;
       function warmOpeningDatabase() {
         if(openingWarmStarted)return;
@@ -7958,9 +7949,7 @@
         $("lobbyAiMode")?.addEventListener(eventName,()=>{warmOpeningDatabase();void ensureStockfish().catch(()=>{});},{once:true,passive:true});
         $("trainingTop")?.addEventListener(eventName,warmOpeningDatabase,{once:true,passive:true});
       }
-      ensureTwentyMoveLines();void loadRecentGames().then(()=>loadAchievementProgress());loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();
->>>>>>> 82566ede208c26fa4a3ae5a5c1ff6ea38107bf0b
-      reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
+      ensureTwentyMoveLines();void loadRecentGames().then(()=>loadAchievementProgress());loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();      reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
       $("setSkillButton").addEventListener("click",setPlayerSkill);
       $("puzzleHintButton").addEventListener("click",showPuzzleHint);
       $("nextPuzzleButton").addEventListener("click",nextPuzzle);
