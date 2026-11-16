@@ -24,10 +24,7 @@ async function hash(value: string) {
   const bytes = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)));
   return [...bytes].map(x => x.toString(16).padStart(2, "0")).join("");
 }
-function code() {
-  const bytes = crypto.getRandomValues(new Uint8Array(7));
-  return [...bytes].map(x => alphabet[x % alphabet.length]).join("");
-}
+function code() {\n  // Rejection sampling avoids modulo bias and always produces exactly seven characters.\n  let value = "";\n  const limit = Math.floor(256 / alphabet.length) * alphabet.length;\n  while (value.length < 7) {\n    const bytes = crypto.getRandomValues(new Uint8Array(16));\n    for (const byte of bytes) {\n      if (byte >= limit) continue;\n      value += alphabet[byte % alphabet.length];\n      if (value.length === 7) break;\n    }\n  }\n  return value;\n}
 function cleanName(value: unknown, fallback: string) {
   return typeof value === "string" ? value.trim().replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 24) || fallback : fallback;
 }
