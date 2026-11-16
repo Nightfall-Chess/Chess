@@ -52,7 +52,6 @@ async function requirePlayer(db: any, id: string, userId: string) {
   return data;
 }
 async function snapshot(db: any, id: string, userId: string) {
-  const player = await requirePlayer(db, id, userId);
   const [roomResult, stateResult, playersResult] = await Promise.all([
     db.from("online_rooms").select("id,status,expires_at").eq("id", id).single(),
     db.from("online_game_state").select("fen,pgn,moves,version,result").eq("room_id", id).single(),
@@ -60,6 +59,8 @@ async function snapshot(db: any, id: string, userId: string) {
   ]);
   if (roomResult.error || stateResult.error || playersResult.error) throw new Error("DATABASE_ERROR");
   if (!roomResult.data || new Date(roomResult.data.expires_at).getTime() < Date.now()) throw new Error("ROOM_NOT_FOUND");
+  const player = playersResult.data.find((entry: any) => entry.user_id === userId);
+  if (!player) throw new Error("NOT_A_PLAYER");
   return { ...roomResult.data, ...stateResult.data, players: playersResult.data, myColor: player.color, myName: player.display_name };
 }
 async function broadcast(db: any, id: string, event: string, payload: Obj) {
