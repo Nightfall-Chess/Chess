@@ -1448,7 +1448,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=11">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=16">
 </head>
 <body>
   <main class="app">
@@ -1915,6 +1915,7 @@
   <audio id="backgroundMusic" preload="none"></audio>
   <div class="music-island" id="musicIsland" role="status" aria-live="polite" aria-hidden="true"><span class="music-island-dot"></span><span id="musicIslandName"></span></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="particle-layer" id="particleLayer" aria-hidden="true"></div>
   <div class="confirm-backdrop" id="exitMatchBackdrop" role="dialog" aria-modal="true" aria-labelledby="exitMatchTitle" hidden>
     <section class="confirm-dialog">
       <h2 id="exitMatchTitle">Exit this match?</h2>
@@ -2150,7 +2151,7 @@
         "Invite link copied.":"پیوند دعوت کپی شد.","Room link could not be copied.":"کپی پیوند اتاق ناموفق بود.",
         "This classroom server requires HTTPS for invitation security.":"برای امنیت دعوت، سرور کلاس باید از HTTPS استفاده کند.",
         "FEN position loaded.":"وضعیت FEN بارگیری شد.","PGN game loaded.":"بازی PGN بارگیری شد.",
-        "Export PGN":"دریافت فایل PGN","First position":"نخستین وضعیت","Previous move":"حرکت پیشین","Next move":"حرکت بعدی","Final position":"وضعیت پایانی","Initial position":"وضعیت آغازین","Review position":"وضعیت مرور","King's Pawn Game":"بازی پیادهٔ شاه","King’s Pawn Game":"بازی پیادهٔ شاه",
+        "Export PGN":"دریافت فایل PGN","First position":"نخستین وضعیت","Previous move":"حرکت پیشین","Next move":"حرکت بعدی","Final position":"وضعیت پایانی","Initial position":"وضعیت آغازین","Review position":"وضعیت مرور","King's Pawn Game":"بازی پیادهٔ شاه","King’s Pawn Game":"بازی پیادهٔ شاه","King's Pawn Game: Wayward Queen Attack":"گشایش پیادهٔ شاه: حملهٔ وزیر سرگردان",
         "Stockfish is calculating a move…":"موتور Stockfish در حال محاسبهٔ حرکت است…","Stockfish is analyzing the moves…":"موتور Stockfish در حال تحلیل حرکت‌هاست…","Loading Stockfish Lite (about 1.8 MB)…":"در حال بارگیری نسخهٔ سبک Stockfish (حدود ۱٫۸ مگابایت)…",
         "Brilliant":"درخشان","Great":"عالی","Best":"بهترین","Excellent":"بسیار خوب","Good":"خوب","Book":"کتابی","Inaccuracy":"نادقیق","Mistake":"اشتباه","Blunder":"اشتباه فاحش","Miss":"فرصت ازدست‌رفته","Unavailable":"در دسترس نیست","Analyzing":"در حال تحلیل",
         "Show Stockfish move analysis in the move list":"نمایش تحلیل Stockfish در فهرست حرکت‌ها","Every move is analyzed asynchronously. The move list shows its classification and evaluation when Stockfish finishes.":"همهٔ حرکت‌ها به‌صورت غیرهم‌زمان تحلیل می‌شوند. پس از پایان Stockfish، طبقه‌بندی و ارزیابی آن‌ها نمایش داده می‌شود.",
@@ -2273,7 +2274,9 @@
         "Moves from the shared board will appear here.":"حرکت‌های صفحهٔ مشترک اینجا نمایش داده می‌شوند.",
         "Best continuation":"بهترین ادامه","Previous":"قبلی","Next":"بعدی","Return to game":"بازگشت به بازی","Autoplay":"پخش خودکار",
         "Speed":"سرعت","Show":"نمایش","All moves":"همهٔ حرکت‌ها","Mistakes & blunders":"اشتباه‌ها و لغزش‌ها","Best & brilliant":"بهترین و درخشان",
-        "White only":"فقط سفید","Black only":"فقط سیاه","Move":"حرکت","Played":"بازی‌شده","Class":"طبقه‌بندی",
+        "White only":"فقط سفید","Black only":"فقط سیاه","Move":"حرکت","Played":"بازی‌شده","Class":"طبقه‌بندی","Classification":"طبقه‌بندی",
+        "Evaluation Before":"ارزیابی پیش از حرکت","Evaluation After":"ارزیابی پس از حرکت","Centipawn Loss":"افت سانتی‌پیاده","Best Alternative":"بهترین جایگزین","Review Actions":"اقدام‌ها",
+        "RECORDED ON THIS DEVICE":"ثبت‌شده روی این دستگاه","Filter games by result":"فیلتر بر اساس نتیجه","Filter games by date":"فیلتر بر اساس تاریخ","Player vs Friend":"بازیکن در برابر دوست","Ratings":"رتبه‌ها",
         "Before":"پیش از","After":"پس از","Loss":"افت","Best alternative":"بهترین گزینه","Review":"مرور","Jump":"رفتن","Show best":"نمایش بهترین حرکت","Retry":"تلاش دوباره",
         "Daily":"روزانه","Slow":"آهسته","Normal":"معمولی","Fast":"سریع","Your chess journey":"مسیر شطرنج شما",
         "Best moment:":"بهترین لحظه:","No moves to review":"حرکتی برای مرور نیست","Next time:":"دفعهٔ بعد:","Good habit:":"عادت خوب:","Opening plan:":"برنامهٔ گشایش:","Next game:":"بازی بعدی:",
@@ -2436,7 +2439,7 @@
         "pirc":"پیرک","trompowsky":"ترومپوفسکی","catalan":"کاتالان","tarrasch":"تاراش","vienna":"وین","four":"چهار",
         "knights":"اسب‌ها","bishop":"فیل","bishops":"فیل‌ها","pawn":"پیاده","pawns":"پیاده‌ها","two":"دو","three":"سه",
         "fourth":"چهارم","fifth":"پنجم","sixth":"ششم","seven":"هفت","eight":"هشت","nine":"نه","ten":"ده",
-        "with":"با","without":"بدون","and":"و","or":"یا","the":""
+        "wayward":"سرگردان","queen":"وزیر","with":"با","without":"بدون","and":"و","or":"یا","the":""
       };
       const openingPersianLetters={a:"ا",b:"ب",c:"ک",d:"د",e:"اِ",f:"ف",g:"گ",h:"ه",i:"ای",j:"ج",k:"ک",l:"ل",m:"م",n:"ن",o:"اُ",p:"پ",q:"ق",r:"ر",s:"س",t:"ت",u:"او",v:"و",w:"و",x:"کس",y:"ی",z:"ز"};
       function openingNameInPersian(name) {
@@ -2467,6 +2470,11 @@
       function moveToUci(move) {
         const square=([row,col])=>`${"abcdefgh"[col]}${8-row}`;
         return `${square(move.from)}${square(move.to)}${move.promoteTo||""}`;
+      }
+      function archivedOpeningIdentity(value) {
+        const name=typeof value==="string"?value:value?.name;
+        if(typeof name!=="string"||!name.trim())return null;
+        return {eco:typeof value==="object"&&typeof value.eco==="string"?value.eco:"",name,nameFa:typeof value==="object"&&typeof value.nameFa==="string"?value.nameFa:openingNameInPersian(name)};
       }
       function ecoCodeInPersian(eco) {
         const letters={A:"اِی",B:"بی",C:"سی",D:"دی",E:"ای"};
@@ -3846,6 +3854,7 @@
       function completePuzzle() {
         if(puzzleSolved)return;
         puzzleSolved=true;
+        emitParticles("puzzle",$("puzzleGameCard"));
         if(dailyChallengeMode) {
           const day=new Date().toISOString().slice(0,10),days=completedDailyChallenges();
           days.add(day);
@@ -4371,7 +4380,7 @@
         $("lobby").hidden=true;$("onlineScreen").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
         mode="friend";state=position;history=[];redoStack=[];selected=null;legalTargets=[];premove=null;
         gameOver=false;matchActive=false;aiThinking=false;humanColor=state.turn;orientation=state.turn;activeArchiveId=null;
-        openingIdentity=moment.opening?{name:moment.opening}:null;
+        openingIdentity=archivedOpeningIdentity(moment.opening);openingByColor={w:null,b:null};
         $("newGameCard").hidden=false;$("newGameTop").hidden=true;$("resetButton").hidden=true;$("puzzleGameCard").hidden=true;
         $("statusText").textContent=isPersian?"وضعیت ذخیره‌شده · فقط مطالعه":"Saved position · study view";
         $("boardHelp").textContent=moment.note||"";
@@ -4433,6 +4442,7 @@
         const scoreChange=mode==="ai"
           ?Math.round(24*(outcome-1/(1+Math.pow(10,(Number($("strength").value)-profileStats.rating)/400))))
           :isDraw?3:won?14:-10;
+        if(won)emitParticles("victory",$("board"));
         changeScore(scoreChange);
         if(isDraw) {
           profileStats.draws++;profileStats.winStreak=0;
@@ -4706,7 +4716,7 @@
         reviewSuggestionPly=0;analysisPositionIndex=index-1;
         $("bestLineTitle").textContent=isPersian?"بهترین ادامه":"Best continuation";
         $("bestLineEvaluation").textContent=engineEvaluationText(grade.rootInfo,entry.before.turn);
-        $("bestLineExplanation").textContent=grade.loss<=10
+        $("bestLineExplanation").textContent=grade.bestUci===moveToUci(entry.move)
           ?(isPersian?`حرکت بازی‌شدهٔ ${entry.san} با انتخاب نخست Stockfish مطابقت داشت.`:`${entry.san} matched Stockfish’s top choice at this search depth.`)
           :(isPersian?`در این وضعیت، ${grade.bestSan} ارزیابی بهتری از حرکت ${entry.san} داشت (${digitPersian(Math.round(grade.loss))} سانتی‌پیاده اختلاف).`:`From this exact position, ${grade.bestSan} scored better than ${entry.san} by about ${Math.round(grade.loss)} centipawns.`);
         $("bestLinePanel").hidden=false;
@@ -4765,7 +4775,7 @@
           mode=record.mode;humanColor=record.color;orientation=record.color;history=structuredClone(record.entries);redoStack=[];
           state=history.length?copyState(history.at(-1).after):startState();
           gameOver=true;matchActive=false;aiThinking=false;resultRecorded=true;lastGameResult=record.resultText||({win:"White wins",loss:"Black wins",draw:"Draw"}[record.outcome]);
-          gameStartedAt=new Date(record.startedAt||record.finishedAt);activeArchiveId=record.id;openingIdentity=record.opening?{name:record.opening}:null;
+          gameStartedAt=new Date(record.startedAt||record.finishedAt);activeArchiveId=record.id;          openingIdentity=archivedOpeningIdentity(record.opening);openingByColor={w:null,b:null};
           selected=null;legalTargets=[];premove=null;reviewPreviewIndex=null;
           $("lobby").hidden=true;$("onlineScreen").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
           $("newGameCard").hidden=false;$("newGameTop").hidden=false;$("resetButton").hidden=false;$("puzzleGameCard").hidden=true;
@@ -4917,6 +4927,11 @@
         if(capture&&targetSquare) {
           targetSquare.classList.add("capture-impact");
           window.setTimeout(()=>targetSquare.classList.remove("capture-impact"),760);
+          emitParticles("capture",targetSquare);
+        } else if(move.promoteTo&&targetSquare) {
+          emitParticles("promotion",targetSquare);
+        } else if(targetSquare&&!inCheck(state,state.turn)) {
+          emitParticles("move",targetSquare);
         }
         if(inCheck(state,state.turn)) {
           const king=findKing(state,state.turn),kingSquare=king?board.querySelector(`.square[data-row="${king[0]}"][data-col="${king[1]}"]`):null;
@@ -4924,6 +4939,7 @@
             const checkmate=!legalMoves(state).length;
             kingSquare.classList.add(checkmate?"checkmate-flash":"check-flash");
             window.setTimeout(()=>kingSquare.classList.remove("check-flash","checkmate-flash"),checkmate?1700:1200);
+            if(!checkmate)emitParticles("check",kingSquare);
           }
         }
       }
@@ -5036,11 +5052,14 @@
         if(puzzleMode)updatePuzzleGameProgress();
       }
       function updateStrategyReport() {
-        const englishTitle=openingIdentity?`${openingIdentity.eco} · ${openingIdentity.name}`:"Opening not identified yet";
-        const code=openingIdentity?(isPersian?`ردهٔ ${ecoCodeInPersian(openingIdentity.eco)}`:`ECO ${openingIdentity.eco}`):"";
-        const title=openingIdentity?`${code} · ${isPersian?openingIdentity.nameFa:openingIdentity.name}`:isPersian?"گشایش هنوز شناسایی نشده":"Opening not identified yet";
+        const englishTitle=openingIdentity?(openingIdentity.eco?`${openingIdentity.eco} · `:"")+openingIdentity.name:"Opening not identified yet";
+        const code=openingIdentity?.eco?(isPersian?`ردهٔ ${ecoCodeInPersian(openingIdentity.eco)}`:`ECO ${openingIdentity.eco}`):"";
+        const openingName=openingIdentity?(isPersian?openingIdentity.nameFa||openingIdentity.name:openingIdentity.name):"";
+        const title=openingIdentity?`${code?`${code} · `:""}${openingName}`:isPersian?"گشایش هنوز شناسایی نشده":"Opening not identified yet";
         const copy=openingIdentity
-          ?isPersian?`گشایش ${openingIdentity.nameFa} با ${code} از پایگاه گشایش‌ها بر پایهٔ وضعیت دقیق صفحه شناسایی شده است. با ادامهٔ بازی، نام آن دقیق‌تر می‌شود.`:`${openingIdentity.name} (${openingIdentity.eco}) was identified from the exact position in the ECO database. Its name becomes more specific as play continues.`
+          ?openingIdentity.eco
+            ?isPersian?`گشایش ${openingName} با ${code} از پایگاه گشایش‌ها بر پایهٔ وضعیت دقیق صفحه شناسایی شده است. با ادامهٔ بازی، نام آن دقیق‌تر می‌شود.`:`${openingIdentity.name} (${openingIdentity.eco}) was identified from the exact position in the ECO database. Its name becomes more specific as play continues.`
+            :isPersian?`گشایش ${openingName} برای این بازی ثبت شده است.`:`${openingIdentity.name} was recorded for this game.`
           :isPersian?"با ادامهٔ بازی، نام گشایش پس از رسیدن به یک وضعیت ثبت‌شده در پایگاه ECO نمایش داده می‌شود.":"The ECO opening name will appear when the game reaches a position listed in the database.";
         $("strategyTitle").dataset.english=englishTitle;
         $("strategyTitle").textContent=title;
@@ -5306,6 +5325,41 @@
         const box=$("promotionOptions"); box.replaceChildren();
         for(const piece of ["q","r","b","n"]) { const button=document.createElement("button");button.type="button";button.textContent=symbols[state.turn==="w"?piece.toUpperCase():piece];button.setAttribute("aria-label",pieceName(piece));button.addEventListener("click",()=>{$("promotionBackdrop").classList.remove("open");saveMove({...m,promoteTo:piece});});box.append(button); }
         $("promotionBackdrop").classList.add("open");
+      }
+      const particlePresets={
+        move:{count:3,colors:["#b7a3ff","#8eb6ff"],spread:26,size:3,duration:480},
+        capture:{count:11,colors:["#ed8b9b","#f1d5a5","#f4efff"],spread:82,size:5,duration:720},
+        check:{count:13,colors:["#d8bd83","#f4e3ad","#b7a3ff"],spread:102,size:5,duration:820},
+        promotion:{count:15,colors:["#b7a3ff","#d8bd83","#8eb6ff"],spread:116,size:5,duration:880},
+        victory:{count:34,colors:["#d8bd83","#b7a3ff","#8eb6ff","#f4efff"],spread:180,size:6,duration:1180},
+        puzzle:{count:24,colors:["#b7a3ff","#8eb6ff","#d8bd83"],spread:150,size:5,duration:1000}
+      };
+      function emitParticles(kind,anchor=null) {
+        const layer=$("particleLayer"),preset=particlePresets[kind];
+        if(!layer||!preset||matchMedia("(prefers-reduced-motion: reduce)").matches||typeof Element.prototype.animate!=="function")return;
+        const bounds=anchor instanceof Element?anchor.getBoundingClientRect():null;
+        const centerX=bounds?bounds.left+bounds.width/2:innerWidth/2;
+        const centerY=bounds?bounds.top+bounds.height/2:innerHeight/2;
+        for(let index=0;index<preset.count;index++) {
+          const particle=document.createElement("i"),angle=Math.random()*Math.PI*2;
+          const distance=preset.spread*(.35+Math.random()*.65),size=preset.size*(.6+Math.random()*.8);
+          const dx=Math.cos(angle)*distance,dy=Math.sin(angle)*distance-distance*.22;
+          particle.className=`particle particle-${index%3}`;
+          particle.style.left=`${centerX}px`;particle.style.top=`${centerY}px`;
+          particle.style.setProperty("--particle-color",preset.colors[index%preset.colors.length]);
+          particle.style.setProperty("--particle-size",`${size}px`);
+          layer.append(particle);
+          const duration=preset.duration*(.75+Math.random()*.5),animation=particle.animate([
+            {opacity:0,transform:"translate(-50%,-50%) scale(.25) rotate(0deg)"},
+            {opacity:1,offset:.12},
+            {opacity:0,transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.05) rotate(${Math.random()*240-120}deg)`}
+          ],{duration,easing:"cubic-bezier(.16,.76,.28,1)",fill:"forwards"});
+          let cleanupTimer=0;
+          const cleanup=()=>{clearTimeout(cleanupTimer);particle.remove();};
+          cleanupTimer=window.setTimeout(cleanup,duration+100);
+          animation.onfinish=cleanup;
+          animation.oncancel=cleanup;
+        }
       }
       function showToast(message) { const t=$("toast");t.textContent=isPersian?translateFa(message):message;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2400); }
       function renderLessonList() {
@@ -7088,8 +7142,9 @@
           const beforeText=engineEvaluationText(grade.rootInfo,entry.before.turn);
           const afterText=grade.evaluationText;
           const lossText=grade.loss>=90000?(isPersian?"مات":"Mate"):`${digit(Math.round(grade.loss))} cp`;
+          const bestAlternative=grade.bestUci===moveToUci(entry.move)?"—":grade.bestSan;
           const retry=grade.quality==="bad"?`<button class="subtle-button" type="button" data-review-action="retry" data-index="${index}">${isPersian?"تلاش دوباره":"Retry"}</button>`:"";
-          return `<tr class="analysis-row${["Mistake","Blunder","Miss"].includes(grade.label)?" critical-move":""}" data-index="${index}" tabindex="0" aria-current="${analysisPositionIndex===index?"true":"false"}"><td>${digit(moveNumber)}.${color==="w"?"":"… "}</td><td>${played}</td><td><span class="grade ${grade.quality}">${isPersian?(faText[grade.label]||grade.label):grade.label}</span></td><td>${beforeText}</td><td>${afterText}</td><td>${lossText}</td><td>${escapeHtml(grade.bestSan)}</td><td><div class="review-move-actions"><button class="subtle-button" type="button" data-review-action="jump" data-index="${index}" aria-label="${isPersian?`رفتن به حرکت ${digit(moveNumber)} ${entry.san}`:`Jump to move ${moveNumber} ${entry.san}`}">${isPersian?"رفتن":"Jump"}</button><button class="subtle-button" type="button" data-review-action="best" data-index="${index}" aria-label="${isPersian?`نمایش بهترین خط پیش از حرکت ${digit(moveNumber)}`:`Show best line before move ${moveNumber}`}">${isPersian?"بهترین حرکت":"Show Best"}</button>${retry}</div></td></tr>`;
+          return `<tr class="analysis-row${["Mistake","Blunder","Miss"].includes(grade.label)?" critical-move":""}" data-index="${index}" tabindex="0" aria-current="${analysisPositionIndex===index?"true":"false"}"><td>${digit(moveNumber)}.${color==="w"?"":"… "}</td><td>${played}</td><td><span class="grade ${grade.quality}">${isPersian?(faText[grade.label]||grade.label):grade.label}</span></td><td>${beforeText}</td><td>${afterText}</td><td>${lossText}</td><td>${escapeHtml(bestAlternative)}</td><td><div class="review-move-actions"><button class="subtle-button" type="button" data-review-action="jump" data-index="${index}" aria-label="${isPersian?`رفتن به حرکت ${digit(moveNumber)} ${entry.san}`:`Jump to move ${moveNumber} ${entry.san}`}">${isPersian?"رفتن":"Jump"}</button><button class="subtle-button" type="button" data-review-action="best" data-index="${index}" aria-label="${isPersian?`نمایش بهترین خط پیش از حرکت ${digit(moveNumber)}`:`Show best line before move ${moveNumber}`}">${isPersian?"بهترین حرکت":"Show Best"}</button>${retry}</div></td></tr>`;
         }).join("");
       }
       async function analyzePosition(position,signal) {

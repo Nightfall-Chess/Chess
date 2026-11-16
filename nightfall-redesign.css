@@ -1061,7 +1061,7 @@ html[lang="fa"] .classroom-info-footer { direction: ltr; }
 .analysis-backdrop { z-index: 220; overflow-y: auto; overscroll-behavior: contain; }
 .promotion-backdrop, .confirm-backdrop { z-index: 210; }
 .analysis-dialog {
-  width: min(1480px, calc(100vw - 32px));
+  width: min(1480px, calc(100vw - 56px));
   max-height: calc(100dvh - 28px);
   overflow: auto;
   overscroll-behavior: contain;
@@ -1072,7 +1072,8 @@ html[lang="fa"] .classroom-info-footer { direction: ltr; }
   flex: 0 0 auto;
   overflow: visible;
 }
-.analysis-content-column { min-width: 0; overflow: visible; }
+.analysis-content-column, .analysis-table-wrap { width: 100%; min-width: 0; max-width: 100%; }
+.analysis-content-column { overflow: visible; }
 .analysis-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
 .analysis-progress { grid-column: 1 / -1; color: var(--muted); font-size: .78rem; }
 .analysis-player-report { min-width: 0; padding: 9px; border: 1px solid #ffffff12; border-radius: 10px; background: #0c101a; }
@@ -1085,7 +1086,7 @@ html[lang="fa"] .classroom-info-footer { direction: ltr; }
 .analysis-filter-row { justify-content: flex-start; }
 .analysis-filter-row select { min-width: 0; max-width: 100%; }
 .analysis-table-wrap { max-width: 100%; max-height: min(48dvh, 520px); overflow: auto; overscroll-behavior: contain; }
-.analysis-table { width: 100%; min-width: 980px; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; }
+.analysis-table { width: 100%; min-width: 840px; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; }
 .analysis-table col:nth-child(1) { width: 7%; }
 .analysis-table col:nth-child(2) { width: 8%; }
 .analysis-table col:nth-child(3) { width: 12%; }
@@ -1107,7 +1108,7 @@ html[lang="fa"] .classroom-info-footer { direction: ltr; }
 .recent-game-row:hover { transform: none; }
 
 @media (max-width: 1100px) {
-  .analysis-dialog { width: min(1120px, calc(100vw - 24px)); }
+  .analysis-dialog { width: min(1120px, calc(100vw - 56px)); }
   .analysis-workspace { grid-template-columns: minmax(0, 1fr); }
   .analysis-board-column {
     display: grid;
@@ -1144,3 +1145,45 @@ html[lang="fa"] .analysis-table td:nth-child(4),
 html[lang="fa"] .analysis-table td:nth-child(5),
 html[lang="fa"] .analysis-table td:nth-child(6) { direction: ltr; }
 html[lang="fa"] .analysis-table tr.critical-move { box-shadow: inset -3px 0 #e88b9b; }
+
+.particle-layer { position: fixed; z-index: 18; inset: 0; overflow: hidden; pointer-events: none; contain: strict; }
+.particle {
+  position: absolute;
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 50%;
+  background: var(--particle-color);
+  box-shadow: 0 0 9px color-mix(in srgb, var(--particle-color) 65%, transparent);
+  will-change: transform, opacity;
+}
+.particle-1 { border-radius: 1px; }
+.particle-2 { width: calc(var(--particle-size) * .75); height: calc(var(--particle-size) * 1.8); border-radius: 999px; }
+
+@keyframes page-arrive {
+  from { opacity: 0; translate: 0 10px; }
+  to { opacity: 1; translate: 0 0; }
+}
+@keyframes card-arrive {
+  from { opacity: 0; translate: 0 8px; }
+  to { opacity: 1; translate: 0 0; }
+}
+#lobby:not([hidden]), #gameScreen:not([hidden]), #trainingScreen:not([hidden]),
+#onlineScreen:not([hidden]), #settingsScreen:not([hidden]), #classroomScreen:not([hidden]) {
+  animation: page-arrive .32s cubic-bezier(.2,.72,.25,1) both;
+}
+.analysis-backdrop.open .analysis-dialog, .confirm-backdrop:not([hidden]) .confirm-dialog,
+.promotion-backdrop.open .promotion-dialog { animation: modal-arrive .24s cubic-bezier(.2,.72,.25,1) both; }
+.lobby-card, .online-card, .classroom-entry-card, .settings-panel, .lesson-content {
+  animation: card-arrive .32s cubic-bezier(.2,.72,.25,1) both;
+}
+.lobby-card:nth-child(2), .online-card:nth-child(2), .classroom-entry-card:nth-child(2),
+.settings-panel:nth-child(2), .lesson-content:nth-child(2) { animation-delay: 35ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .particle-layer { display: none; }
+  #lobby:not([hidden]), #gameScreen:not([hidden]), #trainingScreen:not([hidden]),
+  #onlineScreen:not([hidden]), #settingsScreen:not([hidden]), #classroomScreen:not([hidden]),
+  .lobby-card, .online-card, .classroom-entry-card, .settings-panel, .lesson-content,
+  .analysis-backdrop.open .analysis-dialog, .confirm-backdrop:not([hidden]) .confirm-dialog,
+  .promotion-backdrop.open .promotion-dialog { animation: none !important; }
+}
