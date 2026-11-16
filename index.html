@@ -2776,7 +2776,7 @@
       const classroomOwnEvents=new Set();
       let classroomOnlineUsers=new Set(),classroomChatMessages=[],classroomSavedGames=[];
       let classroomPointerDrag=null,classroomAnnotationDrag=null,classroomIgnoreClickUntil=0;
-      let onlineApi=null,onlineSubscription=null,onlineRoomId="",onlineVersion=0,onlineSyncBusy=false,onlinePlayers=[];
+      let onlineApi=null,onlineSubscription=null,onlineSubscriptionRoomId="",onlineRoomId="",onlineVersion=0,onlineSyncBusy=false,onlineSnapshotBusy=false,onlineRefreshTimer=0,onlinePlayers=[];
       let mode = "ai", humanColor = "w", aiThinking = false, gameOver = false;
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
       const stockfishSearchCache=new Map();
@@ -6919,27 +6919,52 @@
         $("reviewGameButton").hidden=!gameOver||!history.length;$("exportPgnButton").hidden=!gameOver||!history.length;$("goMenuButton").hidden=false;
         if(gameOver) {matchActive=false;stopClock();if(justFinished)playGameEnd(room.result,room.result.startsWith("White")?"w":room.result.startsWith("Black")?"b":null);}
       }
-      async function syncOnlineRoom() {
-        if(!onlineRoomId)return;
+      async function syncOnlineRoom(quiet=false) {
+        if(!onlineRoomId||onlineSnapshotBusy)return;
+        onlineSnapshotBusy=true;
         try {
           const api=await ensureOnlineApi(),result=await api.snapshot(onlineRoomId);
-          if(result.room?.status==="waiting") {
+          const room=result.room;
+          if(!room)return;
+          if(room.status==="waiting") {
             $("createRoomStatus").textContent=isPersian?"کد را برای حریف بفرستید؛ منتظر پیوستن او هستیم.":"Share the code and wait for your opponent to join.";
-          } else if(result.room) {
-            if($("gameScreen").hidden)await startOnlineMatch(result.room);
-            else applyOnlineSnapshot(result.room);
+          } else if($("gameScreen").hidden) {
+            await startOnlineMatch(room);
+          } else if(Number(room.version)>onlineVersion||Boolean(room.result)!==gameOver||room.status==="playing"&&!matchActive) {
+            applyOnlineSnapshot(room);
           }
         } catch(error) {
-          console.error("Online room sync failed:",error);
-          showToast(isPersian?"همگام‌سازی بازی آنلاین ناموفق بود.":"Could not sync the online game.");
+          if(!quiet) {
+            console.error("Online room sync failed:",error);
+            showToast(isPersian?"همگام‌سازی بازی آنلاین ناموفق بود.":"Could not sync the online game.");
+          } else console.warn("Online polling fallback failed:",error);
+        } finally {
+          onlineSnapshotBusy=false;
         }
       }
       async function watchOnlineRoom(roomId) {
+        if(onlineRefreshTimer)clearInterval(onlineRefreshTimer);
+        onlineRefreshTimer=window.setInterval(()=>{
+          if(onlineRoomId!==roomId)return;
+          if($("gameScreen").hidden&&$("onlineScreen").hidden||gameOver) {
+            clearInterval(onlineRefreshTimer);onlineRefreshTimer=0;return;
+          }
+          void syncOnlineRoom(true);
+        },1800);
         const api=await ensureOnlineApi();
         if(onlineSubscription)await onlineSubscription.unsubscribe().catch(()=>{});
-        onlineSubscription=await api.subscribe(roomId,payload=>{if(payload?.room&&Number(payload.version)>onlineVersion){if($("gameScreen").hidden)void startOnlineMatch(payload.room);else applyOnlineSnapshot(payload.room);}else if(payload?.force||Number(payload?.version)>onlineVersion||$("gameScreen").hidden)void syncOnlineRoom();},(status,error)=>{
+        onlineSubscription=null;onlineSubscriptionRoomId="";
+        const subscription=await api.subscribe(roomId,payload=>{
+          if(payload?.room&&Number(payload.version)>onlineVersion) {
+            if($("gameScreen").hidden)void startOnlineMatch(payload.room);
+            else applyOnlineSnapshot(payload.room);
+          } else if(payload?.force||Number(payload?.version)>onlineVersion||$("gameScreen").hidden) {
+            void syncOnlineRoom();
+          }
+        },(status,error)=>{
           if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Online realtime status:",status,error);
         });
+        onlineSubscription=subscription;onlineSubscriptionRoomId=roomId;
       }
       async function startOnlineMatch(room) {
         onlineRoomId=room.id;mode="online";humanColor=room.myColor;orientation=humanColor;onlinePlayers=room.players||[];
@@ -6949,9 +6974,9 @@
         $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=false;
         $("analysisBackdrop").classList.remove("open");analysisShown=false;gameStartedAt=new Date();
         showGameInfoTab("moves");applyOnlineSnapshot(room);playEventSound("gameStart");
-        if(!onlineSubscription) {
+        if(!onlineSubscription||onlineSubscriptionRoomId!==room.id) {
           try { await watchOnlineRoom(room.id); }
-          catch(error) { console.error("Online Realtime subscription failed:",error);showToast(isPersian?"اتصال زنده برقرار نشد؛ وضعیت بازی ممکن است به‌روز نشود.":"Live connection failed; game updates may not arrive."); }
+          catch(error) { console.error("Online Realtime subscription failed; polling fallback remains active:",error);showToast(isPersian?"اتصال زنده برقرار نشد؛ همگام‌سازی پشتیبان فعال است.":"Realtime is unavailable; automatic sync fallback is active."); }
         }
       }
       async function submitOnlineMove(move) {
