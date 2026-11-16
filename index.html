@@ -2775,6 +2775,7 @@
       let classroomConnecting=false,classroomPendingMove=null,classroomRefreshTimer=0,classroomPrivateResult=null,classroomAnalysisController=null;
       let classroomOnlineUsers=new Set(),classroomChatMessages=[],classroomSavedGames=[];
       let classroomPointerDrag=null,classroomAnnotationDrag=null,classroomIgnoreClickUntil=0;
+      let onlineApi=null,onlineSubscription=null,onlineRoomId="",onlineVersion=0,onlineSyncBusy=false;
       let mode = "ai", humanColor = "w", aiThinking = false, gameOver = false;
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
       const stockfishSearchCache=new Map();
@@ -3864,6 +3865,7 @@
             return false;
           }
         }
+        if(!puzzleMode&&mode==="online") { void submitOnlineMove(m); return true; }
         if(!puzzleMode&&mode==="ai"&&state.turn===humanColor)suspendLiveMoveAnalysis();
         moveSuggestion=null;assistanceGeneration++;$("boardHelp").textContent="";
         if(puzzleMode){puzzleHintSquare=null;puzzleHintText="";}
@@ -5173,8 +5175,8 @@
         updateStrategyReport();
         renderBoard(); renderPlayers(); renderMoves();
         $("cancelPremoveButton").hidden=!premove;
-        $("undoButton").hidden=puzzleMode||!gameplaySettings.takebacks;
-        $("redoButton").hidden=puzzleMode||!gameplaySettings.takebacks;
+        $("undoButton").hidden=puzzleMode||mode==="online"||!gameplaySettings.takebacks;
+        $("redoButton").hidden=puzzleMode||mode==="online"||!gameplaySettings.takebacks;
         $("undoButton").disabled=!history.length||aiThinking||boardAnimating;
         $("redoButton").disabled=!redoStack.length||aiThinking||boardAnimating;
         $("hintButton").hidden=!matchActive||gameOver||!gameplaySettings.hints;
@@ -5355,8 +5357,9 @@
         if(puzzleMode&&state.turn!==puzzleColor)return;
         const p=state.board[r][c];
         const selectedPiece=selected&&state.board[selected[0]][selected[1]],selectedColor=colorOf(selectedPiece),clickedColor=colorOf(p);
-        const queueColor=mode==="ai"?humanColor:selectedColor||(clickedColor&&clickedColor!==state.turn?clickedColor:(state.turn==="w"?"b":"w"));
-        const premoveInput=mode==="ai"?state.turn!==humanColor:selectedColor?selectedColor!==state.turn:Boolean(clickedColor&&clickedColor!==state.turn);
+        if(mode==="online"&&state.turn!==humanColor)return;
+        const queueColor=(mode==="ai"||mode==="online")?humanColor:selectedColor||(clickedColor&&clickedColor!==state.turn?clickedColor:(state.turn==="w"?"b":"w"));
+        const premoveInput=mode==="ai"?state.turn!==humanColor:mode==="online"?false:selectedColor?selectedColor!==state.turn:Boolean(clickedColor&&clickedColor!==state.turn);
         if(premoveInput) {
           if(selected) {
             const chosen=legalTargets.find(move=>same(move.to,[r,c]));
@@ -5376,7 +5379,7 @@
           }
           return;
         }
-        if(aiThinking||(mode==="ai"&&state.turn!==humanColor))return;
+        if(aiThinking||((mode==="ai"||mode==="online")&&state.turn!==humanColor))return;
         if(selected) {
           const match=legalTargets.find(m=>same(m.to,[r,c]));
           if(match) {
@@ -5411,7 +5414,7 @@
       }
       function beginPieceDrag(event) {
         if(!event.isPrimary||event.button!==0||puzzleMode||!matchActive||gameOver||boardAnimating||aiThinking
-          ||(mode==="ai"&&state.turn!==humanColor))return;
+          ||((mode==="ai"||mode==="online")&&state.turn!==humanColor))return;
         const square=event.target instanceof Element?event.target.closest(".square"):null;
         if(!square||!$("board").contains(square))return;
         const from=[Number(square.dataset.row),Number(square.dataset.col)],piece=state.board[from[0]][from[1]];
@@ -5895,7 +5898,11 @@
         render();
       }
       function showLobby() {
-        if(matchActive)return;
+        if(matchActive&&mode!=="online")return;
+        if(mode==="online") {
+          if(onlineSubscription){void onlineSubscription.unsubscribe().catch(()=>{});onlineSubscription=null;}
+          onlineRoomId="";onlineVersion=0;mode="ai";
+        }
         stopClock();cancelAIRequest();
         $("lobbyStrength").value=$("strength").value;$("lobbyStrengthLabel").textContent=$("strength").value;
         $("lobbyColor").value=$("colorChoice").value;
@@ -5911,7 +5918,9 @@
         const invite=new URLSearchParams(location.hash.slice(1)).get("room");
         if(invite&&/^[A-Z0-9]{4,12}$/i.test(invite))$("joinRoomCode").value=invite.toUpperCase();
       }
-      function closeOnline() {
+      async function closeOnline() {
+        if(onlineSubscription){await onlineSubscription.unsubscribe().catch(()=>{});onlineSubscription=null;}
+        onlineRoomId="";onlineVersion=0;
         $("onlineScreen").hidden=true;$("settingsScreen").hidden=true;$("classroomScreen").hidden=true;$("lobby").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;
       }
@@ -6860,26 +6869,118 @@
           throw error;
         }
       }
-      function createRoom() {
-        const alphabet="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-        const bytes=new Uint8Array(6);
-        if(window.crypto?.getRandomValues)window.crypto.getRandomValues(bytes);
-        else for(let index=0;index<bytes.length;index++)bytes[index]=Math.floor(Math.random()*256);
-        roomInviteCode=[...bytes].map(value=>alphabet[value%alphabet.length]).join("");
-        $("roomCodeValue").textContent=roomInviteCode;
-        $("createdRoom").hidden=false;$("copyInviteButton").disabled=false;$("shareInviteButton").disabled=false;
-        $("createRoomStatus").textContent=isPersian?"اتاق ساخته شد. کد را برای دوستتان بفرستید.":"Room created. Share the code with your friend.";
+      async function ensureOnlineApi() {
+        if(!onlineApi) onlineApi=(await import("./online-supabase.js")).getOnlineClient();
+        return onlineApi;
       }
-      function joinRoom() {
-        const code=$("joinRoomCode").value.trim().toUpperCase(),status=$("joinRoomStatus");
-        if(!/^[A-Z0-9]{4,12}$/.test(code)) {
-          status.dataset.state="error";
-          status.textContent=isPersian?"کد اتاق باید ۴ تا ۱۲ حرف یا عدد باشد.":"Room code must be 4–12 letters or numbers.";
-          return;
+      function onlineSquare(row,col){return `${"abcdefgh"[col]}${8-row}`;}
+      function onlineBuildHistory(moves) {
+        let position=startState();const entries=[];
+        for(const item of moves||[]) {
+          const from=[8-Number(item.from[1]),"abcdefgh".indexOf(item.from[0])];
+          const to=[8-Number(item.to[1]),"abcdefgh".indexOf(item.to[0])];
+          const candidate=legalMoves(position).find(move=>same(move.from,from)&&same(move.to,to));
+          if(!candidate)throw new Error("The online move history is invalid.");
+          const move=candidate.promotion?{...candidate,promoteTo:item.promotion||"q"}:candidate;
+          const before=copyState(position),after=applyMove(position,move);
+          entries.push({before,after:copyState(after),move,san:item.san||notation(move,before,after),ply:entries.length,prefix:entries.map(previous=>moveToUci(previous.move))});
+          position=after;
         }
-        status.dataset.state="ready";
-        status.textContent=isPersian?"کد اتاق پذیرفته شد. بازی زنده هنوز وصل نیست؛ برای بازی همین حالا، بازی محلی را شروع کنید.":"Room code accepted. Live play is not connected yet; start a local game to play now.";
-        $("joinRoomCode").value=code;
+        return {entries,position};
+      }
+      function applyOnlineSnapshot(room) {
+        if(!room)return;
+        onlineVersion=Number(room.version)||0;
+        const built=onlineBuildHistory(room.moves);
+        history=built.entries;redoStack=[];state=built.position;
+        selected=null;legalTargets=[];premove=null;orientation=humanColor=room.myColor||humanColor;
+        gameOver=Boolean(room.result);matchActive=room.status==="playing"&&!gameOver;
+        resultRecorded=false;lastGameResult=room.result||"";
+        if(gameOver&&!resultRecorded) {
+          const winnerColor=/^White wins/i.test(room.result)?"w":/^Black wins/i.test(room.result)?"b":null;
+          recordGameResult(room.result,winnerColor);
+        }
+        render();
+        $("statusText").textContent=room.result||(room.status==="waiting"
+          ?(isPersian?"منتظر بازیکن دوم…":"Waiting for the second player…")
+          :(isPersian?(state.turn===humanColor?"نوبت شماست":"نوبت حریف است"):(state.turn===humanColor?"Your turn":"Opponent's turn")));
+        $("newGameCard").hidden=!gameOver;$("newGameTop").hidden=!gameOver;$("resetButton").hidden=true;
+        $("reviewGameButton").hidden=!gameOver||!history.length;$("exportPgnButton").hidden=!gameOver||!history.length;$("goMenuButton").hidden=false;
+        if(gameOver) {matchActive=false;stopClock();playGameEnd(room.result,room.result.startsWith("White")?"w":"b");}
+      }
+      async function syncOnlineRoom() {
+        if(!onlineRoomId)return;
+        try {
+          const api=await ensureOnlineApi(),result=await api.snapshot(onlineRoomId);
+          if(result.room)applyOnlineSnapshot(result.room);
+          const waiting=result.room?.status==="waiting";
+          if(waiting)$("createRoomStatus").textContent=isPersian?"کد را برای حریف بفرستید؛ منتظر پیوستن او هستیم.":"Share the code and wait for your opponent to join.";
+        } catch(error) {
+          console.error("Online room sync failed:",error);
+          showToast(isPersian?"همگام‌سازی بازی آنلاین ناموفق بود.":"Could not sync the online game.");
+        }
+      }
+      async function watchOnlineRoom(roomId) {
+        const api=await ensureOnlineApi();
+        if(onlineSubscription)await onlineSubscription.unsubscribe().catch(()=>{});
+        onlineSubscription=await api.subscribe(roomId,()=>void syncOnlineRoom(),(status,error)=>{
+          if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Online realtime status:",status,error);
+        });
+      }
+      async function startOnlineMatch(room) {
+        onlineRoomId=room.id;mode="online";humanColor=room.myColor;orientation=humanColor;
+        cancelAIRequest();stopClock();clockOn=false;clocks={w:0,b:0};
+        analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;
+        $("onlineScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
+        $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=false;
+        $("analysisBackdrop").classList.remove("open");analysisShown=false;gameStartedAt=new Date();
+        showGameInfoTab("moves");applyOnlineSnapshot(room);playEventSound("gameStart");
+        if(!onlineSubscription)await watchOnlineRoom(room.id);
+      }
+      async function submitOnlineMove(move) {
+        if(onlineSyncBusy||!onlineRoomId||!matchActive||state.turn!==humanColor)return false;
+        onlineSyncBusy=true;
+        try {
+          const api=await ensureOnlineApi();
+          const result=await api.move({roomId:onlineRoomId,expectedVersion:onlineVersion,from:onlineSquare(...move.from),to:onlineSquare(...move.to),promotion:move.promoteTo});
+          if(result.room)applyOnlineSnapshot(result.room);
+          return true;
+        } catch(error) {
+          console.error("Online move failed:",error);
+          await syncOnlineRoom();
+          showToast(isPersian?(error.message||"حرکت آنلاین ثبت نشد."):(error.message||"Online move was not saved."));
+          return false;
+        } finally {onlineSyncBusy=false;}
+      }
+      async function createRoom() {
+        const status=$("createRoomStatus"),button=$("createRoomButton");
+        button.disabled=true;status.textContent=isPersian?"در حال ساخت اتاق امن…":"Creating a secure room…";
+        try {
+          const api=await ensureOnlineApi(),result=await api.create({name:classroomPlayerName()});
+          const room=result.room;roomInviteCode=result.invitationCode;onlineRoomId=room.id;
+          $("roomCodeValue").textContent=roomInviteCode;$("createdRoom").hidden=false;
+          $("copyInviteButton").disabled=false;$("shareInviteButton").disabled=false;
+          status.textContent=isPersian?"اتاق ساخته شد؛ کد را برای حریف بفرستید.":"Room created. Share this code with your opponent.";
+          await watchOnlineRoom(room.id);
+        } catch(error) {
+          console.error("Online room creation failed:",error);
+          status.dataset.state="error";status.textContent=isPersian?`ساخت اتاق ناموفق بود: ${error.message}`:`Could not create room: ${error.message}`;
+        } finally {button.disabled=false;}
+      }
+      async function joinRoom() {
+        const code=$("joinRoomCode").value.trim().toUpperCase(),status=$("joinRoomStatus"),button=$("joinRoomButton");
+        if(!/^[A-Z0-9]{7}$/.test(code)) {
+          status.dataset.state="error";status.textContent=isPersian?"کد دعوت باید ۷ حرف یا عدد باشد.":"Invitation code must be 7 letters or numbers.";return;
+        }
+        button.disabled=true;status.textContent=isPersian?"در حال اتصال به اتاق…":"Connecting to room…";
+        try {
+          const api=await ensureOnlineApi(),result=await api.join({invitationCode:code,name:classroomPlayerName()});
+          $("joinRoomCode").value=code;status.dataset.state="ready";
+          await startOnlineMatch(result.room);
+        } catch(error) {
+          console.error("Online room join failed:",error);
+          status.dataset.state="error";status.textContent=isPersian?`ورود به اتاق ناموفق بود: ${error.message}`:`Could not join room: ${error.message}`;
+        } finally {button.disabled=false;}
       }
       function startLocalFriendGame() {
         $("onlineScreen").hidden=true;$("lobby").hidden=false;
@@ -6912,6 +7013,12 @@
       function confirmResignation() {
         $("resignBackdrop").hidden=true;
         if(!matchActive||gameOver||puzzleMode)return;
+        if(mode==="online") {
+          const roomId=onlineRoomId;
+          void ensureOnlineApi().then(api=>api.resign(roomId)).then(result=>{if(result.room)applyOnlineSnapshot(result.room);})
+            .catch(error=>{console.error(error);showToast(error.message||"Could not resign online.");});
+          return;
+        }
         const resigningColor=mode==="ai"?humanColor:state.turn;
         const winnerColor=resigningColor==="w"?"b":"w";
         const winner=winnerColor==="w"?"White":"Black";
