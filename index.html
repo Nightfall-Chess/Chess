@@ -6895,7 +6895,8 @@
         history=built.entries;redoStack=[];state=built.position;
         selected=null;legalTargets=[];premove=null;orientation=humanColor=room.myColor||humanColor;
         gameOver=Boolean(room.result);matchActive=room.status==="playing"&&!gameOver;
-        resultRecorded=false;lastGameResult=room.result||"";
+        const alreadyRecorded=resultRecorded&&lastGameResult===room.result;
+        resultRecorded=alreadyRecorded;lastGameResult=room.result||"";
         if(gameOver&&!resultRecorded) {
           const winnerColor=/^White wins/i.test(room.result)?"w":/^Black wins/i.test(room.result)?"b":null;
           recordGameResult(room.result,winnerColor);
@@ -6912,9 +6913,12 @@
         if(!onlineRoomId)return;
         try {
           const api=await ensureOnlineApi(),result=await api.snapshot(onlineRoomId);
-          if(result.room)applyOnlineSnapshot(result.room);
-          const waiting=result.room?.status==="waiting";
-          if(waiting)$("createRoomStatus").textContent=isPersian?"کد را برای حریف بفرستید؛ منتظر پیوستن او هستیم.":"Share the code and wait for your opponent to join.";
+          if(result.room?.status==="waiting") {
+            $("createRoomStatus").textContent=isPersian?"کد را برای حریف بفرستید؛ منتظر پیوستن او هستیم.":"Share the code and wait for your opponent to join.";
+          } else if(result.room) {
+            if($("gameScreen").hidden)await startOnlineMatch(result.room);
+            else applyOnlineSnapshot(result.room);
+          }
         } catch(error) {
           console.error("Online room sync failed:",error);
           showToast(isPersian?"همگام‌سازی بازی آنلاین ناموفق بود.":"Could not sync the online game.");
@@ -6929,7 +6933,7 @@
       }
       async function startOnlineMatch(room) {
         onlineRoomId=room.id;mode="online";humanColor=room.myColor;orientation=humanColor;
-        cancelAIRequest();stopClock();clockOn=false;clocks={w:0,b:0};
+        cancelAIRequest();stopClock();clockOn=false;clocks={w:0,b:0};resultRecorded=false;lastGameResult="";
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;
         $("onlineScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
         $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=false;
