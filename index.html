@@ -2773,6 +2773,7 @@
       let classroomClient=null,classroomRealtime=null,classroomRoomState=null,classroomRoomId="",classroomParticipantId="",classroomInvitationCode="";
       let classroomReturnScreen="lobby",classroomSelectedSquare="",classroomAnnotationColor="violet";
       let classroomConnecting=false,classroomPendingMove=null,classroomRefreshTimer=0,classroomPrivateResult=null,classroomAnalysisController=null;
+      const classroomOwnEvents=new Set();
       let classroomOnlineUsers=new Set(),classroomChatMessages=[],classroomSavedGames=[];
       let classroomPointerDrag=null,classroomAnnotationDrag=null,classroomIgnoreClickUntil=0;
       let onlineApi=null,onlineSubscription=null,onlineRoomId="",onlineVersion=0,onlineSyncBusy=false,onlinePlayers=[];
@@ -6118,6 +6119,7 @@
         }
       }
       function classroomHandleRealtimeEvent(message) {
+        if(message.type==="state"&&message.payload?.eventId&&classroomOwnEvents.delete(message.payload.eventId))return;
         if(message.type==="state"&&Number(message.payload?.version)>Number(classroomRoomState?.version)) {
           window.clearTimeout(classroomRefreshTimer);
           classroomRefreshTimer=window.setTimeout(()=>void classroomRefresh(),25);
@@ -6186,6 +6188,8 @@
           setClassroomNotice(text,"error");showToast(text);return false;
         }
         const requestId=crypto.randomUUID();
+        classroomOwnEvents.add(requestId);
+        if(classroomOwnEvents.size>64)classroomOwnEvents.delete(classroomOwnEvents.values().next().value);
         const operation={...payload};
         if(type==="annotation") {
           operation.annotationAction=operation.action;
@@ -6198,6 +6202,7 @@
           classroomApplySnapshot(result.room);
           if(type==="load"||type==="reset")void classroomLoadGames();
         }).catch(error=>{
+          classroomOwnEvents.delete(requestId);
           console.error("Classroom action failed:",error);
           if(type==="move"||type==="load") {
             classroomPendingMove=null;$("classroomPromotionBackdrop").hidden=true;$("classroomPromotionBackdrop").classList.remove("open");
