@@ -6912,7 +6912,7 @@
           :(isPersian?(state.turn===humanColor?"نوبت شماست":"نوبت حریف است"):(state.turn===humanColor?"Your turn":"Opponent's turn")));
         $("newGameCard").hidden=!gameOver;$("newGameTop").hidden=!gameOver;$("resetButton").hidden=true;
         $("reviewGameButton").hidden=!gameOver||!history.length;$("exportPgnButton").hidden=!gameOver||!history.length;$("goMenuButton").hidden=false;
-        if(gameOver) {matchActive=false;stopClock();if(justFinished)playGameEnd(room.result,room.result.startsWith("White")?"w":"b");}
+        if(gameOver) {matchActive=false;stopClock();if(justFinished)playGameEnd(room.result,room.result.startsWith("White")?"w":room.result.startsWith("Black")?"b":null);}
       }
       async function syncOnlineRoom() {
         if(!onlineRoomId)return;
@@ -6944,7 +6944,10 @@
         $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=false;
         $("analysisBackdrop").classList.remove("open");analysisShown=false;gameStartedAt=new Date();
         showGameInfoTab("moves");applyOnlineSnapshot(room);playEventSound("gameStart");
-        if(!onlineSubscription)await watchOnlineRoom(room.id);
+        if(!onlineSubscription) {
+          try { await watchOnlineRoom(room.id); }
+          catch(error) { console.error("Online Realtime subscription failed:",error);showToast(isPersian?"اتصال زنده برقرار نشد؛ وضعیت بازی ممکن است به‌روز نشود.":"Live connection failed; game updates may not arrive."); }
+        }
       }
       async function submitOnlineMove(move) {
         if(onlineSyncBusy||!onlineRoomId||!matchActive||state.turn!==humanColor)return false;
@@ -6970,7 +6973,8 @@
           $("roomCodeValue").textContent=roomInviteCode;$("createdRoom").hidden=false;
           $("copyInviteButton").disabled=false;$("shareInviteButton").disabled=false;
           status.textContent=isPersian?"اتاق ساخته شد؛ کد را برای حریف بفرستید.":"Room created. Share this code with your opponent.";
-          await watchOnlineRoom(room.id);
+          try { await watchOnlineRoom(room.id); }
+          catch(error) { console.error("Online Realtime subscription failed:",error);status.textContent=isPersian?"اتاق ساخته شد، اما اتصال زنده برقرار نشد.":"Room created, but live connection failed."; }
         } catch(error) {
           console.error("Online room creation failed:",error);
           status.dataset.state="error";status.textContent=isPersian?`ساخت اتاق ناموفق بود: ${error.message}`:`Could not create room: ${error.message}`;
