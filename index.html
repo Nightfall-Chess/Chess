@@ -5977,12 +5977,13 @@
       }
       function openClassroom() {
         if(!$("settingsScreen").hidden)closeSettings();
-        if(matchActive) {
-          showToast(isPersian?"ابتدا بازی فعلی را تمام کنید.":"Finish the current match before opening Classroom.");
-          return;
-        }
         if(!$("classroomScreen").hidden)return;
         classroomReturnScreen=["gameScreen","trainingScreen","onlineScreen","lobby"].find(id=>!$(id).hidden)||"lobby";
+        if(classroomReturnScreen==="gameScreen"&&matchActive) {
+          stopClock();
+          cancelAIRequest();
+          $("statusText").textContent=isPersian?"بازی هنگام حضور در کلاس متوقف است.":"Game paused while you are in Classroom.";
+        }
         for(const id of ["gameScreen","trainingScreen","onlineScreen","settingsScreen","lobby"])$(id).hidden=true;
         $("classroomScreen").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;
@@ -6159,7 +6160,11 @@
         setClassroomConnection("offline","Not connected");
         $("classroomScreen").hidden=true;
         window.history.replaceState(null,"",`${location.pathname}${location.search}`);
-        $(classroomReturnScreen==="gameScreen"?"lobby":classroomReturnScreen).hidden=false;
+        $(classroomReturnScreen).hidden=false;
+        if(classroomReturnScreen==="gameScreen"&&matchActive) {
+          startClock();
+          if(mode==="ai"&&state.turn!==humanColor)scheduleAI();
+        }
         $("classroomLandingStatus").textContent="";
       }
       function classroomSend(type,payload={}) {
@@ -6961,7 +6966,7 @@
         $("lobbyAiMode")?.addEventListener(eventName,()=>{warmOpeningDatabase();void ensureStockfish().catch(()=>{});},{once:true,passive:true});
         $("trainingTop")?.addEventListener(eventName,warmOpeningDatabase,{once:true,passive:true});
       }
-      ensureTwentyMoveLines();void loadRecentGames().then(()=>loadAchievementProgress());loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();
+      ensureTwentyMoveLines();void loadRecentGames();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();
         if(mode==="ai"&&state.turn!==humanColor) scheduleAI();
         showToast(mode==="ai"?`New game · ${humanColor==="w"?"You play White":"You play Black"}`:"New local game");
       }
@@ -7949,7 +7954,7 @@
         $("lobbyAiMode")?.addEventListener(eventName,()=>{warmOpeningDatabase();void ensureStockfish().catch(()=>{});},{once:true,passive:true});
         $("trainingTop")?.addEventListener(eventName,warmOpeningDatabase,{once:true,passive:true});
       }
-      ensureTwentyMoveLines();void loadRecentGames().then(()=>loadAchievementProgress());loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();      reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
+      ensureTwentyMoveLines();void loadRecentGames();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();      reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
       $("setSkillButton").addEventListener("click",setPlayerSkill);
       $("puzzleHintButton").addEventListener("click",showPuzzleHint);
       $("nextPuzzleButton").addEventListener("click",nextPuzzle);
