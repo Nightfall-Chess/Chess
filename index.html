@@ -6937,7 +6937,7 @@
       async function watchOnlineRoom(roomId) {
         const api=await ensureOnlineApi();
         if(onlineSubscription)await onlineSubscription.unsubscribe().catch(()=>{});
-        onlineSubscription=await api.subscribe(roomId,payload=>{if(payload?.force||Number(payload?.version)>onlineVersion||$("gameScreen").hidden)void syncOnlineRoom();},(status,error)=>{
+        onlineSubscription=await api.subscribe(roomId,payload=>{if(payload?.room&&Number(payload.version)>onlineVersion){if($("gameScreen").hidden)void startOnlineMatch(payload.room);else applyOnlineSnapshot(payload.room);}else if(payload?.force||Number(payload?.version)>onlineVersion||$("gameScreen").hidden)void syncOnlineRoom();},(status,error)=>{
           if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Online realtime status:",status,error);
         });
       }
@@ -6960,7 +6960,7 @@
         try {
           const api=await ensureOnlineApi();
           const result=await api.move({roomId:onlineRoomId,expectedVersion:onlineVersion,from:onlineSquare(...move.from),to:onlineSquare(...move.to),promotion:move.promoteTo});
-          if(result.room)applyOnlineSnapshot(result.room);
+          if(result.room){applyOnlineSnapshot(result.room);if(onlineSubscription?.broadcast)void onlineSubscription.broadcast(result.room).catch(error=>console.warn("Fast online move broadcast failed; server fallback remains active.",error));}
           return true;
         } catch(error) {
           console.error("Online move failed:",error);
@@ -6974,7 +6974,7 @@
         button.disabled=true;status.textContent=isPersian?"در حال ساخت اتاق امن…":"Creating a secure room…";
         try {
           const api=await ensureOnlineApi(),result=await api.create({name:classroomPlayerName()});
-          const room=result.room;roomInviteCode=result.invitationCode;onlineRoomId=room.id;
+          const room=result.room;const generatedCode=String(result.invitationCode||"").trim().toUpperCase();if(!/^[A-Z0-9]{7}$/.test(generatedCode))throw new Error("Server returned an invalid room code (expected exactly 7 characters).");roomInviteCode=generatedCode;onlineRoomId=room.id;
           $("roomCodeValue").textContent=roomInviteCode;$("createdRoom").hidden=false;
           $("copyInviteButton").disabled=false;$("shareInviteButton").disabled=false;
           status.textContent=isPersian?"اتاق ساخته شد؛ کد را برای حریف بفرستید.":"Room created. Share this code with your opponent.";
