@@ -6963,7 +6963,7 @@
             clearInterval(onlineRefreshTimer);onlineRefreshTimer=0;return;
           }
           void syncOnlineRoom(true);
-        },5000);
+        },1000);
         onlineSubscriptionRoomId=roomId;
         const pending=(async()=>{
           const api=await ensureOnlineApi();
