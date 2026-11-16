@@ -16,13 +16,40 @@ The first index build can take about a minute. Check readiness and the accepted/
 
 ## Run locally
 
-Use Node.js 22.15 or newer (required for the built-in streaming Zstandard decompressor). In PowerShell, run:
+Use Node.js 22.15 or newer (required for the built-in streaming Zstandard decompressor). After checkout, install the server dependencies once with `npm install`. In PowerShell, run:
 
 ```powershell
 .\start-chess.ps1
 ```
 
-Or double-click `start-chess.cmd` in File Explorer. Then open <http://127.0.0.1:4173>. Keep the terminal open while playing; it serves both the app and puzzle API. Alternatively, run `npm start`. No package install, account, CDN, or other external service is required to play. The bundled single-threaded engine is loaded locally and needs no cross-origin isolation headers.
+Or double-click `start-chess.cmd` in File Explorer. Then open <http://127.0.0.1:4173>. Keep the terminal open while playing; it serves both the app and puzzle API. Alternatively, run `npm start`. The bundled single-threaded engine is loaded locally and needs no cross-origin isolation headers.
+
+## Self-hosted online games
+
+The Online screen defaults to **Self-hosted WebSocket**. This mode uses the Node server in this repository and does not require Supabase. The server assigns White to the room creator and Black to the first guest, rejects a third player, validates every move with `chess.js`, owns both clocks, and broadcasts authoritative positions. A per-seat resume token is saved in that browser so a player can reconnect to the same room. Rooms are retained for 24 hours after every player disconnects.
+
+The normal Windows launch is:
+
+```powershell
+.\start-chess.ps1
+```
+
+For friends outside your local network, expose port `4173` with Cloudflare Tunnel. Keep the Node server window open and start the tunnel in a second PowerShell window:
+
+```powershell
+cloudflared tunnel --url http://127.0.0.1:4173
+```
+
+Set the browser site's origin on the server before starting it. For the GitHub Pages site:
+
+```powershell
+$env:ONLINE_ALLOWED_ORIGINS = "https://nightfall-chess.github.io"
+.\start-chess.ps1
+```
+
+If you serve the website from a stable Cloudflare hostname instead, include that exact `https://...` origin as well. In the Online screen, enter the public tunnel base URL in **WebSocket server URL** (for example `https://your-tunnel.example.com`); the app converts it to the secure WebSocket endpoint. Share the generated invite link or seven-character room code. The invite link includes the server URL for the guest. Keep the Node window running for the whole game. Do not share the resume token; it is local to each browser. This mode has no account system, so only share your server URL and room code with people you intend to play.
+
+`HOST` defaults to `0.0.0.0` so a tunnel can reach the server. `ONLINE_ALLOWED_ORIGINS` is a comma-separated exact-origin allowlist for browser WebSocket handshakes; local loopback pages are allowed automatically. The separate **Supabase rooms** option remains available and continues to use the existing Supabase configuration.
 
 ## Run with VS Code Live Server
 

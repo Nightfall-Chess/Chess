@@ -933,6 +933,10 @@
     .online-intro, .online-note { color: var(--muted); line-height: 1.65; }
     .online-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
     .online-card { min-width: 0; padding: clamp(20px, 3vw, 30px); }
+    .online-connection-card { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 14px; margin-bottom: 18px; }
+    .online-connection-card .field { min-width: 0; margin-top: 0; }
+    .online-connection-card small { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; }
+    .online-grid > .online-card:last-child { grid-column: 1 / -1; }
     .online-card h2 { margin: 0 0 8px; font-size: 19px; }
     .online-card p { margin: 0 0 18px; color: var(--muted); font-size: 13px; line-height: 1.65; }
     .online-card .field { margin-top: 14px; }
@@ -958,6 +962,8 @@
       :root { --board-size: min(620px, calc(100dvh - 390px), calc(100vw - 36px)); }
       .app { padding-bottom: 12px; }
       .online-grid { grid-template-columns: 1fr; }
+      .online-connection-card { grid-template-columns: 1fr; gap: 4px; }
+      .online-grid > .online-card:last-child { grid-column: auto; }
       .online-head { align-items: flex-start; }
       #gameScreen.layout { height: calc(100dvh - 115px); min-height: 0; overflow: hidden; }
       #gameScreen .side-panel { min-height: 0; overflow: auto; }
@@ -1448,7 +1454,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=21">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=28">
 </head>
 <body>
   <main class="app">
@@ -1611,12 +1617,17 @@
     <section class="online-screen" id="onlineScreen" aria-labelledby="onlineTitle" hidden>
       <div class="online-head">
         <div><div class="lobby-kicker">PLAY TOGETHER</div><h1 id="onlineTitle">Online with friends</h1><p class="online-intro">Create a room and share its invite code, or enter a code your friend sent you.</p></div>
-        <div><span class="online-availability" id="onlineAvailability">Room sharing is ready · live play is not connected</span><button class="subtle-button" id="onlineBack" type="button">← Back to menu</button></div>
+        <div><span class="online-availability" id="onlineAvailability">Self-hosted live play is ready</span><button class="subtle-button" id="onlineBack" type="button">← Back to menu</button></div>
       </div>
+      <section class="card online-card online-connection-card">
+        <div class="field"><label class="field-label" for="onlineTransport">Connection mode</label><select id="onlineTransport"><option value="self-hosted" selected>Self-hosted WebSocket (this server)</option><option value="supabase">Supabase rooms</option></select></div>
+        <div class="field" id="selfHostedServerField"><label class="field-label" for="selfHostedServerUrl">WebSocket server URL</label><input id="selfHostedServerUrl" type="url" autocomplete="url" placeholder="Auto: this website's server"><small>Use the Cloudflare Tunnel URL for games outside your network.</small></div>
+        <div class="field" id="onlineTimeControlField"><label class="field-label" for="onlineTimeControl">Clock</label><select id="onlineTimeControl"><option value="180">3 minutes</option><option value="300" selected>5 minutes</option><option value="600">10 minutes</option><option value="0">No clock</option></select></div>
+      </section>
       <div class="online-grid">
         <section class="card online-card">
           <h2>Create a private room</h2>
-          <p>Make a unique invitation code and share its link. When you are both ready, you can still play locally on one device.</p>
+          <p>Create a room on this server. White hosts; one guest joins as Black. The server validates moves and clocks.</p>
           <button class="primary-button" id="createRoomButton" type="button">Create room code</button>
           <div class="room-code" id="createdRoom" hidden><span>Invitation code</span><strong id="roomCodeValue"></strong></div>
           <div class="online-actions"><button class="subtle-button" id="copyInviteButton" type="button" disabled>Copy invite link</button><button class="subtle-button" id="shareInviteButton" type="button" disabled>Share invite</button></div>
@@ -1624,14 +1635,14 @@
         </section>
         <section class="card online-card">
           <h2>Join a friend's room</h2>
-          <p>Enter the invitation code. Room codes are checked locally; a live connection will be available when an online server is added.</p>
+          <p>Enter the seven-character code shared by the host. A room admits exactly two players.</p>
           <div class="field"><label class="field-label" for="joinRoomCode">Room code</label><input id="joinRoomCode" type="text" inputmode="text" autocomplete="off" maxlength="7" placeholder="e.g. H7K4Q2A"></div>
           <button class="primary-button" id="joinRoomButton" type="button">Join room</button>
           <p class="room-status" id="joinRoomStatus" aria-live="polite">Enter a code to check the room.</p>
         </section>
         <section class="card online-card">
           <h2>Play together now</h2>
-          <p>Online matchmaking is not connected yet. Start a local pass-and-play game while sharing the same board.</p>
+          <p>For same-device pass-and-play, use the local friend game. Self-hosted online games connect directly to your Node server, without Supabase.</p>
           <button class="subtle-button" id="localFriendButton" type="button">Start a local friend game</button>
         </section>
       </div>
@@ -2176,16 +2187,21 @@
         "Accuracy estimate based on Stockfish win-chance changes":"برآورد دقت بر پایهٔ تغییر شانس برد در ارزیابی Stockfish","Engine evaluation":"ارزیابی موتور","ECO":"رده‌بندی ECO",
         "♧ Online":"♧ آنلاین","PLAY TOGETHER":"باهم بازی کنید","Online with friends":"بازی آنلاین با دوستان",
         "Create a room and share its invite code, or enter a code your friend sent you.":"اتاقی بسازید و کد دعوتش را بفرستید یا کدی را که دوستتان فرستاده وارد کنید.",
+        "Self-hosted live play is ready":"بازی زندهٔ خودمیزبان آماده است","Connection mode":"روش اتصال","Self-hosted WebSocket (this server)":"وب‌سوکت خودمیزبان (این سرور)","Supabase rooms":"اتاق‌های Supabase",
+        "WebSocket server URL":"نشانی سرور WebSocket","Auto: this website's server":"خودکار: سرور همین وب‌سایت","Use the Cloudflare Tunnel URL for games outside your network.":"برای بازی بیرون از شبکه، نشانی Cloudflare Tunnel را وارد کنید.",
+        "Clock":"زمان","5 minutes":"۵ دقیقه","10 minutes":"۱۰ دقیقه","No clock":"بدون ساعت",
         "Room sharing is ready · live play is not connected":"اشتراک کد آماده است · بازی زنده هنوز وصل نیست",
         "Create a private room":"ساخت اتاق خصوصی",
-        "Make a unique invitation code and share its link. When you are both ready, you can still play locally on one device.":"یک کد دعوت بسازید و پیوندش را بفرستید. تا زمان فراهم‌شدن بازی آنلاین، می‌توانید روی یک دستگاه نوبتی بازی کنید.",
+        "Create a room on this server. White hosts; one guest joins as Black. The server validates moves and clocks.":"روی این سرور اتاق بسازید. میزبان سفید است و یک مهمان با مهرهٔ سیاه می‌پیوندد. سرور حرکت‌ها و ساعت را بررسی می‌کند.",
         "Create room code":"ساخت کد اتاق","Invitation code":"کد دعوت","Copy invite link":"کپی پیوند دعوت","Share invite":"اشتراک دعوت",
         "No room created yet.":"هنوز اتاقی ساخته نشده است.","Join a friend's room":"پیوستن به اتاق دوست",
-        "Enter the invitation code. Room codes are checked locally; a live connection will be available when an online server is added.":"کد دعوت را وارد کنید. کد در همین دستگاه بررسی می‌شود؛ اتصال زنده پس از راه‌اندازی سرور آنلاین فراهم خواهد شد.",
+        "Enter the seven-character code shared by the host. A room admits exactly two players.":"کد هفت‌حرفی میزبان را وارد کنید. هر اتاق دقیقاً دو بازیکن می‌پذیرد.",
         "Room code":"کد اتاق","Join room":"پیوستن به اتاق","Enter a code to check the room.":"برای بررسی اتاق، کد را وارد کنید.",
         "e.g. H7K4Q2":"برای نمونه: H7K4Q2",
         "Play together now":"همین حالا باهم بازی کنید",
-        "Online matchmaking is not connected yet. Start a local pass-and-play game while sharing the same board.":"بازی آنلاین هنوز فعال نیست. با همان صفحه، بازی نوبتی محلی را شروع کنید.",
+        "For same-device pass-and-play, use the local friend game. Self-hosted online games connect directly to your Node server, without Supabase.":"برای بازی نوبتی روی یک دستگاه، بازی محلی با دوست را انتخاب کنید. بازی خودمیزبان مستقیماً و بدون Supabase به سرور Node شما وصل می‌شود.",
+        "Connecting to the game server…":"در حال اتصال به سرور بازی…","Connected to the game server":"به سرور بازی متصل","Could not connect to the game server":"اتصال به سرور بازی ناموفق بود",
+        "Online game connected":"بازی آنلاین متصل","Opponent disconnected; waiting for reconnection":"حریف قطع شده؛ منتظر اتصال دوباره هستیم","Connection lost; reconnecting…":"اتصال قطع شد؛ تلاش دوباره…",
         "Start a local friend game":"شروع بازی محلی با دوست","Room code must be 4–12 letters or numbers.":"کد اتاق باید ۴ تا ۱۲ حرف یا عدد باشد.",
         "Room code accepted. Live play is not connected yet; start a local game to play now.":"کد اتاق پذیرفته شد. بازی زنده هنوز وصل نیست؛ برای بازی همین حالا، بازی محلی را شروع کنید.",
         "Room created. Share the code with your friend.":"اتاق ساخته شد. کد را برای دوستتان بفرستید.",
@@ -2777,6 +2793,7 @@
       let classroomOnlineUsers=new Set(),classroomChatMessages=[],classroomSavedGames=[];
       let classroomPointerDrag=null,classroomAnnotationDrag=null,classroomIgnoreClickUntil=0;
       let onlineApi=null,onlineSubscription=null,onlineSubscriptionRoomId="",onlineWatchPromise=null,onlineRoomId="",onlineVersion=0,onlineSyncBusy=false,onlineSnapshotBusy=false,onlineRefreshTimer=0,onlinePlayers=[];
+      let selfHostedSocket=null,selfHostedSocketGeneration=0,selfHostedRetryTimer=0,selfHostedConnectPending=null,selfHostedSession=null,selfHostedPaused=true,selfHostedRoom=null,selfHostedMovePending=false;
       let mode = "ai", humanColor = "w", aiThinking = false, gameOver = false;
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
       const stockfishSearchCache=new Map();
@@ -4308,15 +4325,18 @@
         }).join("");
       }
       async function recordRecentGame(outcome) {
-        const finishedAt=new Date(),modeName=mode==="ai"?"ai":"friend",timeControl=String(Number(modeName==="ai"?$("aiTimeControl").value:$("timeControl").value));
+        const finishedAt=new Date(),modeName=mode==="ai"?"ai":mode==="online"?"online":"friend";
+        const timeControl=String(Number(modeName==="ai"?$("aiTimeControl").value:modeName==="online"?(selfHostedRoom?.timeControlSeconds??0):$("timeControl").value));
         const playerName=playerProfile.username||"Player",rating=modeName==="ai"?Number($("strength").value):null;
-        const players=modeName==="ai"
+        const players=modeName==="online"
+          ?{w:{name:onlinePlayers.find(player=>player.color==="w")?.name||"White",rating:"?"},b:{name:onlinePlayers.find(player=>player.color==="b")?.name||"Black",rating:"?"}}
+          :modeName==="ai"
           ?(humanColor==="w"?{w:{name:playerName,rating:profileStats.skillAnswered?String(profileStats.rating):"?"},b:{name:"Stockfish 19",rating:String(rating)}}:{w:{name:"Stockfish 19",rating:String(rating)},b:{name:playerName,rating:profileStats.skillAnswered?String(profileStats.rating):"?"}})
           :{w:{name:playerName,rating:"?"},b:{name:"Friend",rating:"?"}};
         const entries=history.map(entry=>({before:entry.before,after:entry.after,move:entry.move,san:entry.san,ply:entry.ply,prefix:entry.prefix,analysis:entry.analysis||null}));
         try {
           const record={
-            id:crypto.randomUUID(),startedAt:gameStartedAt.toISOString(),finishedAt:finishedAt.toISOString(),
+            id:modeName==="online"&&onlineRoomId?onlineRoomId:crypto.randomUUID(),startedAt:gameStartedAt.toISOString(),finishedAt:finishedAt.toISOString(),
             durationMs:Math.max(0,finishedAt.getTime()-gameStartedAt.getTime()),outcome,resultText:lastGameResult,pgnResult:pgnResultFromText(lastGameResult,outcome),
             mode:modeName,rating,color:modeName==="ai"?humanColor:"w",plies:entries.length,opening:openingIdentity?.name||"",
             timeControl:timeControl==="0"?"-":`${timeControl}+0`,players,entries
@@ -4324,6 +4344,13 @@
           record.pgn=createGamePgn(entries,record);
           activeArchiveId=record.id;
           await (await archiveApiPromise).saveGame(record);
+          if(modeName==="online"&&onlineRoomId) {
+            try {
+              const recorded=JSON.parse(localStorage.getItem("nightfall-online-recorded-v1")||"[]");
+              const next=Array.isArray(recorded)?recorded.filter(id=>id!==onlineRoomId):[];
+              localStorage.setItem("nightfall-online-recorded-v1",JSON.stringify([...next,onlineRoomId].slice(-100)));
+            } catch(error) { console.warn("Could not save the online result marker:",error); }
+          }
           recentGames=[record,...recentGames.filter(item=>item.id!==record.id)].sort((a,b)=>Date.parse(b.finishedAt)-Date.parse(a.finishedAt));
           renderRecentGames();renderJourney();
           void refreshAchievements();
@@ -4572,6 +4599,12 @@
       function recordGameResult(result,winnerColor) {
         if(resultRecorded)return;
         resultRecorded=true;
+        if(mode==="online"&&onlineRoomId) {
+          try {
+            const recorded=JSON.parse(localStorage.getItem("nightfall-online-recorded-v1")||"[]");
+            if(Array.isArray(recorded)&&recorded.includes(onlineRoomId))return;
+          } catch(error) { console.warn("Could not check the saved online result marker:",error); }
+        }
         profileStats.games++;
         const isDraw=/draw/i.test(result),won=!isDraw&&winnerColor===humanColor,outcome=isDraw?0.5:won?1:0;
         const scoreChange=mode==="ai"
@@ -5110,7 +5143,7 @@
         const isPuzzleOpponent=puzzleMode&&!isProfileSide, isWhite=color==="w", active=state.turn===color&&!gameOver;
         const onlinePlayer=onlinePlayers.find(player=>player.color===color);
         const name=isAI?isPersian?"هوش مصنوعی":"AI"
-          :mode==="online"?(onlinePlayer?.display_name||(isPersian?"حریف آنلاین":"Online opponent"))
+          :mode==="online"?(onlinePlayer?.name||onlinePlayer?.display_name||(isPersian?"حریف آنلاین":"Online opponent"))
           :isProfileSide?playerProfile.username
             :isPuzzleOpponent?isPersian?"حریف معما":"Puzzle opponent"
               :isPersian?"مهمان محلی":"Local guest";
@@ -5904,8 +5937,9 @@
       function showLobby() {
         if(matchActive&&mode!=="online")return;
         if(mode==="online") {
+          pauseSelfHostedConnection();
           if(onlineSubscription){void onlineSubscription.unsubscribe().catch(()=>{});onlineSubscription=null;}
-          onlineRoomId="";onlineVersion=0;mode="ai";
+          onlineRoomId="";onlineVersion=0;matchActive=false;mode="ai";
         }
         stopClock();cancelAIRequest();
         $("lobbyStrength").value=$("strength").value;$("lobbyStrengthLabel").textContent=$("strength").value;
@@ -5919,10 +5953,22 @@
         if(matchActive){showToast(isPersian?"ابتدا بازی فعلی را تمام کنید.":"Finish the current match before opening Online.");return;}
         $("lobby").hidden=true;$("gameScreen").hidden=true;$("trainingScreen").hidden=true;$("classroomScreen").hidden=true;$("settingsScreen").hidden=true;$("onlineScreen").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;
-        const invite=new URLSearchParams(location.hash.slice(1)).get("room");
+        const params=new URLSearchParams(location.hash.slice(1)),invite=params.get("room"),sharedServer=params.get("ws");
+        if(sharedServer) {
+          $("onlineTransport").value="self-hosted";
+          $("selfHostedServerUrl").value=sharedServer;
+          updateOnlineTransport();
+        }
         if(invite&&/^[A-Z0-9]{4,12}$/i.test(invite))$("joinRoomCode").value=invite.toUpperCase();
+        const saved=loadSelfHostedSession();
+        if($("onlineTransport").value==="self-hosted"&&saved&&(!invite||invite.toUpperCase()===saved.code)) {
+          selfHostedSession=saved;
+          $("selfHostedServerUrl").value=saved.url;
+          void connectSelfHosted({type:"resume",...saved}).catch(error=>console.warn("Could not resume the saved online game:",error));
+        }
       }
       async function closeOnline() {
+        pauseSelfHostedConnection();
         if(onlineSubscription){await onlineSubscription.unsubscribe().catch(()=>{});onlineSubscription=null;}
         onlineRoomId="";onlineVersion=0;
         $("onlineScreen").hidden=true;$("settingsScreen").hidden=true;$("classroomScreen").hidden=true;$("lobby").hidden=false;
@@ -6854,7 +6900,9 @@
       function inviteUrl() {
         if(!roomInviteCode)throw new Error("Create a room before sharing an invite.");
         const invite=new URL(location.href);
-        invite.hash=new URLSearchParams({room:roomInviteCode}).toString();
+        const params=new URLSearchParams({room:roomInviteCode});
+        if($("onlineTransport").value==="self-hosted")params.set("ws",selfHostedServerAddress());
+        invite.hash=params.toString();
         return invite.href;
       }
       async function copyInvite() {
@@ -6889,6 +6937,162 @@
         }
         return onlineApi;
       }
+      function selfHostedServerAddress() {
+        const configured=$("selfHostedServerUrl").value.trim();
+        let url;
+        if(configured) {
+          url=new URL(configured);
+          if(url.protocol==="http:")url.protocol="ws:";
+          else if(url.protocol==="https:")url.protocol="wss:";
+          if(url.protocol!=="ws:"&&url.protocol!=="wss:")throw new Error("Use a ws:// or wss:// server URL.");
+          url.pathname="/ws/online";url.search="";url.hash="";
+        } else {
+          const protocol=location.protocol==="https:"?"wss:":"ws:";
+          const hostname=location.hostname||"127.0.0.1";
+          const port=location.port==="5500"||location.port==="5501"?"4173":location.port;
+          url=new URL(`${protocol}//${hostname}${port?`:${port}`:""}/ws/online`);
+        }
+        return url.href;
+      }
+      function saveSelfHostedSession(session) {
+        selfHostedSession=session;
+        try { localStorage.setItem("nightfall-self-hosted-room-v1",JSON.stringify(session)); }
+        catch(error) { console.warn("Could not save the online reconnect token:",error); }
+      }
+      function loadSelfHostedSession() {
+        try {
+          const saved=localStorage.getItem("nightfall-self-hosted-room-v1");
+          if(!saved)return null;
+          const parsed=JSON.parse(saved);
+          if(typeof parsed?.url!=="string"||typeof parsed?.code!=="string"||typeof parsed?.token!=="string"||!["w","b"].includes(parsed.color))throw new Error("Saved online room credentials are invalid.");
+          return parsed;
+        } catch(error) {
+          console.warn("Could not load the saved online room:",error);
+          localStorage.removeItem("nightfall-self-hosted-room-v1");
+          return null;
+        }
+      }
+      function setSelfHostedConnectionStatus(message,error=false) {
+        $("onlineAvailability").textContent=message;
+        $("onlineAvailability").dataset.state=error?"error":"ready";
+      }
+      function pauseSelfHostedConnection() {
+        selfHostedPaused=true;clearTimeout(selfHostedRetryTimer);selfHostedRetryTimer=0;
+        selfHostedSocketGeneration++;
+        if(selfHostedConnectPending) {
+          clearTimeout(selfHostedConnectPending.timeout);
+          selfHostedConnectPending.reject(new Error("Connection attempt was canceled."));
+          selfHostedConnectPending=null;
+        }
+        if(selfHostedSocket) {
+          const socket=selfHostedSocket;selfHostedSocket=null;
+          if(socket.readyState<WebSocket.CLOSING)socket.close(1000,"Leaving the online screen");
+        }
+      }
+      function updateOnlineTransport() {
+        const selfHosted=$("onlineTransport").value==="self-hosted";
+        $("selfHostedServerField").hidden=!selfHosted;
+        $("onlineTimeControlField").hidden=!selfHosted;
+        setSelfHostedConnectionStatus(selfHosted
+          ?(isPersian?"بازی زندهٔ خودمیزبان آماده است":"Self-hosted live play is ready")
+          :(isPersian?"اتاق‌های Supabase":"Supabase rooms"));
+      }
+      function resumeSelfHostedConnection() {
+        if(selfHostedConnectPending||!selfHostedSession||selfHostedPaused)return;
+        void connectSelfHosted({type:"resume",code:selfHostedSession.code,token:selfHostedSession.token,url:selfHostedSession.url})
+          .catch(error=>console.warn("Online room reconnection failed:",error));
+      }
+      function connectSelfHosted(request) {
+        selfHostedPaused=false;
+        clearTimeout(selfHostedRetryTimer);selfHostedRetryTimer=0;
+        if(selfHostedSocket?.readyState===WebSocket.OPEN)selfHostedSocket.close(1000,"Replacing room connection");
+        const generation=++selfHostedSocketGeneration;
+        const endpoint=request.url||selfHostedServerAddress();
+        $("selfHostedServerUrl").value=request.url||$("selfHostedServerUrl").value;
+        setSelfHostedConnectionStatus(isPersian?"در حال اتصال به سرور بازی…":"Connecting to the game server…");
+        return new Promise((resolve,reject)=>{
+          const timeout=setTimeout(()=>{
+            if(generation!==selfHostedSocketGeneration)return;
+            selfHostedConnectPending=null;
+            reject(new Error("The game server did not respond. Check its URL and that the Node server is running."));
+            selfHostedSocket?.close();
+          },10000);
+          selfHostedConnectPending={resolve,reject,timeout};
+          let socket;
+          try { socket=new WebSocket(endpoint); }
+          catch(error) { clearTimeout(timeout);selfHostedConnectPending=null;reject(error);return; }
+          selfHostedSocket=socket;
+          socket.addEventListener("open",()=>{
+            if(generation!==selfHostedSocketGeneration)return;
+            if(request.type==="create")socket.send(JSON.stringify({type:"create",name:classroomPlayerName(),timeControlSeconds:Number($("onlineTimeControl").value)}));
+            else if(request.type==="join")socket.send(JSON.stringify({type:"join",code:request.code,name:classroomPlayerName()}));
+            else socket.send(JSON.stringify({type:"resume",code:request.code,token:request.token}));
+          });
+          socket.addEventListener("message",event=>{
+            if(generation!==selfHostedSocketGeneration)return;
+            let payload;
+            try { payload=JSON.parse(event.data); }
+            catch(error) { console.error("Invalid game-server message:",error);return; }
+            if(payload.type==="error") {
+              selfHostedMovePending=false;
+              const pending=selfHostedConnectPending;
+              if(pending) {
+                clearTimeout(pending.timeout);selfHostedConnectPending=null;pending.reject(new Error(payload.message||"The game server rejected the request."));
+              } else {
+                showToast(payload.message||"The game server rejected the request.");
+                setSelfHostedConnectionStatus(payload.message||"Game server error.",true);
+              }
+              return;
+            }
+            if(["created","joined","resumed"].includes(payload.type)) {
+              const room=payload.room;
+              if(!room||!payload.token||!["w","b"].includes(payload.color)) {
+                const pending=selfHostedConnectPending;
+                if(pending){clearTimeout(pending.timeout);selfHostedConnectPending=null;pending.reject(new Error("The game server returned an invalid room session."));}
+                return;
+              }
+              if(onlineRoomId!==room.id) {
+                onlineVersion=0;history=[];redoStack=[];state=startState();gameOver=false;matchActive=false;
+                resultRecorded=false;lastGameResult="";gameStartedAt=new Date();
+              }
+              selfHostedRoom=room;onlineMyColor=payload.color;roomInviteCode=room.code;onlineRoomId=room.id;
+              saveSelfHostedSession({url:endpoint,code:room.code,token:payload.token,color:payload.color});
+              $("roomCodeValue").textContent=room.code;$("createdRoom").hidden=false;
+              $("copyInviteButton").disabled=false;$("shareInviteButton").disabled=false;
+              if(payload.type==="joined")$("joinRoomStatus").textContent=isPersian?"به اتاق پیوستید؛ بازی شروع شد.":"Joined the room. The game is starting.";
+              else $("createRoomStatus").textContent=room.status==="waiting"
+                ?(isPersian?"اتاق آماده است؛ کد را برای حریف بفرستید.":"Room is ready. Share the code with your opponent.")
+                :(isPersian?"به اتاق بازگشتید.":"Reconnected to your room.");
+              void startOnlineMatch(room);
+              const pending=selfHostedConnectPending;
+              if(pending){clearTimeout(pending.timeout);selfHostedConnectPending=null;pending.resolve(room);}
+              setSelfHostedConnectionStatus(isPersian?"به سرور بازی متصل":"Connected to the game server");
+              return;
+            }
+            if(payload.type==="state"&&payload.room) {
+              if(Number(payload.room.version)>onlineVersion)selfHostedMovePending=false;
+              selfHostedRoom=payload.room;
+              if(mode==="online"&&onlineRoomId===payload.room.id)applyOnlineSnapshot(payload.room);
+              else if($("gameScreen").hidden&&payload.room.code===selfHostedSession?.code)void startOnlineMatch(payload.room);
+              setSelfHostedConnectionStatus(payload.room.players?.some(player=>!player.connected)
+                ?(isPersian?"حریف قطع شده؛ منتظر اتصال دوباره هستیم":"Opponent disconnected; waiting for reconnection")
+                :(isPersian?"بازی آنلاین متصل":"Online game connected"));
+            }
+          });
+          socket.addEventListener("error",()=>{
+            if(generation===selfHostedSocketGeneration)setSelfHostedConnectionStatus(isPersian?"اتصال به سرور بازی ناموفق بود":"Could not connect to the game server",true);
+          });
+          socket.addEventListener("close",()=>{
+            if(generation!==selfHostedSocketGeneration)return;
+            const pending=selfHostedConnectPending;
+            if(pending){clearTimeout(pending.timeout);selfHostedConnectPending=null;pending.reject(new Error("The connection to the game server closed."));}
+            if(!selfHostedPaused&&selfHostedSession) {
+              setSelfHostedConnectionStatus(isPersian?"اتصال قطع شد؛ تلاش دوباره…":"Connection lost; reconnecting…",true);
+              selfHostedRetryTimer=setTimeout(resumeSelfHostedConnection,1500);
+            }
+          });
+        });
+      }
       function onlineSquare(row,col){return `${"abcdefgh"[col]}${8-row}`;}
       function onlineBuildHistory(moves) {
         let position=startState();const entries=[];
@@ -6906,14 +7110,40 @@
       }
       function applyOnlineSnapshot(room) {
         if(!room)return;
-        onlineVersion=Number(room.version)||0;
+        if(room.startedAt)gameStartedAt=new Date(room.startedAt);
+        const nextVersion=Number(room.version)||0;
+        if(nextVersion<onlineVersion)return;
+        const previousLength=history.length;
+        const wasSamePosition=nextVersion===onlineVersion;
         const built=onlineBuildHistory(room.moves);
+        if(wasSamePosition&&built.entries.length===previousLength) {
+          if(room.clocks) {
+            clocks={w:Math.max(0,Number(room.clocks.w)||0)/1000,b:Math.max(0,Number(room.clocks.b)||0)/1000};
+            clockStamp=Date.now();
+            renderPlayers();
+          }
+          return;
+        }
+        onlineVersion=nextVersion;
         history=built.entries;redoStack=[];state=built.position;
+        if(room.clocks) {
+          clocks={w:Math.max(0,Number(room.clocks.w)||0)/1000,b:Math.max(0,Number(room.clocks.b)||0)/1000};
+          clockOn=room.status==="playing"&&Number(room.timeControlSeconds)>0;
+          clockStamp=Date.now();
+          if(clockOn&&!window.clockInterval)startClock();
+          else if(!clockOn)stopClock();
+          renderPlayers();
+        }
         selected=null;legalTargets=[];premove=null;
         onlinePlayers=Array.isArray(room.players)?room.players:[];
         gameOver=Boolean(room.result);matchActive=room.status==="playing"&&!gameOver;
         if(gameOver&&onlineRefreshTimer){clearInterval(onlineRefreshTimer);onlineRefreshTimer=0;}
-        const alreadyRecorded=resultRecorded&&lastGameResult===room.result;
+        let recordedRooms=[];
+        if(mode==="online")try {
+          const value=JSON.parse(localStorage.getItem("nightfall-online-recorded-v1")||"[]");
+          if(Array.isArray(value))recordedRooms=value;
+        } catch(error) { console.warn("Could not read the saved online result marker:",error); }
+        const alreadyRecorded=(resultRecorded&&lastGameResult===room.result)||Boolean(room.result&&recordedRooms.includes(room.id));
         resultRecorded=alreadyRecorded;lastGameResult=room.result||"";
         const justFinished=gameOver&&!resultRecorded;
         if(justFinished) {
@@ -6921,6 +7151,7 @@
           recordGameResult(room.result,winnerColor);
         }
         render();
+        if(history.length>previousLength&&history.length)animateMove(history.at(-1).move,history.at(-1).before);
         $("statusText").textContent=room.result||(room.status==="waiting"
           ?(isPersian?"منتظر بازیکن دوم…":"Waiting for the second player…")
           :(isPersian?(state.turn===humanColor?"نوبت شماست":"نوبت حریف است"):(state.turn===humanColor?"Your turn":"Opponent's turn")));
@@ -6929,6 +7160,7 @@
         if(gameOver) {matchActive=false;stopClock();if(justFinished)playGameEnd(room.result,room.result.startsWith("White")?"w":room.result.startsWith("Black")?"b":null);}
       }
       async function syncOnlineRoom(quiet=false) {
+        if($("onlineTransport").value==="self-hosted")return;
         if(!onlineRoomId||onlineSnapshotBusy)return;
         onlineSnapshotBusy=true;
         try {
@@ -6953,6 +7185,7 @@
         }
       }
       async function watchOnlineRoom(roomId) {
+        if($("onlineTransport").value==="self-hosted")return null;
         if(onlineSubscription&&onlineSubscriptionRoomId===roomId)return onlineSubscription;
         if(onlineWatchPromise&&onlineSubscriptionRoomId===roomId)return onlineWatchPromise;
         if(onlineWatchPromise)await onlineWatchPromise.catch(()=>{});
@@ -7001,13 +7234,14 @@
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;
         $("onlineScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
         $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=false;
-        $("analysisBackdrop").classList.remove("open");analysisShown=false;gameStartedAt=new Date();
+        $("analysisBackdrop").classList.remove("open");analysisShown=false;
+        gameStartedAt=room.startedAt?new Date(room.startedAt):new Date();
         showGameInfoTab("moves");applyOnlineSnapshot(room);playEventSound("gameStart");
         if(isFirstJoinNotice) {
           onlineJoinNoticeRoomId=room.id;
           showToast(isPersian?"حریف وارد اتاق شد؛ بازی شروع شد.":"Your opponent joined. The game has started.");
         }
-        if(!onlineSubscription||onlineSubscriptionRoomId!==room.id) {
+        if($("onlineTransport").value!=="self-hosted"&&(!onlineSubscription||onlineSubscriptionRoomId!==room.id)) {
           try { await watchOnlineRoom(room.id); }
           catch(error) { console.error("Online Realtime subscription failed; polling fallback remains active:",error);showToast(isPersian?"اتصال زنده برقرار نشد؛ همگام‌سازی پشتیبان فعال است.":"Realtime is unavailable; automatic sync fallback is active."); }
         }
@@ -7016,11 +7250,22 @@
         if(onlineSyncBusy||!onlineRoomId||!matchActive||state.turn!==humanColor)return false;
         onlineSyncBusy=true;
         try {
+          if($("onlineTransport").value==="self-hosted") {
+            if(selfHostedMovePending)return false;
+            if(!selfHostedSocket||selfHostedSocket.readyState!==WebSocket.OPEN)throw new Error("The game server is disconnected. Wait for reconnection before moving.");
+            selfHostedMovePending=true;
+            selfHostedSocket.send(JSON.stringify({
+              type:"move",expectedVersion:onlineVersion,from:onlineSquare(...move.from),to:onlineSquare(...move.to),
+              ...(move.promoteTo?{promotion:move.promoteTo}:{})
+            }));
+            return true;
+          }
           const api=await ensureOnlineApi();
           const result=await api.move({roomId:onlineRoomId,expectedVersion:onlineVersion,from:onlineSquare(...move.from),to:onlineSquare(...move.to),promotion:move.promoteTo});
           if(result.room){applyOnlineSnapshot(result.room);if(onlineSubscription?.broadcast)void onlineSubscription.broadcast(result.room).catch(error=>console.warn("Fast online move broadcast failed; server fallback remains active.",error));}
           return true;
         } catch(error) {
+          selfHostedMovePending=false;
           console.error("Online move failed:",error);
           await syncOnlineRoom();
           showToast(isPersian?(error.message||"حرکت آنلاین ثبت نشد."):(error.message||"Online move was not saved."));
@@ -7031,6 +7276,11 @@
         const status=$("createRoomStatus"),button=$("createRoomButton");
         button.disabled=true;status.textContent=isPersian?"در حال ساخت اتاق امن…":"Creating a secure room…";
         try {
+          if($("onlineTransport").value==="self-hosted") {
+            await connectSelfHosted({type:"create",url:selfHostedServerAddress()});
+            status.dataset.state="ready";
+            return;
+          }
           const api=await ensureOnlineApi(),result=await api.create({name:classroomPlayerName()});
           const room=result.room;onlineMyColor=room.myColor||"";const generatedCode=String(result.invitationCode||"").trim().toUpperCase();if(!/^[A-Z0-9]{7}$/.test(generatedCode))throw new Error("Server returned an invalid room code (expected exactly 7 characters).");roomInviteCode=generatedCode;onlineRoomId=room.id;
           $("roomCodeValue").textContent=roomInviteCode;$("createdRoom").hidden=false;
@@ -7050,6 +7300,11 @@
         }
         button.disabled=true;status.textContent=isPersian?"در حال اتصال به اتاق…":"Connecting to room…";
         try {
+          if($("onlineTransport").value==="self-hosted") {
+            await connectSelfHosted({type:"join",code,url:selfHostedServerAddress()});
+            status.dataset.state="ready";
+            return;
+          }
           const api=await ensureOnlineApi(),result=await api.join({invitationCode:code,name:classroomPlayerName()});
           $("joinRoomCode").value=code;status.dataset.state="ready";onlineMyColor=result.room.myColor||"";
           await startOnlineMatch(result.room);
@@ -7090,6 +7345,14 @@
         $("resignBackdrop").hidden=true;
         if(!matchActive||gameOver||puzzleMode)return;
         if(mode==="online") {
+          if($("onlineTransport").value==="self-hosted") {
+            if(!selfHostedSocket||selfHostedSocket.readyState!==WebSocket.OPEN) {
+              showToast(isPersian?"اتصال به سرور برقرار نیست.":"The game server is disconnected.");
+              return;
+            }
+            selfHostedSocket.send(JSON.stringify({type:"resign"}));
+            return;
+          }
           const roomId=onlineRoomId;
           void ensureOnlineApi().then(api=>api.resign(roomId)).then(result=>{if(result.room)applyOnlineSnapshot(result.room);})
             .catch(error=>{console.error(error);showToast(error.message||"Could not resign online.");});
@@ -7846,6 +8109,11 @@
         window.clockInterval=setInterval(()=>{
           if(gameOver)return;
           const now=Date.now();clocks[state.turn]-=(now-clockStamp)/1000;clockStamp=now;
+          if(mode==="online") {
+            clocks[state.turn]=Math.max(0,clocks[state.turn]);
+            renderPlayers();
+            return;
+          }
           if(clocks[state.turn]<=0) {
             clocks[state.turn]=0;
             lastGameResult=`Time — ${state.turn==="w"?"Black":"White"} wins`;
@@ -7937,6 +8205,8 @@
       });
       $("onlineTop").addEventListener("click",openOnline);
       $("onlineBack").addEventListener("click",closeOnline);
+      $("onlineTransport").addEventListener("change",updateOnlineTransport);
+      updateOnlineTransport();
       $("createRoomButton").addEventListener("click",createRoom);
       $("joinRoomButton").addEventListener("click",joinRoom);
       $("joinRoomCode").addEventListener("keydown",event=>{if(event.key==="Enter")joinRoom();});

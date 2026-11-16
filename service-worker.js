@@ -1,11 +1,11 @@
-const CACHE_VERSION = "nightfall-v27";
+const CACHE_VERSION = "nightfall-v28";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./nightfall-redesign.css?v=21",
+  "./nightfall-redesign.css?v=28",
   "./game-archive.mjs",
   "./achievements.mjs",
   "./opening-book.mjs",

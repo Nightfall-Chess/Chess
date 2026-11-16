@@ -19,7 +19,7 @@ if ($nodeVersion -lt [version]"22.15.0") {
   exit 1
 }
 
-Write-Host "Starting Nightfall Chess at http://127.0.0.1:4173/"
+Write-Host "Starting Nightfall Chess at http://127.0.0.1:4173/ (listening on all interfaces for LAN and tunnel access)"
 Write-Host "Keep this window open while playing. Press Ctrl+C to stop the server."
 & $node.Source (Join-Path $PSScriptRoot "server.mjs")
 exit $LASTEXITCODE
