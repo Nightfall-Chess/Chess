@@ -6937,7 +6937,7 @@
       async function watchOnlineRoom(roomId) {
         const api=await ensureOnlineApi();
         if(onlineSubscription)await onlineSubscription.unsubscribe().catch(()=>{});
-        onlineSubscription=await api.subscribe(roomId,()=>void syncOnlineRoom(),(status,error)=>{
+        onlineSubscription=await api.subscribe(roomId,payload=>{if(payload?.force||Number(payload?.version)>onlineVersion||$("gameScreen").hidden)void syncOnlineRoom();},(status,error)=>{
           if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Online realtime status:",status,error);
         });
       }
