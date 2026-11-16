@@ -2610,7 +2610,7 @@
         if(error)job.reject(error);else job.resolve(result);
       }
       function failStockfishWorker(error) {
-        clearTimeout(stockfishReadyTimer);stockfishReadyTimer=null;
+        clearTimeout(stockfishReadyTimer);stockfishReadyTimer=null;stockfishIsReady=false;
         const worker=stockfishWorker;stockfishWorker=null;stockfishReadyPromise=null;
         worker?.terminate();
         const rejectReady=stockfishReadyReject;stockfishReadyResolve=null;stockfishReadyReject=null;
@@ -2628,8 +2628,10 @@
           },5000);
         }
       }
+      let stockfishIsReady=false,stockfishLoadStartedAt=0;
       function ensureStockfish() {
         if(stockfishReadyPromise)return stockfishReadyPromise;
+        stockfishIsReady=false;stockfishLoadStartedAt=Date.now();
         if(matchActive&&aiThinking)$("statusText").textContent=isPersian?"در حال بارگیری نسخهٔ سبک Stockfish (حدود ۱٫۸ مگابایت)…":"Loading Stockfish Lite (about 1.8 MB)…";
         stockfishReadyPromise=new Promise((resolve,reject)=>{
           stockfishReadyResolve=resolve;stockfishReadyReject=reject;
@@ -2655,6 +2657,7 @@
                   return;
                 }
                 clearTimeout(stockfishReadyTimer);stockfishReadyTimer=null;
+                stockfishIsReady=true;
                 stockfishReadyResolve?.();stockfishReadyResolve=null;stockfishReadyReject=null;
                 return;
               }
@@ -2683,9 +2686,9 @@
               error.code="ENGINE_WORKER_FAILED";failStockfishWorker(error);
             };
             stockfishReadyTimer=setTimeout(()=>{
-              const error=new Error("Stockfish did not finish loading within 3 minutes.");
+              const error=new Error("Stockfish did not finish loading within 60 seconds.");
               error.code="ENGINE_LOAD_TIMEOUT";failStockfishWorker(error);
-            },180000);
+            },60000);
             stockfishWorker.postMessage("uci");
           } catch(error) {
             error.code="ENGINE_WORKER_FAILED";failStockfishWorker(error);
@@ -2723,7 +2726,7 @@
                 if(stockfishJob===job){const error=new Error("Stockfish did not acknowledge the search setup.");error.code="ENGINE_WORKER_FAILED";failStockfishWorker(error);}
               },30000);
               for(const command of [
-                "setoption name Threads value 1","setoption name Hash value 64",`setoption name MultiPV value ${safeMultiPV}`,
+                "setoption name Threads value 1","setoption name Hash value 16",`setoption name MultiPV value ${safeMultiPV}`,
                 ...options,"ucinewgame",`position fen ${fen}`,"isready"
               ])stockfishWorker.postMessage(command);
             });
@@ -2735,7 +2738,7 @@
             if(stockfishSearchCache.size>500)stockfishSearchCache.delete(stockfishSearchCache.keys().next().value);
             return result;
           } catch(error) {
-            if(error.name==="AbortError"||signal?.aborted||!["ENGINE_WORKER_FAILED","ENGINE_LOAD_TIMEOUT"].includes(error.code))throw error;
+            if(error.name==="AbortError"||signal?.aborted||error.code!=="ENGINE_WORKER_FAILED")throw error;
             return run(false);
           }
         });
@@ -3089,26 +3092,33 @@
         if(king&&attacked(after,king[0],king[1],position.turn))score+=2;
         return score;
       }
+      function completeOpeningLine(review,coreMoves) {
+        let position=startState();
+        for(let index=0;index<coreMoves.length;index++) {
+          const code=coreMoves[index],from=[8-Number(code[1]),"abcdefgh".indexOf(code[0])],to=[8-Number(code[3]),"abcdefgh".indexOf(code[2])];
+          const move=legalMoves(position).find(candidate=>same(candidate.from,from)&&same(candidate.to,to));
+          if(!move)throw new Error(`Invalid ${review.title} walkthrough at ${code}`);
+          position=applyMove(position,move);
+        }
+        const moves=[...coreMoves],movedFrom=new Set();
+        while(moves.length<40) {
+          const candidates=legalMoves(position);
+          if(!candidates.length)throw new Error(`${review.title} ends before its 20-move teaching line.`);
+          candidates.sort((a,b)=>openingMoveScore(position,b,movedFrom)-openingMoveScore(position,a,movedFrom));
+          const move=candidates[0];
+          moves.push(`${"abcdefgh"[move.from[1]]}${8-move.from[0]}${"abcdefgh"[move.to[1]]}${8-move.to[0]}`);
+          movedFrom.add(`${move.from[0]},${move.from[1]}`);
+          position=applyMove(position,move);
+        }
+        return moves;
+      }
+      // The extended line of each opening is generated on first use instead of for every opening at startup.
       function ensureTwentyMoveLines() {
         for(const review of quickReviews) {
-          let position=startState();
-          for(let index=0;index<review.moves.length;index++) {
-            const code=review.moves[index],from=[8-Number(code[1]),"abcdefgh".indexOf(code[0])],to=[8-Number(code[3]),"abcdefgh".indexOf(code[2])];
-            const move=legalMoves(position).find(candidate=>same(candidate.from,from)&&same(candidate.to,to));
-            if(!move)throw new Error(`Invalid ${review.title} walkthrough at ${code}`);
-            position=applyMove(position,move);
-          }
-          review.coreMoveCount=review.moves.length;
-          const movedFrom=new Set();
-          while(review.moves.length<40) {
-            const candidates=legalMoves(position);
-            if(!candidates.length)throw new Error(`${review.title} ends before its 20-move teaching line.`);
-            candidates.sort((a,b)=>openingMoveScore(position,b,movedFrom)-openingMoveScore(position,a,movedFrom));
-            const move=candidates[0];
-            review.moves.push(`${"abcdefgh"[move.from[1]]}${8-move.from[0]}${"abcdefgh"[move.to[1]]}${8-move.to[0]}`);
-            movedFrom.add(`${move.from[0]},${move.from[1]}`);
-            position=applyMove(position,move);
-          }
+          const coreMoves=review.moves;let completed=null;
+          Object.defineProperty(review,"coreMoves",{value:coreMoves,enumerable:false});
+          Object.defineProperty(review,"coreMoveCount",{get:()=>coreMoves.length,enumerable:true,configurable:true});
+          Object.defineProperty(review,"moves",{get(){return completed||(completed=completeOpeningLine(review,coreMoves));},enumerable:true,configurable:true});
         }
       }
       let quickReviewIndex=0, quickReviewPly=0, reviewPreviewIndex=null, analysisPositionIndex=null, lessonAnimationTimer=0, reviewStudySide="w",quickReviewCategory="all";
@@ -3116,13 +3126,14 @@
       const iconByName={pawn:"♙",knight:"♘",bishop:"♗",rook:"♖",queen:"♕",king:"♔"};
       function pieceIcon(name) { return iconByName[name.toLowerCase()]||"♟"; }
       function quickReviewOpeningCategory(review) {
-        return review.moves[0]==="e2e4"?"e4":review.moves[0]==="d2d4"?"d4":"flank";
+        const first=(review.coreMoves||review.moves)[0];
+        return first==="e2e4"?"e4":first==="d2d4"?"d4":"flank";
       }
       const quickReviewEcoCache=new WeakMap();
       function quickReviewEco(review) {
         if(!openingDatabaseByPosition.size)return "";
         if(quickReviewEcoCache.has(review))return quickReviewEcoCache.get(review);
-        const line=review.moves.slice(0,review.coreMoveCount||review.moves.length);
+        const line=review.coreMoves||review.moves.slice(0,review.coreMoveCount||review.moves.length);
         let best=null;
         for(const records of openingDatabaseByPosition.values())for(const entry of records) {
           if(entry.m.length>line.length||entry.m.length<2||!entry.m.every((move,index)=>move===line[index]))continue;
@@ -6924,9 +6935,14 @@
         else { humanColor="w";orientation="w"; }
         const seconds=Number(mode==="ai"?$("aiTimeControl").value:$("timeControl").value);
         clockOn=seconds>0;clocks={w:seconds,b:seconds};clockStamp=Date.now();
+<<<<<<< HEAD
         if(mode==="ai")void ensureStockfish().catch(error=>console.warn("Stockfish warm-up failed:",error));
         render(); evaluateEnd(); startClock();
         playEventSound("gameStart");
+=======
+        if(mode==="ai"){warmOpeningDatabase();void ensureStockfish().catch(error=>console.warn("Stockfish warm-up failed:",error));}
+        render(); evaluateEnd(); startClock();playEventSound("gameStart");
+>>>>>>> 82566ede208c26fa4a3ae5a5c1ff6ea38107bf0b
         if(mode==="ai"&&state.turn!==humanColor) scheduleAI();
         showToast(mode==="ai"?`New game · ${humanColor==="w"?"You play White":"You play Black"}`:"New local game");
       }
@@ -7565,20 +7581,40 @@
         }
         return bestMove;
       }
+      let stockfishFailedAt=0,stockfishLoadingToastShown=false;
       async function chooseAIMove(position=state,signal) {
         const rating=Number($("strength").value);
         if(!legalMoves(position).length)return null;
+        if(!openingDatabaseByPosition.size&&openingDatabasePromise&&history.length<12)await Promise.race([openingDatabasePromise.catch(()=>{}),new Promise(resolve=>setTimeout(resolve,1200))]);
         const bookMove=ecoOpeningBookMove(position,rating);
         if(bookMove)return bookMove;
         const depth=rating<700?6:rating<1000?8:rating<1400?10:rating<1700?12:14;
         const movetime=rating<700?450:rating<1000?700:rating<1400?1000:rating<1700?1400:1800;
-        const result=await stockfishSearch(position,{rating,depth,movetime,signal});
-        const move=uciMove(position,result.best);
-        if(!move)throw new Error(`Stockfish returned an illegal move: ${result.best}`);
-        return move;
+        if(Date.now()-stockfishFailedAt<120000)return chooseFallbackMove(position,rating);
+        const loading=ensureStockfish();loading.catch(()=>{});
+        if(!stockfishIsReady) {
+          const grace=Math.max(0,2500-(Date.now()-stockfishLoadStartedAt));
+          if(grace)await Promise.race([loading.catch(()=>{}),new Promise(resolve=>setTimeout(resolve,grace))]);
+          if(!stockfishIsReady&&Date.now()-stockfishFailedAt>=120000) {
+            if(!stockfishLoadingToastShown){stockfishLoadingToastShown=true;showToast(isPersian?"استاک‌فیش هنوز در حال بارگیری است؛ تا آن موقع موتور داخلی بازی می‌کند.":"Stockfish is still loading; the built-in engine plays until it is ready.");}
+            return chooseFallbackMove(position,rating);
+          }
+        }
+        try {
+          const result=await stockfishSearch(position,{rating,depth,movetime,signal});
+          const move=uciMove(position,result.best);
+          if(!move)throw new Error(`Stockfish returned an illegal move: ${result.best}`);
+          return move;
+        } catch(error) {
+          if(error.name==="AbortError"||signal?.aborted)throw error;
+          console.error(error);
+          stockfishFailedAt=Date.now();
+          showToast(isPersian?"استاک‌فیش در دسترس نیست؛ موتور داخلی بازی را ادامه می‌دهد.":"Stockfish is unavailable; the built-in engine will keep playing.");
+          return chooseFallbackMove(position,rating);
+        }
       }
       function waitForAIMinimumThinkTime(startedAt,signal) {
-        const remaining=Math.max(0,2700-(performance.now()-startedAt));
+        const remaining=Math.max(0,600-(performance.now()-startedAt));
         if(!remaining)return Promise.resolve();
         return new Promise((resolve,reject)=>{
           const finish=()=>{signal.removeEventListener("abort",cancel);resolve();};
@@ -7868,6 +7904,7 @@
         else showToast(completedLessons.size===lessons.length?"Course complete — keep practicing in real games":"Nice work. Revisit any lesson or keep practicing.");
       });
       loadGameplaySettings();loadAiOpeningHistory();
+<<<<<<< HEAD
       void loadOpeningDatabase().then(()=>{
         const previousOpening=openingIdentity;
         recognizeOpening();
@@ -7876,6 +7913,34 @@
       }).catch(error=>{console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);});
       void registerOfflineSupport();void requestPersistentStorage();
       ensureTwentyMoveLines();loadRecentGames();loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();renderJourney();renderDailyChallenge();
+=======
+      let openingWarmStarted=false;
+      function warmOpeningDatabase() {
+        if(openingWarmStarted)return;
+        openingWarmStarted=true;
+        void loadOpeningDatabase().then(()=>{
+          const previousOpening=openingIdentity;
+          recognizeOpening();
+          if(openingIdentity!==previousOpening&&!$("gameScreen").hidden)render();
+          if(!$("trainingScreen").hidden)renderQuickReviews($("openingSearch").value);
+        }).catch(error=>{openingWarmStarted=false;console.error(error);showToast(isPersian?`پایگاه گشایش‌ها بارگیری نشد: ${error.message}`:`Opening database could not be loaded: ${error.message}`);});
+      }
+      function whenBrowserIdle(task,timeout) {
+        if("requestIdleCallback" in window)requestIdleCallback(task,{timeout});
+        else setTimeout(task,Math.min(timeout,1500));
+      }
+      window.addEventListener("load",()=>{
+        setTimeout(()=>{
+          whenBrowserIdle(warmOpeningDatabase,3000);
+          if(!navigator.connection?.saveData)whenBrowserIdle(()=>{void ensureStockfish().catch(error=>console.warn("Stockfish preload failed; it will be retried when needed.",error));},8000);
+        },1200);
+      },{once:true});
+      for(const eventName of ["pointerenter","focus","pointerdown"]) {
+        $("lobbyAiMode")?.addEventListener(eventName,()=>{warmOpeningDatabase();void ensureStockfish().catch(()=>{});},{once:true,passive:true});
+        $("trainingTop")?.addEventListener(eventName,warmOpeningDatabase,{once:true,passive:true});
+      }
+      ensureTwentyMoveLines();void loadRecentGames().then(()=>loadAchievementProgress());loadProfileStats();loadPlayerProfile();loadAppearance();loadLessonProgress();loadMusicSettings();void loadAudioPreferencesFromArchive();void registerOfflineSupport();void requestPersistentStorage();renderJourney();renderDailyChallenge();
+>>>>>>> 82566ede208c26fa4a3ae5a5c1ff6ea38107bf0b
       reviewStudySide=openingSideFor(quickReviews[quickReviewIndex]);renderQuickReviews();
       $("setSkillButton").addEventListener("click",setPlayerSkill);
       $("puzzleHintButton").addEventListener("click",showPuzzleHint);
