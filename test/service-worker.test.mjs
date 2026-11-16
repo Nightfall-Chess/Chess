@@ -61,7 +61,7 @@ test("service worker pre-caches the app shell, leaves puzzle APIs uncached, and 
   await install.promise;
 
   assert.ok(harness.precached.includes(`${harness.scope}index.html`));
-  assert.ok(harness.precached.includes(`${harness.scope}opening-index.mjs`));
+  assert.ok(harness.precached.includes(`${harness.scope}opening-book.mjs`));
   // Large files must not slow down the first page load while the worker installs.
   assert.equal(harness.precached.some(url => url.endsWith(".wasm") || url.endsWith("openings.json")), false);
 
