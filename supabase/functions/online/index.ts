@@ -114,14 +114,19 @@ async function main(req: Request) {
       if (error || !room || room.status === "finished" || new Date(room.expires_at).getTime() < Date.now()) throw new Error("ROOM_NOT_FOUND");
       const id = room.id;
       const existing = await db.from("online_players").select("color").eq("room_id", id).eq("user_id", userId).maybeSingle();
+      if (existing.error) throw existing.error;
       if (existing.data) {
         data = { room: await snapshot(db, id, userId) };
       } else {
-        if (room.status !== "waiting") throw new Error("ROOM_FULL");
-        const { error: addError } = await db.from("online_players").insert({ room_id: id, user_id: userId, color: "b", display_name: cleanName(body.name, "Player 2") });
-        if (addError) throw new Error("ROOM_FULL");
-        const { error: updateError } = await db.from("online_rooms").update({ status: "playing", updated_at: new Date().toISOString() }).eq("id", id).eq("status", "waiting");
-        if (updateError) throw updateError;
+        const { error: joinError } = await db.rpc("online_join_room", {
+          p_room_id: id,
+          p_user_id: userId,
+          p_display_name: cleanName(body.name, "Player 2")
+        });
+        if (joinError) {
+          if (String(joinError.message || "").includes("ROOM_FULL")) throw new Error("ROOM_FULL");
+          throw joinError;
+        }
         data = { room: await snapshot(db, id, userId) };
         event = "joined"; eventRoom = id;
       }
