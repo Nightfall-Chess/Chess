@@ -9,6 +9,8 @@
   --orbit-y: 50%;
   --orbit-tilt-x: 0deg;
   --orbit-tilt-y: 0deg;
+  position: relative;
+  isolation: isolate;
   transform: perspective(900px) rotateX(var(--orbit-tilt-y)) rotateY(var(--orbit-tilt-x));
   transform-style: preserve-3d;
   transition: transform .22s cubic-bezier(.2,.7,.25,1), border-color .2s ease, box-shadow .2s ease;
@@ -28,6 +30,7 @@
 [data-orbit-surface]:hover::after,
 [data-orbit-surface]:focus-within::after { opacity: 1; }
 [data-orbit-surface]:hover {
+  transform: perspective(900px) rotateX(var(--orbit-tilt-y)) rotateY(var(--orbit-tilt-x)) translateY(-1px);
   border-color: var(--orbit-border);
   box-shadow: 0 12px 30px rgba(0,0,0,.18), 0 0 22px rgba(183,163,255,.07);
 }
