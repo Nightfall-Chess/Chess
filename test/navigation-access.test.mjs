@@ -8,10 +8,10 @@ test("Classroom and achievements remain reachable through explicit navigation", 
     readFile(new URL("../nightfall-redesign.css", import.meta.url), "utf8")
   ]);
 
-  assert.match(html, /id="classroomTop"[^>]*>[^<]*Classroom/);
+  assert.match(html, /id="classroomTop"[^>]*>(?:\s*<svg\b[^>]*>[\s\S]*?<\/svg>)?\s*Classroom/);
   assert.match(html, /classroomTop"\)\.addEventListener\("click",openClassroom\)/);
-  assert.match(html, /data-lobby-page="achievements">Achievements<\/button>/);
-  assert.match(html, /data-lobby-page="import">Import PGN<\/button>/);
+  assert.match(html, /data-lobby-page="achievements">(?:\s*<svg\b[^>]*>[\s\S]*?<\/svg>)?\s*Achievements<\/button>/);
+  assert.match(html, /data-lobby-page="import">(?:\s*<svg\b[^>]*>[\s\S]*?<\/svg>)?\s*Import PGN<\/button>/);
   assert.match(html, /id="pgnImportSection"[^>]+hidden/);
   assert.match(html, /importPgnButton"\)\.addEventListener\("click",\(\)=>void importPgnGame\(\)\)/);
   assert.match(html, /viewImportedArchiveButton"\)\.addEventListener\("click",\(\)=>switchLobbyPage\("progress"\)\)/);

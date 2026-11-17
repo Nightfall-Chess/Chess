@@ -1459,20 +1459,39 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=31">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=36">
 </head>
 <body>
+  <svg class="icon-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-classroom" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="icon-training" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></symbol>
+    <symbol id="icon-online" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.5.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.5-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.8l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.5-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.5.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1-.1 1.8Z" transform="translate(-1 -2)"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 12 7-12 7z"/></symbol>
+    <symbol id="icon-puzzle" viewBox="0 0 24 24"><path d="M4 4h6v3a2 2 0 1 0 4 0V4h6v6h-3a2 2 0 1 0 0 4h3v6h-6v-3a2 2 0 1 0-4 0v3H4v-6h3a2 2 0 1 0 0-4H4z"/></symbol>
+    <symbol id="icon-progress" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-5 5"/></symbol>
+    <symbol id="icon-achievements" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z"/></symbol>
+    <symbol id="icon-import" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></symbol>
+    <symbol id="icon-profile" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></symbol>
+    <symbol id="icon-gameplay" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2m9 7h-2M5 12H3m9 9v-2"/></symbol>
+    <symbol id="icon-appearance" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18m6-18v18"/></symbol>
+    <symbol id="icon-sound" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7m3-10a9 9 0 0 1 0 13"/></symbol>
+    <symbol id="icon-language" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></symbol>
+    <symbol id="icon-friend" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="icon-openings" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v3a3 3 0 0 0 3 3h6"/></symbol>
+    <symbol id="icon-streak" viewBox="0 0 24 24"><path d="M12 22c4.4 0 7-2.9 7-6.7 0-2.7-1.6-4.9-4.1-7.3.2 2-1 3.1-2.2 3.7C12.8 7.8 10.7 4.5 7 2c.7 4.1-.2 6.1-1.7 8.4C4.1 12.2 4 13.4 4 15.2 4 19.1 7 22 12 22Z"/><path d="M12 22c2.1 0 3.4-1.4 3.4-3.2 0-1.2-.7-2.4-2.2-3.8-.1 1.2-.8 1.8-1.6 2.2-.1-1.6-.8-2.7-2.1-3.8.2 2.1-1 3-1 4.9 0 2.1 1.4 3.7 3.5 3.7Z"/></symbol>
+  </svg>
   <main class="app">
     <header>
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">♞</div>
+        <div class="brand-mark" aria-hidden="true"><img src="./chess-icon.svg" alt=""></div>
         <div><div class="brand-name">Nightfall Chess</div><div class="brand-caption">A quieter kind of competition</div></div>
       </div>
       <div class="header-actions">
-        <button class="sound-toggle classroom-nav-button" id="classroomTop" type="button">♧ Classroom</button>
-        <button class="sound-toggle" id="trainingTop" type="button">♟ Training</button>
-        <button class="sound-toggle" id="onlineTop" type="button">♧ Online</button>
-        <button class="sound-toggle" id="settingsTop" type="button">⚙ Settings</button>
+        <button class="sound-toggle classroom-nav-button" id="classroomTop" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#icon-classroom"></use></svg>Classroom</button>
+        <button class="sound-toggle" id="trainingTop" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#icon-training"></use></svg>Training</button>
+        <button class="sound-toggle" id="onlineTop" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#icon-online"></use></svg>Online</button>
+        <button class="sound-toggle" id="settingsTop" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#icon-settings"></use></svg>Settings</button>
         <button class="subtle-button" id="newGameTop" type="button" hidden>＋ <span>New game</span></button>
         <button class="icon-button" id="flipButton" type="button" aria-label="Flip board" title="Flip board" hidden>↻</button>
       </div>
@@ -1498,17 +1517,17 @@
         </div>
       </div>
       <nav class="lobby-navigation" aria-label="Main menu">
-        <button class="lobby-nav-button active" type="button" data-lobby-page="play" aria-current="page">Play</button>
-        <button class="lobby-nav-button" type="button" data-lobby-page="puzzles">Puzzles</button>
-        <button class="lobby-nav-button" type="button" data-lobby-page="progress">Progress</button>
-        <button class="lobby-nav-button" type="button" data-lobby-page="achievements">Achievements</button>
-        <button class="lobby-nav-button" type="button" data-lobby-page="import">Import PGN</button>
+        <button class="lobby-nav-button active" type="button" data-lobby-page="play" aria-current="page"><svg class="ui-icon" aria-hidden="true"><use href="#icon-play"></use></svg>Play</button>
+        <button class="lobby-nav-button" type="button" data-lobby-page="puzzles"><svg class="ui-icon" aria-hidden="true"><use href="#icon-puzzle"></use></svg>Puzzles</button>
+        <button class="lobby-nav-button" type="button" data-lobby-page="progress"><svg class="ui-icon" aria-hidden="true"><use href="#icon-progress"></use></svg>Progress</button>
+        <button class="lobby-nav-button" type="button" data-lobby-page="achievements"><svg class="ui-icon" aria-hidden="true"><use href="#icon-achievements"></use></svg>Achievements</button>
+        <button class="lobby-nav-button" type="button" data-lobby-page="import"><svg class="ui-icon" aria-hidden="true"><use href="#icon-import"></use></svg>Import PGN</button>
       </nav>
       <section class="home-shortcuts" aria-label="Quick access">
-        <button class="home-shortcut" id="homeAiButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">♟</span><span><strong>Play against AI</strong><small>Choose your challenge</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
-        <button class="home-shortcut" id="homeFriendButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">♙</span><span><strong>Play a friend locally</strong><small>One board, two players</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
-        <button class="home-shortcut" id="homeAcademyButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">♧</span><span><strong>Explore the Academy</strong><small>Practice at your own pace.</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
-        <button class="home-shortcut" id="homeOpeningsButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">⌘</span><span><strong>Opening explorer</strong><small>Review openings from real master games.</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
+        <button class="home-shortcut" id="homeAiButton" type="button"><span class="home-shortcut-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#icon-play"></use></svg></span><span><strong>Play against AI</strong><small>Choose your challenge</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
+        <button class="home-shortcut" id="homeFriendButton" type="button"><span class="home-shortcut-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#icon-friend"></use></svg></span><span><strong>Play a friend locally</strong><small>One board, two players</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
+        <button class="home-shortcut" id="homeAcademyButton" type="button"><span class="home-shortcut-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#icon-training"></use></svg></span><span><strong>Explore the Academy</strong><small>Practice at your own pace.</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
+        <button class="home-shortcut" id="homeOpeningsButton" type="button"><span class="home-shortcut-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#icon-openings"></use></svg></span><span><strong>Opening explorer</strong><small>Review openings from real master games.</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
       </section>
       <div class="lobby-grid">
         <section class="lobby-card">
@@ -1555,7 +1574,7 @@
           <button class="primary-button" id="setSkillButton" type="button">Set my level</button>
         </section>
         <section class="lobby-card daily-card" id="dailyCard">
-          <div><strong>🔥 <span id="dailyStreak">0</span> <span>day streak</span></strong><span id="dailyStreakHint">Play one game and solve one puzzle each day.</span></div>
+          <div><strong><svg class="ui-icon" aria-hidden="true"><use href="#icon-streak"></use></svg><span id="dailyStreak">0</span> <span>day streak</span></strong><span id="dailyStreakHint">Play one game and solve one puzzle each day.</span></div>
           <div class="daily-checklist"><span class="daily-check" id="dailyGameCheck">♟ Game today</span><span class="daily-check" id="dailyPuzzleCheck">♞ Puzzle today</span></div>
         </section>
         <section class="card daily-challenge-card" id="dailyChallengeCard" aria-labelledby="dailyChallengeTitle">
@@ -1618,7 +1637,7 @@
           <p class="profile-chart-empty" id="momentsEmpty">Save a position while playing to keep it here.</p>
         </section>
         <section class="lobby-card" id="puzzleSection" hidden>
-          <div class="puzzle-heading"><div><h2>♞ Chess puzzles</h2><p class="puzzle-copy" id="puzzleProgress">Loading the Lichess puzzle collection…</p></div><span class="puzzle-rating" id="puzzleRating">Rating 400</span></div>
+          <div class="puzzle-heading"><div><h2><svg class="ui-icon" aria-hidden="true"><use href="#icon-puzzle"></use></svg><span>Chess puzzles</span></h2><p class="puzzle-copy" id="puzzleProgress">Loading the Lichess puzzle collection…</p></div><span class="puzzle-rating" id="puzzleRating">Rating 400</span></div>
           <div class="puzzle-progress-track" role="progressbar" aria-label="Puzzle collection progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="puzzle-progress-fill" id="puzzleProgressFill"></div></div>
           <div class="puzzle-area">
             <div class="quick-board puzzle-board" id="puzzleBoard" role="grid" aria-label="Chess puzzle preview"></div>
@@ -1725,11 +1744,11 @@
       <div class="settings-head"><div><div class="lobby-kicker">PERSONALIZE YOUR GAME</div><h1 id="settingsTitle">Settings</h1><p>Make the board, sound and profile feel like yours.</p></div><button class="subtle-button" id="settingsBack" type="button">← Back</button></div>
       <div class="settings-layout">
         <nav class="card settings-nav" aria-label="Settings sections">
-          <button type="button" class="settings-nav-button active" data-settings-panel="profile">Profile</button>
-          <button type="button" class="settings-nav-button" data-settings-panel="gameplay">Gameplay</button>
-          <button type="button" class="settings-nav-button" data-settings-panel="appearance">Board & pieces</button>
-          <button type="button" class="settings-nav-button" data-settings-panel="audio">Sound</button>
-          <button type="button" class="settings-nav-button" data-settings-panel="language">Language</button>
+          <button type="button" class="settings-nav-button active" data-settings-panel="profile"><svg class="ui-icon" aria-hidden="true"><use href="#icon-profile"></use></svg>Profile</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="gameplay"><svg class="ui-icon" aria-hidden="true"><use href="#icon-gameplay"></use></svg>Gameplay</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="appearance"><svg class="ui-icon" aria-hidden="true"><use href="#icon-appearance"></use></svg>Board & pieces</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="audio"><svg class="ui-icon" aria-hidden="true"><use href="#icon-sound"></use></svg>Sound</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="language"><svg class="ui-icon" aria-hidden="true"><use href="#icon-language"></use></svg>Language</button>
         </nav>
         <div class="settings-content">
           <section class="card settings-panel" data-settings-content="profile">
@@ -2210,7 +2229,7 @@
         "Brilliant":"درخشان","Great":"عالی","Best":"بهترین","Excellent":"بسیار خوب","Good":"خوب","Book":"کتابی","Inaccuracy":"نادقیق","Mistake":"اشتباه","Blunder":"اشتباه فاحش","Miss":"فرصت ازدست‌رفته","Unavailable":"در دسترس نیست","Analyzing":"در حال تحلیل",
         "Show Stockfish move analysis in the move list":"نمایش تحلیل Stockfish در فهرست حرکت‌ها","Every move is analyzed asynchronously. The move list shows its classification and evaluation when Stockfish finishes.":"همهٔ حرکت‌ها به‌صورت غیرهم‌زمان تحلیل می‌شوند. پس از پایان Stockfish، طبقه‌بندی و ارزیابی آن‌ها نمایش داده می‌شود.",
         "Accuracy estimate based on Stockfish win-chance changes":"برآورد دقت بر پایهٔ تغییر شانس برد در ارزیابی Stockfish","Engine evaluation":"ارزیابی موتور","ECO":"رده‌بندی ECO",
-        "♧ Online":"♧ آنلاین","PLAY TOGETHER":"باهم بازی کنید","Online with friends":"بازی آنلاین با دوستان",
+        "Online":"آنلاین","♧ Online":"♧ آنلاین","PLAY TOGETHER":"باهم بازی کنید","Online with friends":"بازی آنلاین با دوستان",
         "Import PGN":"واردکردن PGN","Import and review a PGN":"واردکردن و مرور PGN","Choose a PGN file":"انتخاب فایل PGN",
         "Or paste PGN text":"یا متن PGN را جای‌گذاری کنید","Choose a PGN file or paste a game. Nightfall validates every move, saves the complete game to your archive, and opens it in Game Review.":"یک فایل انتخاب یا بازی را جای‌گذاری کنید. نایت‌فال حرکت‌ها را بررسی می‌کند، بازی کامل را در بایگانی ذخیره می‌کند و مرور بازی را باز می‌کند.",
         "Import and review":"واردکردن و مرور","View game archive":"نمایش بایگانی بازی‌ها","Clear":"پاک‌کردن","SAVED TO GAME ARCHIVE":"ذخیره در بایگانی بازی‌ها",
@@ -2254,7 +2273,7 @@
         "Your level is set. Solve a few easier positions first, then difficulty will follow your results.":"سطح شما ثبت شد. ابتدا چند موقعیت ساده‌تر را حل کنید؛ سپس سختی با نتیجه‌های شما هماهنگ می‌شود.",
         "Adaptive puzzle selection":"انتخاب هوشمند معما","Puzzle rating":"درجهٔ سختی معما",
         "⚙ Settings":"⚙ تنظیمات","Settings":"تنظیمات","PERSONALIZE YOUR GAME":"شخصی‌سازی بازی","Make the board, sound and profile feel like yours.":"صفحه، صدا و نمایه را مطابق سلیقهٔ خود تنظیم کنید.",
-        "Profile":"نمایه","Board & pieces":"صفحه و مهره‌ها","Sound":"صدا","Sound & music":"صدا و موسیقی","Language":"زبان","Display language":"زبان نمایش",
+        "Profile":"نمایه","Gameplay":"روند بازی","Board & pieces":"صفحه و مهره‌ها","Sound":"صدا","Sound & music":"صدا و موسیقی","Language":"زبان","Display language":"زبان نمایش",
         "Player profile":"نمایهٔ بازیکن","YOUR ACCOUNT ON THIS DEVICE":"حساب شما در این دستگاه","Username":"نام کاربری","Profile picture":"تصویر نمایه",
         "Save profile":"ذخیرهٔ نمایه","Remove picture":"حذف تصویر","Your profile is saved on this device and shown in local games. No account or image upload is required.":"نمایه در این دستگاه ذخیره و در بازی‌های محلی نمایش داده می‌شود. حساب کاربری یا بارگذاری تصویر لازم نیست.",
         "Board theme":"پوستهٔ صفحه","Piece style":"سبک مهره","LIVE PREVIEW":"پیش‌نمایش زنده","Preview":"پیش‌نمایش","Sage":"سبز ملایم","Arctic blue":"آبی یخی","Walnut":"گردویی",
@@ -2297,7 +2316,8 @@
         "More player info":"اطلاعات بیشتر بازیکن","Nightfall Chess Academy":"آموزشگاه شطرنج شبانه",
         "Learn chess, one idea at a time.":"شطرنج را قدم‌به‌قدم یاد بگیرید.",
         "Start with the pieces, then practice safe moves, tactics, and complete opening plans with clear steps and examples.":"از حرکت مهره‌ها شروع کنید؛ سپس حرکت‌های امن، تاکتیک‌ها و برنامهٔ گشایش‌ها را با مثال‌های روشن یاد بگیرید.",
-        "COURSE PROGRESS":"پیشرفت دوره","← Back to game":"← بازگشت به بازی","← Back to menu":"← بازگشت به منو",
+        "COURSE PROGRESS":"پیشرفت دوره","← Back to game":"← بازگشت به بازی","← Back to online":"← بازگشت به بازی آنلاین","← Back to menu":"← بازگشت به منو",
+        "Chess mastery takes sustained practice. These lessons give you a solid path; keep playing, reviewing, and learning beyond them.":"تسلط بر شطرنج نیازمند تمرین پیوسته است. این درس‌ها مسیر روشنی پیش روی شما می‌گذارند؛ به بازی، مرور و یادگیری ادامه دهید.",
         "⚡ Fast opening reviews · 1 minute each":"⚡ مرور سریع گشایش‌ها · هرکدام ۱ دقیقه",
         "Find an opening":"جست‌وجوی گشایش","Search 33 opening plans":"جست‌وجو در ۳۳ گشایش",
         "Choose the side to study":"انتخاب رنگ برای آموزش","Study from":"آموزش از دیدِ","♙ White":"♙ سفید","♟ Black":"♟ سیاه",
