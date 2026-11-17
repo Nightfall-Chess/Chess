@@ -127,7 +127,7 @@ async function fillAudio(url) {
 async function sliceAudioRange(response, range) {
   const blob = await response.blob();
   const size = blob.size;
-  const match = /^bytes=(\\d*)-(\\d*)$/.exec(range || "");
+  const match = /^bytes=(\d*)-(\d*)$/.exec(range || "");
   if (!match) return new Response(null, { status: 416, headers: { "Content-Range": "bytes */" + size } });
   let start = 0;
   let end = size - 1;
