@@ -1891,3 +1891,45 @@ html[dir="rtl"] .mode-card.active::after { right: auto; left: 13px; }
     flex-basis: 17px;
   }
 }
+
+/* Refined two-line footer credits. */
+.site-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 7px;
+  width: min(100%, 1120px);
+  margin: 34px auto 0;
+  padding: 19px 12px 4px;
+  border-top: 1px solid #ffffff12;
+  color: #85899c;
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: .025em;
+  text-align: center;
+}
+
+.site-footer .site-footer-credit {
+  color: #c9c0e8;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+.site-footer .site-footer-heart {
+  display: inline-block;
+  margin-inline-start: 3px;
+  color: #d9a0b4;
+  font-size: 10px;
+  vertical-align: 1px;
+}
+
+.site-footer .site-footer-copyright {
+  color: #777d91;
+  font-size: 10px;
+  letter-spacing: .035em;
+}
+
+html[lang="fa"] .site-footer {
+  direction: rtl;
+}
