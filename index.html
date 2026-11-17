@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111312">
+  <meta name="theme-color" content="#090b13">
   <meta name="description" content="شطرنج شبانه؛ با دوستتان یا هوش مصنوعی بازی کنید و شطرنج را گام‌به‌گام بیاموزید.">
-  <link rel="icon" type="image/svg+xml" href="./chess-icon.svg">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="./chess-icon.svg">
   <link rel="apple-touch-icon" href="./chess-icon.svg">
+  <link rel="mask-icon" href="./chess-icon.svg" color="#b7a3ff">
   <title>شطرنج شبانه</title>
   <style>
     :root {
@@ -1458,7 +1459,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=29">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=31">
 </head>
 <body>
   <main class="app">
@@ -1944,6 +1945,11 @@
         </section>
       </aside>
     </div>
+    <footer class="site-footer">
+      <span>Online fixes</span>
+      <span>Created by Love 😇</span>
+      <span>All copyrights belongs to Orbit Studios. ©️</span>
+    </footer>
   </main>
   <audio id="backgroundMusic" preload="none"></audio>
   <div class="music-island" id="musicIsland" role="status" aria-live="polite" aria-hidden="true"><span class="music-island-dot"></span><span id="musicIslandName"></span></div>
@@ -2094,6 +2100,8 @@
         ],"piece");
       }
       const faText = {
+        "Online fixes":"بهبودهای آنلاین",
+        "All copyrights belongs to Orbit Studios. ©️":"تمام حقوق متعلق به Orbit Studios است. ©️",
         "Nightfall Chess":"شطرنج شبانه","A quieter kind of competition":"رقابتی آرام و هوشمندانه",
         "MOONLIT STUDY · NIGHTFALL CHESS":"مطالعه زیر نور ماه · شطرنج شبانه","Your next move awaits.":"حرکت بعدی در انتظار شماست.",
         "A quieter kind of competition. Settle in, find your rhythm, and let the game unfold.":"رقابتی آرام و هوشمندانه. آسوده بنشینید، ریتم خود را پیدا کنید و بگذارید بازی پیش برود.",
@@ -2907,7 +2915,7 @@
         aiThinking=false;
       }
       async function showMoveAssistance(kind) {
-        if(!matchActive||gameOver||aiThinking||(mode==="ai"&&state.turn!==humanColor)||boardAnimating)return;
+        if(mode==="online"||!matchActive||gameOver||aiThinking||(mode==="ai"&&state.turn!==humanColor)||boardAnimating)return;
         const generation=++assistanceGeneration,position=copyState(state),fen=stateToFen(position);
         const controller=new AbortController();
         aiSearchController=controller;
@@ -5342,8 +5350,8 @@
         $("redoButton").hidden=puzzleMode||mode==="online"||mode==="imported"||!gameplaySettings.takebacks;
         $("undoButton").disabled=!history.length||aiThinking||boardAnimating;
         $("redoButton").disabled=!redoStack.length||aiThinking||boardAnimating;
-        $("hintButton").hidden=!matchActive||gameOver||!gameplaySettings.hints;
-        $("suggestButton").hidden=!matchActive||gameOver||!gameplaySettings.suggestions;
+        $("hintButton").hidden=mode==="online"||!matchActive||gameOver||!gameplaySettings.hints;
+        $("suggestButton").hidden=mode==="online"||!matchActive||gameOver||!gameplaySettings.suggestions;
         $("hintButton").disabled=aiThinking||(mode==="ai"&&state.turn!==humanColor)||boardAnimating;
         $("suggestButton").disabled=aiThinking||(mode==="ai"&&state.turn!==humanColor)||boardAnimating;
         $("resignButton").hidden=!matchActive||puzzleMode;
@@ -7052,7 +7060,6 @@
           throw error;
         }
       }
-      async function ensureOnlineApi() {
       async function copyRoomCode() {
         if(!roomInviteCode)throw new Error("No room code is available to copy.");
         try {
@@ -7074,8 +7081,9 @@
         }
       }
 
+      async function ensureOnlineApi() {
         if(!onlineApi) {
-          onlineApi=import("./online-supabase.js?v=online-private-realtime-20261116")
+          onlineApi=import("./online-supabase.js?v=online-authoritative-snapshot-20261117")
             .catch(error=>{
               console.warn("GitHub Pages module load failed; using CDN fallback:",error);
               return import("https://cdn.jsdelivr.net/gh/Nightfall-Chess/Chess@main/online-supabase.js");
@@ -7303,7 +7311,7 @@
         $("statusText").textContent=room.result||(room.status==="waiting"
           ?(isPersian?"منتظر بازیکن دوم…":"Waiting for the second player…")
           :(isPersian?(state.turn===humanColor?"نوبت شماست":"نوبت حریف است"):(state.turn===humanColor?"Your turn":"Opponent's turn")));
-        $("newGameCard").hidden=!gameOver;$("newGameTop").hidden=!gameOver;$("resetButton").hidden=true;
+        $("newGameCard").hidden=mode==="online"||!gameOver;$("newGameTop").hidden=mode==="online"||!gameOver;$("resetButton").hidden=true;
         $("reviewGameButton").hidden=!gameOver||!history.length;$("exportPgnButton").hidden=!gameOver||!history.length;$("goMenuButton").hidden=false;
         if(gameOver) {matchActive=false;stopClock();if(justFinished)playGameEnd(room.result,room.result.startsWith("White")?"w":room.result.startsWith("Black")?"b":null);}
       }
@@ -7350,13 +7358,8 @@
           const api=await ensureOnlineApi();
           if(onlineSubscription)await onlineSubscription.unsubscribe().catch(()=>{});
           onlineSubscription=null;
-          const subscription=await api.subscribe(roomId,payload=>{
-            if(payload?.room&&Number(payload.version)>onlineVersion) {
-              if($("gameScreen").hidden)void startOnlineMatch(payload.room);
-              else applyOnlineSnapshot(payload.room);
-            } else if(payload?.force||Number(payload.version)>onlineVersion||$("gameScreen").hidden) {
-              void syncOnlineRoom();
-            }
+          const subscription=await api.subscribe(roomId,()=>{
+            if(onlineRoomId===roomId)void syncOnlineRoom(true);
           },(status,error)=>{
             if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Online realtime status:",status,error);
           });
@@ -7420,7 +7423,7 @@
           }
           const api=await ensureOnlineApi();
           const result=await api.move({roomId:onlineRoomId,expectedVersion:onlineVersion,from:onlineSquare(...move.from),to:onlineSquare(...move.to),promotion:move.promoteTo});
-          if(result.room){applyOnlineSnapshot(result.room);if(onlineSubscription?.broadcast)void onlineSubscription.broadcast(result.room).catch(error=>console.warn("Fast online move broadcast failed; server fallback remains active.",error));}
+          if(result.room)applyOnlineSnapshot(result.room);
           return true;
         } catch(error) {
           selfHostedMovePending=false;
@@ -7533,6 +7536,10 @@
         window.setTimeout(()=>{if(gameOver&&lastGameResult===result)void showAnalysis(result);},180);
       }
       function startGame() {
+        if(mode==="online") {
+          showToast(isPersian?"بازی آنلاین را نمی‌توان از اینجا بازنشانی کرد.":"Online matches cannot be restarted from the local game menu.");
+          return;
+        }
         if(matchActive){showToast("Finish the current game before starting another");return;}
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;dailyChallengeMode=false;reviewRetryMode=false;puzzleSolved=false;clearTimeout(puzzleReplyTimer);puzzleReplyTimer=null;activeArchiveId=null;
         cancelAIRequest();suspendLiveMoveAnalysis();stopClock();

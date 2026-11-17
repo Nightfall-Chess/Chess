@@ -71,9 +71,15 @@ Completed games, imported PGNs, and saved Chess Moments are stored in browser In
 
 AI move searches run in the existing local Stockfish worker. The engine can calculate while the player sees the thinking indicator; the reply waits at least 2.7 seconds from the player's move before animating, unless calculation takes longer. Reduced-motion preferences intentionally disable piece animations.
 
-## Supabase Classroom
+## Supabase online rooms and Classroom
 
-Classroom is a static-site feature backed by Supabase; it does not use a Node WebSocket server. Configure Supabase once, then publish the same static files to GitHub Pages (including a repository site deployed beneath `/Chess/`).
+Supabase rooms and Classroom are static-site features backed by Supabase; neither uses the Node WebSocket server. Configure the required Supabase services, then publish the static files to GitHub Pages (including a repository site deployed beneath `/Chess/`).
+
+### Online multiplayer
+
+The **Supabase rooms** transport uses the `online` Edge Function and private Realtime notifications. Enable Anonymous Sign-Ins, apply the migrations in `supabase/migrations/` in order (or run `supabase db push`), then deploy with `supabase functions deploy online`. The latest online migration adds atomic room creation, serialized guest joins, version-checked move commits, and resignation; move results and room completion are committed together. Notifications are only hints: each browser fetches and applies the server-owned room snapshot.
+
+The Supabase transport currently does not offer clocks. Select **Self-hosted WebSocket** for timed games; it supports authoritative clocks and reconnects through the Node server. Live Server only serves static assets, so self-hosted online games still require the Node backend described above.
 
 ### Supabase setup
 
@@ -90,7 +96,7 @@ Classroom is a static-site feature backed by Supabase; it does not use a Node We
    });
    ```
 
-   A public browser key is expected to be visible. Never put a service-role key, secret key, database password, or Edge Function secret in this file. The committed values are intentionally blank; Classroom reports a configuration error until they are supplied.
+   A public browser key is expected to be visible. Never put a service-role key, secret key, database password, or Edge Function secret in this file.    The file must contain the project URL and public browser key. These values are public; never put a service-role key, secret key, database password, or Edge Function secret in the browser or GitHub Pages.
 
 The migration creates rooms, memberships, saved games, shared state, private room secrets, and chat messages. RLS allows member-only reads; client writes are revoked. Invitation codes and optional passwords are stored as hashes in a table that is not readable by browser roles. The Edge Function verifies the Supabase user, checks membership and room access, validates chess moves using `chess.js`, and calls restricted SQL functions. State commits lock and compare the room version, so simultaneous or stale moves cannot overwrite a newer position. A rejected operation does not change the stored state.
 
@@ -108,4 +114,4 @@ The app loads the Supabase JS client lazily from a version-pinned public CDN onl
 
 The Node server remains available for the existing local puzzle API and development workflow. GitHub Pages and Live Server do not host that puzzle API; use the documented `npm start` setup if you need the Lichess puzzle collection. This puzzle service is separate from Classroom and is not part of the Supabase deployment.
 
-Before deploying, test in two separate browser profiles: create a room in one, join with its invitation link in the other, verify moves and annotations synchronize, test denied student actions and reconnection, and confirm private analysis appears only in its originating browser until the Host publishes it. No Supabase project credentials are configured in this checkout, so a live two-device connection and deployment cannot be claimed until those manual setup steps are completed.
+Before deploying, test in two separate browser profiles: create a room in one, join with its invitation link in the other, verify moves and annotations synchronize, test denied student actions and reconnection, and confirm private analysis appears only in its originating browser until the Host publishes it. This checkout's automated tests do not contact a live Supabase project; verify migration application, Edge Function deployment, and two-device operation in the target project before claiming those workflows are available.

@@ -48,8 +48,8 @@ async function initialize() {
       const channel = supabase.channel(`online:${roomId}`, {
         config: { private: true }
       });
-      channel.on("broadcast", { event: "state" }, message => onChange(message.payload))
-        .on("broadcast", { event: "joined" }, message => onChange({ ...(message.payload || {}), force: true }));
+      channel.on("broadcast", { event: "state" }, () => onChange())
+        .on("broadcast", { event: "joined" }, () => onChange());
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error("Timed out connecting to the online game.")), 15000);
         channel.subscribe((status, err) => {
@@ -67,11 +67,6 @@ async function initialize() {
         throw err;
       });
       return {
-        broadcast: async room => {
-          const payload = { version: Number(room?.version) || 0, room };
-          const result = await channel.send({ type: "broadcast", event: "state", payload });
-          if (result !== "ok") throw new Error(`Realtime broadcast failed: ${result}`);
-        },
         unsubscribe: () => supabase.removeChannel(channel)
       };
     }

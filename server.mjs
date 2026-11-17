@@ -138,6 +138,7 @@ const server = createServer((request, response) => {
 });
 
 const websocketServer = new WebSocketServer({ noServer: true, maxPayload: 8192 });
+const heartbeatIntervalMs = Math.max(1000, Math.min(60000, Number(process.env.ONLINE_HEARTBEAT_MS) || 15000));
 
 function isAllowedOnlineOrigin(request) {
   const origin = request.headers.origin;
@@ -174,11 +175,16 @@ function safeEqual(left, right) {
 }
 
 function generateRoomCode() {
-  let code;
-  do {
-    code = Array.from(randomBytes(7), byte => roomCodeAlphabet[byte % roomCodeAlphabet.length]).join("");
-  } while (rooms.has(code));
-  return code;
+  const limit = Math.floor(256 / roomCodeAlphabet.length) * roomCodeAlphabet.length;
+  while (true) {
+    let code = "";
+    for (const byte of randomBytes(16)) {
+      if (byte >= limit) continue;
+      code += roomCodeAlphabet[byte % roomCodeAlphabet.length];
+      if (code.length === 7) break;
+    }
+    if (code.length === 7 && !rooms.has(code)) return code;
+  }
 }
 
 function roomResult(game, winnerColor, reason) {
@@ -368,6 +374,9 @@ function sanitizeName(value) {
 }
 
 websocketServer.on("connection", client => {
+  client.isAlive = true;
+  client.on("pong", () => { client.isAlive = true; });
+  client.on("error", error => console.error("Online WebSocket connection failed:", error));
   client.on("message", data => {
     try {
       handleMessage(client, JSON.parse(data.toString()));
@@ -385,6 +394,19 @@ websocketServer.on("connection", client => {
     broadcastRoom(room);
   });
 });
+
+const heartbeatTimer = setInterval(() => {
+  for (const client of websocketServer.clients) {
+    if (client.readyState !== WebSocket.OPEN) continue;
+    if (client.isAlive === false) {
+      client.terminate();
+      continue;
+    }
+    client.isAlive = false;
+    client.ping();
+  }
+}, heartbeatIntervalMs);
+heartbeatTimer.unref();
 
 const clockTimer = setInterval(() => {
   const now = Date.now();

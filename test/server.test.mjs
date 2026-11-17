@@ -8,7 +8,7 @@ import { WebSocket } from "ws";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 
-async function startChessServer(t) {
+async function startChessServer(t, { heartbeatIntervalMs } = {}) {
   const probe = createServer();
   probe.listen(0, "127.0.0.1");
   await once(probe, "listening");
@@ -17,7 +17,12 @@ async function startChessServer(t) {
   await once(probe, "close");
   const child = spawn(process.execPath, [fileURLToPath(new URL("../server.mjs", import.meta.url))], {
     cwd: root,
-    env: { ...process.env, HOST: "127.0.0.1", PORT: String(address.port) },
+    env: {
+      ...process.env,
+      HOST: "127.0.0.1",
+      PORT: String(address.port),
+      ...(heartbeatIntervalMs ? { ONLINE_HEARTBEAT_MS: String(heartbeatIntervalMs) } : {})
+    },
     stdio: ["ignore", "pipe", "pipe"]
   });
   t.after(async () => {
@@ -211,4 +216,164 @@ test("puzzle API CORS allows loopback pages and rejects other origins", async t 
   const denied = await fetch(endpoint, { method: "OPTIONS", headers: { Origin: "https://example.com" } });
   assert.equal(denied.status, 403);
   assert.equal(denied.headers.get("access-control-allow-origin"), null);
+});
+
+test("self-hosted room joins serialize concurrent guests and recover after abrupt disconnect", async t => {
+  const url = await startChessServer(t);
+  const open = async () => {
+    const socket = await openWebSocket(url);
+    t.after(() => socket.close());
+    return socket;
+  };
+  const host = await open();
+  const createdPromise = nextMessage(host, message => message.type === "created");
+  host.send(JSON.stringify({ type: "create", name: "Host", timeControlSeconds: 0 }));
+  const created = await createdPromise;
+  const firstGuest = await open();
+  const secondGuest = await open();
+  const firstResultPromise = nextMessage(firstGuest, message => message.type === "joined" || message.type === "error");
+  const secondResultPromise = nextMessage(secondGuest, message => message.type === "joined" || message.type === "error");
+  firstGuest.send(JSON.stringify({ type: "join", code: created.room.code, name: "First guest" }));
+  secondGuest.send(JSON.stringify({ type: "join", code: created.room.code, name: "Second guest" }));
+  const results = await Promise.all([firstResultPromise, secondResultPromise]);
+  const joinedIndex = results.findIndex(message => message.type === "joined");
+  assert.notEqual(joinedIndex, -1);
+  const joined = results[joinedIndex];
+  assert.equal(results[1 - joinedIndex].type, "error");
+  assert.equal(joined.color, "b");
+
+  const guestSocket = joinedIndex === 0 ? firstGuest : secondGuest;
+  const disconnectedPromise = nextMessage(host, message =>
+    message.type === "state" && !message.room.players.find(player => player.color === "b").connected
+  );
+  guestSocket.terminate();
+  await disconnectedPromise;
+
+  const reconnect = await open();
+  const resumedPromise = nextMessage(reconnect, message => message.type === "resumed");
+  reconnect.send(JSON.stringify({ type: "resume", code: created.room.code, token: joined.token }));
+  const resumed = await resumedPromise;
+  assert.equal(resumed.color, "b");
+  assert.equal(resumed.room.status, "playing");
+});
+
+test("self-hosted games synchronize en passant, castling, and promotion", async t => {
+  const url = await startChessServer(t);
+  const host = await openWebSocket(url);
+  const guest = await openWebSocket(url);
+  t.after(() => { host.close(); guest.close(); });
+  const createdPromise = nextMessage(host, message => message.type === "created");
+  host.send(JSON.stringify({ type: "create", name: "Host", timeControlSeconds: 0 }));
+  const created = await createdPromise;
+  const joinedPromise = nextMessage(guest, message => message.type === "joined");
+  guest.send(JSON.stringify({ type: "join", code: created.room.code, name: "Guest" }));
+  const joined = await joinedPromise;
+
+  let version = joined.room.version;
+  let room = joined.room;
+  const play = async (color, from, to, promotion) => {
+    const sender = color === "w" ? host : guest;
+    const hostState = nextMessage(host, message => message.type === "state" && message.room.version === version + 1);
+    const guestState = nextMessage(guest, message => message.type === "state" && message.room.version === version + 1);
+    sender.send(JSON.stringify({ type: "move", expectedVersion: version, from, to, ...(promotion ? { promotion } : {}) }));
+    const [whiteView, blackView] = await Promise.all([hostState, guestState]);
+    assert.equal(whiteView.room.fen, blackView.room.fen);
+    room = whiteView.room;
+    version = room.version;
+  };
+
+  for (const [color, from, to] of [
+    ["w", "e2", "e4"], ["b", "a7", "a6"],
+    ["w", "e4", "e5"], ["b", "d7", "d5"],
+    ["w", "e5", "d6"], ["b", "c7", "d6"],
+    ["w", "g1", "f3"], ["b", "b8", "c6"],
+    ["w", "f1", "c4"], ["b", "g8", "f6"],
+    ["w", "e1", "g1"]
+  ]) await play(color, from, to);
+  assert.equal(room.moves[4].san, "exd6");
+  assert.equal(room.moves.at(-1).san, "O-O");
+  assert.match(room.fen, / b kq - /);
+
+  const promotionHost = await openWebSocket(url);
+  const promotionGuest = await openWebSocket(url);
+  t.after(() => { promotionHost.close(); promotionGuest.close(); });
+  const promotionCreatedPromise = nextMessage(promotionHost, message => message.type === "created");
+  promotionHost.send(JSON.stringify({ type: "create", name: "Host", timeControlSeconds: 0 }));
+  const promotionCreated = await promotionCreatedPromise;
+  const promotionJoinedPromise = nextMessage(promotionGuest, message => message.type === "joined");
+  promotionGuest.send(JSON.stringify({ type: "join", code: promotionCreated.room.code, name: "Guest" }));
+  const promotionJoined = await promotionJoinedPromise;
+  let promotionVersion = promotionJoined.room.version;
+  let promotionRoom;
+  for (const [color, from, to, promotion] of [
+    ["w", "a2", "a4"], ["b", "h7", "h5"],
+    ["w", "a4", "a5"], ["b", "h5", "h4"],
+    ["w", "a5", "a6"], ["b", "h4", "h3"],
+    ["w", "a6", "b7"], ["b", "h3", "g2"],
+    ["w", "b7", "a8", "q"]
+  ]) {
+    const sender = color === "w" ? promotionHost : promotionGuest;
+    const snapshotPromise = nextMessage(promotionHost, message => message.type === "state" && message.room.version === promotionVersion + 1);
+    sender.send(JSON.stringify({ type: "move", expectedVersion: promotionVersion, from, to, ...(promotion ? { promotion } : {}) }));
+    promotionRoom = (await snapshotPromise).room;
+    promotionVersion = promotionRoom.version;
+  }
+  assert.equal(promotionRoom.moves.at(-1).promotion, "q");
+  assert.match(promotionRoom.moves.at(-1).san, /Q/);
+  assert.match(promotionRoom.fen, /^Qn/);
+});
+
+test("self-hosted server accepts only one copy of a raced move", async t => {
+  const url = await startChessServer(t);
+  const host = await openWebSocket(url);
+  const guest = await openWebSocket(url);
+  t.after(() => { host.close(); guest.close(); });
+  const createdPromise = nextMessage(host, message => message.type === "created");
+  host.send(JSON.stringify({ type: "create", name: "Host", timeControlSeconds: 0 }));
+  const created = await createdPromise;
+  const joinedPromise = nextMessage(guest, message => message.type === "joined");
+  guest.send(JSON.stringify({ type: "join", code: created.room.code, name: "Guest" }));
+  const joined = await joinedPromise;
+  const updatePromise = nextMessage(guest, message => message.type === "state" && message.room.moves.length === 1);
+  const rejectionPromise = nextMessage(host, message => message.type === "error");
+  const move = JSON.stringify({ type: "move", expectedVersion: joined.room.version, from: "e2", to: "e4" });
+  host.send(move);
+  host.send(move);
+  const update = await updatePromise;
+  assert.equal(update.room.moves.length, 1);
+  assert.match((await rejectionPromise).message, /not your turn|game changed/);
+});
+
+test("self-hosted server sends WebSocket heartbeats", async t => {
+  const url = await startChessServer(t, { heartbeatIntervalMs: 1000 });
+  const socket = await openWebSocket(url);
+  t.after(() => socket.close());
+  await new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("Server heartbeat was not received.")), 3000);
+    socket.once("ping", () => { clearTimeout(timer); resolve(); });
+  });
+});
+
+test("self-hosted server synchronizes checkmate and closes the result", async t => {
+  const url = await startChessServer(t);
+  const host = await openWebSocket(url);
+  const guest = await openWebSocket(url);
+  t.after(() => { host.close(); guest.close(); });
+  const createdPromise = nextMessage(host, message => message.type === "created");
+  host.send(JSON.stringify({ type: "create", name: "Host", timeControlSeconds: 0 }));
+  const created = await createdPromise;
+  const joinedPromise = nextMessage(guest, message => message.type === "joined");
+  guest.send(JSON.stringify({ type: "join", code: created.room.code, name: "Guest" }));
+  let room = (await joinedPromise).room;
+  for (const [player, from, to] of [
+    [host, "f2", "f3"], [guest, "e7", "e5"],
+    [host, "g2", "g4"], [guest, "d8", "h4"]
+  ]) {
+    const updatePromise = nextMessage(host, message => message.type === "state" && message.room.moves.length === room.moves.length + 1);
+    player.send(JSON.stringify({ type: "move", expectedVersion: room.version, from, to }));
+    room = (await updatePromise).room;
+  }
+  assert.equal(room.status, "finished");
+  assert.equal(room.result, "Black wins by checkmate");
+  assert.equal(room.moves.at(-1).san, "Qh4#");
 });

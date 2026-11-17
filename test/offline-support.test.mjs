@@ -14,6 +14,7 @@ test("offline cache version matches the stylesheet and includes app, study, and 
   assert.equal(cacheVersion, stylesheetVersion);
   for (const asset of [
     "./index.html",
+    "./online-supabase.js?v=online-authoritative-snapshot-20261117",
     "./pgn-import.mjs",
     "./openings.json",
     "./puzzles.json",

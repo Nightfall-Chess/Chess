@@ -101,18 +101,21 @@ async function main(req: Request) {
       const invite = code();
       const id = crypto.randomUUID();
       const name = cleanName(body.name, "Player");
-      const { error: roomError } = await db.from("online_rooms").insert({ id, code_hash: await hash(invite), host_id: userId });
-      if (roomError) throw roomError;
-      const { error: playerError } = await db.from("online_players").insert({ room_id: id, user_id: userId, color: "w", display_name: name });
-      if (playerError) throw playerError;
-      const { error: stateError } = await db.from("online_game_state").insert({ room_id: id, fen: INITIAL_FEN });
-      if (stateError) throw stateError;
+      const { error } = await db.rpc("online_create_room", {
+        p_room_id: id,
+        p_code_hash: await hash(invite),
+        p_user_id: userId,
+        p_display_name: name,
+        p_initial_fen: INITIAL_FEN
+      });
+      if (error) throw error;
       data = { room: await snapshot(db, id, userId), invitationCode: invite };
     } else if (body.action === "join") {
       const invite = typeof body.invitationCode === "string" ? body.invitationCode.trim().toUpperCase() : "";
       if (!/^[A-Z0-9]{7}$/.test(invite)) throw new Error("ROOM_NOT_FOUND");
       const { data: room, error } = await db.from("online_rooms").select("id,status,expires_at").eq("code_hash", await hash(invite)).maybeSingle();
-      if (error || !room || room.status === "finished" || new Date(room.expires_at).getTime() < Date.now()) throw new Error("ROOM_NOT_FOUND");
+      if (error) throw error;
+      if (!room || room.status === "finished" || new Date(room.expires_at).getTime() < Date.now()) throw new Error("ROOM_NOT_FOUND");
       const id = room.id;
       const existing = await db.from("online_players").select("color").eq("room_id", id).eq("user_id", userId).maybeSingle();
       if (existing.error) throw existing.error;
@@ -137,6 +140,11 @@ async function main(req: Request) {
     } else if (body.action === "move") {
       const id = roomId(body.roomId);
       const player = await requirePlayer(db, id, userId);
+      const { data: activeRoom, error: roomError } = await db.from("online_rooms")
+        .select("status,expires_at").eq("id", id).single();
+      if (roomError) throw roomError;
+      if (!activeRoom || new Date(activeRoom.expires_at).getTime() < Date.now()) throw new Error("ROOM_NOT_FOUND");
+      if (activeRoom.status !== "playing") throw new Error("GAME_NOT_ACTIVE");
       const { data: saved, error } = await db.from("online_game_state").select("fen,pgn,moves,version").eq("room_id", id).single();
       if (error || !saved) throw new Error("ROOM_NOT_FOUND");
       if (Number(saved.version) !== Number(body.expectedVersion)) throw new Error("STALE_VERSION");
@@ -158,23 +166,31 @@ async function main(req: Request) {
         : chess.isThreefoldRepetition() ? "Draw by repetition"
         : chess.isInsufficientMaterial() ? "Draw by insufficient material"
         : chess.isDraw() ? "Draw" : null;
-      const nextVersion = Number(saved.version) + 1;
-      const { data: updated, error: updateError } = await db.from("online_game_state")
-        .update({ fen: chess.fen(), pgn: chess.pgn(), moves, version: nextVersion, result, updated_at: new Date().toISOString() })
-        .eq("room_id", id).eq("version", saved.version).select("room_id").maybeSingle();
-      if (updateError) throw updateError;
-      if (!updated) throw new Error("STALE_VERSION");
-      if (result) await db.from("online_rooms").update({ status: "finished", updated_at: new Date().toISOString() }).eq("id", id);
+      const { error: commitError } = await db.rpc("online_commit_move", {
+        p_room_id: id,
+        p_expected_version: Number(saved.version),
+        p_fen: chess.fen(),
+        p_pgn: chess.pgn(),
+        p_moves: moves,
+        p_result: result
+      });
+      if (commitError) {
+        const message = String(commitError.message || "");
+        if (message.includes("STALE_VERSION")) throw new Error("STALE_VERSION");
+        if (message.includes("GAME_NOT_ACTIVE")) throw new Error("GAME_NOT_ACTIVE");
+        if (message.includes("ROOM_NOT_FOUND")) throw new Error("ROOM_NOT_FOUND");
+        throw commitError;
+      }
       data = { room: await snapshot(db, id, userId), san: played.san };
       event = "state"; eventRoom = id;
     } else if (body.action === "resign") {
       const id = roomId(body.roomId);
-      const player = await requirePlayer(db, id, userId);
-      const winner = player.color === "w" ? "Black" : "White";
-      const result = `${winner} wins by resignation`;
-      const { error } = await db.from("online_game_state").update({ result, updated_at: new Date().toISOString() }).eq("room_id", id).is("result", null);
-      if (error) throw error;
-      await db.from("online_rooms").update({ status: "finished", updated_at: new Date().toISOString() }).eq("id", id);
+      const { error } = await db.rpc("online_resign_room", { p_room_id: id, p_user_id: userId });
+      if (error) {
+        if (String(error.message || "").includes("GAME_NOT_ACTIVE")) throw new Error("GAME_NOT_ACTIVE");
+        if (String(error.message || "").includes("NOT_A_PLAYER")) throw new Error("NOT_A_PLAYER");
+        throw error;
+      }
       data = { room: await snapshot(db, id, userId) };
       event = "state"; eventRoom = id;
     } else {
@@ -184,7 +200,7 @@ async function main(req: Request) {
     return reply(200, data);
   } catch (error) {
     const message = error instanceof Error ? error.message : "DATABASE_ERROR";
-    const known = new Set(["ROOM_NOT_FOUND","ROOM_FULL","NOT_A_PLAYER","STALE_VERSION","NOT_YOUR_TURN","ILLEGAL_MOVE","UNKNOWN_ACTION"]);
+    const known = new Set(["ROOM_NOT_FOUND","ROOM_FULL","NOT_A_PLAYER","STALE_VERSION","NOT_YOUR_TURN","ILLEGAL_MOVE","GAME_NOT_ACTIVE","UNKNOWN_ACTION"]);
     const code = known.has(message) ? message : "DATABASE_ERROR";
     if (code === "DATABASE_ERROR") console.error("Online game request failed:", error);
     return reply(code === "ROOM_NOT_FOUND" ? 404 : 400, { code, message: ({
@@ -194,6 +210,7 @@ async function main(req: Request) {
       STALE_VERSION: "The board changed. Syncing the latest position.",
       NOT_YOUR_TURN: "It is not your turn.",
       ILLEGAL_MOVE: "That move is not legal.",
+      GAME_NOT_ACTIVE: "This game is no longer active.",
       DATABASE_ERROR: "Online service error. Please try again."
     } as Record<string,string>)[code] || code });
   }

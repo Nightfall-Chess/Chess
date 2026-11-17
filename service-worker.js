@@ -1,11 +1,12 @@
-const CACHE_VERSION = "nightfall-v29";
+const CACHE_VERSION = "nightfall-v31";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./nightfall-redesign.css?v=29",
+  "./nightfall-redesign.css?v=31",
+  "./online-supabase.js?v=online-authoritative-snapshot-20261117",
   "./game-archive.mjs",
   "./pgn-import.mjs",
   "./achievements.mjs",
