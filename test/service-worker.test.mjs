@@ -116,6 +116,7 @@ test("service worker pre-caches the app shell, leaves puzzle APIs uncached, and 
   });
   assert.equal(puzzleApiIntercepted, false);
 
+  harness.setOnline(true);
   const staticRequest = new Request(`${harness.scope}boards/board.png`);
   let responsePromise;
   harness.listeners.get("fetch")({ request: staticRequest, respondWith(promise) { responsePromise = promise; } });
