@@ -11,9 +11,13 @@ test("Classroom and achievements remain reachable through explicit navigation", 
   assert.match(html, /id="classroomTop"[^>]*>[^<]*Classroom/);
   assert.match(html, /classroomTop"\)\.addEventListener\("click",openClassroom\)/);
   assert.match(html, /data-lobby-page="achievements">Achievements<\/button>/);
+  assert.match(html, /data-lobby-page="import">Import PGN<\/button>/);
+  assert.match(html, /id="pgnImportSection"[^>]+hidden/);
+  assert.match(html, /importPgnButton"\)\.addEventListener\("click",\(\)=>void importPgnGame\(\)\)/);
+  assert.match(html, /viewImportedArchiveButton"\)\.addEventListener\("click",\(\)=>switchLobbyPage\("progress"\)\)/);
   assert.match(html, /id="showAchievementDetails"[^>]*>View all achievements<\/button>/);
   assert.match(html, /showAchievementDetails"\)\.addEventListener\("click",openAchievementDetails\)/);
-  assert.match(html, /!?\["play","puzzles","progress","achievements"\]\.includes\(page\)/);
+  assert.match(html, /!?\["play","puzzles","progress","achievements","import"\]\.includes\(page\)/);
   assert.ok(css.includes('#lobby[data-page="achievements"] .lobby-dashboard > :not(.profile-stats):not(#journeyCard) { display: none;'));
 });
 

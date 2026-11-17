@@ -1454,7 +1454,7 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
   </style>
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=28">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=29">
 </head>
 <body>
   <main class="app">
@@ -1497,6 +1497,7 @@
         <button class="lobby-nav-button" type="button" data-lobby-page="puzzles">Puzzles</button>
         <button class="lobby-nav-button" type="button" data-lobby-page="progress">Progress</button>
         <button class="lobby-nav-button" type="button" data-lobby-page="achievements">Achievements</button>
+        <button class="lobby-nav-button" type="button" data-lobby-page="import">Import PGN</button>
       </nav>
       <section class="home-shortcuts" aria-label="Quick access">
         <button class="home-shortcut" id="homeAiButton" type="button"><span class="home-shortcut-icon" aria-hidden="true">♟</span><span><strong>Play against AI</strong><small>Choose your challenge</small></span><span class="home-shortcut-arrow" aria-hidden="true">↗</span></button>
@@ -1583,6 +1584,14 @@
           </div>
           <ol class="recent-game-list" id="recentGameList"></ol>
           <p class="profile-chart-empty" id="recentGamesEmpty">Completed games will appear here.</p>
+        </section>
+        <section class="card pgn-import-section" id="pgnImportSection" aria-labelledby="pgnImportTitle" hidden>
+          <div class="card-heading"><span class="card-title" id="pgnImportTitle">Import and review a PGN</span><span class="eyebrow">SAVED TO GAME ARCHIVE</span></div>
+          <p class="note">Choose a .pgn file or paste a game. Nightfall validates every move, saves the complete game to your archive, and opens it in Game Review.</p>
+          <label class="pgn-file-picker" for="pgnImportFile"><span aria-hidden="true">↥</span><span><strong>Choose a PGN file</strong><small id="pgnFileName">.pgn files up to 2 MB</small></span><input id="pgnImportFile" type="file" accept=".pgn,.txt,application/x-chess-pgn,text/plain"></label>
+          <label class="field pgn-text-field" for="pgnImportText"><span class="field-label">Or paste PGN text</span><textarea id="pgnImportText" rows="12" maxlength="2500000" spellcheck="false" placeholder='[Event "Casual Game"]&#10;[White "White"]&#10;[Black "Black"]&#10;[Result "*"]&#10;&#10;1. e4 e5 2. Nf3 Nc6 *'></textarea></label>
+          <p class="pgn-import-status" id="pgnImportStatus" role="status" aria-live="polite"></p>
+          <div class="pgn-import-actions"><button class="primary-button" id="importPgnButton" type="button">Import and review</button><button class="subtle-button" id="clearPgnImportButton" type="button">Clear</button><button class="subtle-button" id="viewImportedArchiveButton" type="button">View game archive</button></div>
         </section>
         <section class="card profile-learning" id="profileLearning" aria-labelledby="profileLearningTitle">
           <div class="card-heading"><span class="card-title" id="profileLearningTitle">Academy progress</span><span class="eyebrow" id="profileLessonCount">0 / 49 lessons</span></div>
@@ -2186,6 +2195,9 @@
         "Show Stockfish move analysis in the move list":"نمایش تحلیل Stockfish در فهرست حرکت‌ها","Every move is analyzed asynchronously. The move list shows its classification and evaluation when Stockfish finishes.":"همهٔ حرکت‌ها به‌صورت غیرهم‌زمان تحلیل می‌شوند. پس از پایان Stockfish، طبقه‌بندی و ارزیابی آن‌ها نمایش داده می‌شود.",
         "Accuracy estimate based on Stockfish win-chance changes":"برآورد دقت بر پایهٔ تغییر شانس برد در ارزیابی Stockfish","Engine evaluation":"ارزیابی موتور","ECO":"رده‌بندی ECO",
         "♧ Online":"♧ آنلاین","PLAY TOGETHER":"باهم بازی کنید","Online with friends":"بازی آنلاین با دوستان",
+        "Import PGN":"واردکردن PGN","Import and review a PGN":"واردکردن و مرور PGN","Choose a PGN file":"انتخاب فایل PGN",
+        "Or paste PGN text":"یا متن PGN را جای‌گذاری کنید","Choose a PGN file or paste a game. Nightfall validates every move, saves the complete game to your archive, and opens it in Game Review.":"یک فایل انتخاب یا بازی را جای‌گذاری کنید. نایت‌فال حرکت‌ها را بررسی می‌کند، بازی کامل را در بایگانی ذخیره می‌کند و مرور بازی را باز می‌کند.",
+        "Import and review":"واردکردن و مرور","View game archive":"نمایش بایگانی بازی‌ها","Clear":"پاک‌کردن","SAVED TO GAME ARCHIVE":"ذخیره در بایگانی بازی‌ها",
         "Create a room and share its invite code, or enter a code your friend sent you.":"اتاقی بسازید و کد دعوتش را بفرستید یا کدی را که دوستتان فرستاده وارد کنید.",
         "Self-hosted live play is ready":"بازی زندهٔ خودمیزبان آماده است","Connection mode":"روش اتصال","Self-hosted WebSocket (this server)":"وب‌سوکت خودمیزبان (این سرور)","Supabase rooms":"اتاق‌های Supabase",
         "WebSocket server URL":"نشانی سرور WebSocket","Auto: this website's server":"خودکار: سرور همین وب‌سایت","Use the Cloudflare Tunnel URL for games outside your network.":"برای بازی بیرون از شبکه، نشانی Cloudflare Tunnel را وارد کنید.",
@@ -4246,10 +4258,113 @@
       function isRecentGameRecord(record) {
         return Boolean(record&&typeof record==="object"&&!Array.isArray(record)
           &&typeof record.finishedAt==="string"&&Number.isFinite(Date.parse(record.finishedAt))
-          &&["win","draw","loss"].includes(record.outcome)&&["ai","friend"].includes(record.mode)
+          &&["win","draw","loss","imported"].includes(record.outcome)&&["ai","friend","online","imported"].includes(record.mode)
           &&(record.mode==="ai"?Number.isSafeInteger(record.rating)&&record.rating>=400&&record.rating<=2000:record.rating===null)
           &&["w","b"].includes(record.color)&&Number.isSafeInteger(record.plies)&&record.plies>=0
           &&typeof record.opening==="string"&&record.opening.length<=120);
+      }
+      function stateFromImportedFen(fen) {
+        const fields=String(fen||"").trim().split(/\s+/);
+        if(fields.length<4||fields.length>6||!["w","b"].includes(fields[1])||!/^(-|K?Q?k?q?)$/.test(fields[2])
+          ||!(fields[3]==="-"||/^[a-h][36]$/.test(fields[3])))throw new Error("The PGN starting FEN is invalid.");
+        const board=classroomFenBoard(fields[0]).map(row=>row.map(piece=>piece||null));
+        if(board.flat().filter(piece=>piece==="K").length!==1||board.flat().filter(piece=>piece==="k").length!==1
+          ||board[0].some(piece=>piece?.toLowerCase()==="p")||board[7].some(piece=>piece?.toLowerCase()==="p")) {
+          throw new Error("The PGN starting FEN does not describe a valid chess position.");
+        }
+        const halfmove=Number(fields[4]||0),fullmove=Number(fields[5]||1);
+        if(!Number.isSafeInteger(halfmove)||halfmove<0||!Number.isSafeInteger(fullmove)||fullmove<1)throw new Error("The PGN starting FEN counters are invalid.");
+        const ep=fields[3]==="-"?null:[8-Number(fields[3][1]),"abcdefgh".indexOf(fields[3][0])];
+        const state={board,turn:fields[1],castle:{K:fields[2].includes("K"),Q:fields[2].includes("Q"),k:fields[2].includes("k"),q:fields[2].includes("q")},ep,halfmove,fullmove};
+        if(!legalMoves(state).length)throw new Error("The PGN starting FEN has no legal moves.");
+        return state;
+      }
+      function resolveImportedSan(token,position) {
+        const san=token.replace(/[!?+#]+$/,"").replace(/(?:e\.p\.|ep)$/i,"").replace(/0/g,"O");
+        if(san==="O-O"||san==="O-O-O") {
+          const castle=san==="O-O"?"K":"Q";
+          const matches=legalMoves(position).filter(move=>move.castle===castle);
+          if(matches.length===1)return matches[0];
+          throw new Error(`The PGN move ${token} is not legal in this position.`);
+        }
+        const match=/^(?<piece>[KQRBN])?(?<origin>[a-h]?[1-8]?)(?<capture>x)?(?<to>[a-h][1-8])(?:=?(?<promotion>[QRBN]))?$/i.exec(san);
+        if(!match)throw new Error(`The PGN move ${token} is not valid standard algebraic notation.`);
+        const piece=(match.groups.piece||"P").toUpperCase(),to=match.groups.to;
+        const target=[8-Number(to[1]),"abcdefgh".indexOf(to[0])],origin=match.groups.origin||"";
+        const promotion=match.groups.promotion?.toLowerCase();
+        const candidates=legalMoves(position).flatMap(move=>move.promotion?["q","r","b","n"].map(promoteTo=>({...move,promoteTo})): [move])
+          .filter(move=>{
+            const moving=position.board[move.from[0]][move.from[1]];
+            const captured=position.board[move.to[0]][move.to[1]]||move.enPassant;
+            return moving?.toUpperCase()===piece&&same(move.to,target)
+              &&(!match.groups.capture||Boolean(captured))
+              &&(match.groups.capture||!captured)
+              &&(!/[a-h]/i.test(origin)||origin.includes("abcdefgh"[move.from[1]]))
+              &&(!/[1-8]/.test(origin)||origin.includes(String(8-move.from[0])))
+              &&(promotion?move.promoteTo===promotion:!move.promoteTo);
+          });
+        if(candidates.length!==1)throw new Error(candidates.length
+          ?`The PGN move ${token} is ambiguous in this position.`
+          :`The PGN move ${token} is not legal in this position.`);
+        return candidates[0];
+      }
+      function importedGameDate(value) {
+        const match=/^(\d{4})\.(\d{2})\.(\d{2})$/.exec(value||"");
+        if(!match)return new Date();
+        const date=new Date(Date.UTC(Number(match[1]),Number(match[2])-1,Number(match[3]),12));
+        if(date.getUTCFullYear()!==Number(match[1])||date.getUTCMonth()!==Number(match[2])-1||date.getUTCDate()!==Number(match[3]))return new Date();
+        return date;
+      }
+      async function importPgnGame() {
+        const button=$("importPgnButton"),status=$("pgnImportStatus"),source=$("pgnImportText").value;
+        if(!source.trim()) {
+          status.dataset.state="error";status.textContent=isPersian?"ابتدا فایل PGN را انتخاب یا متن بازی را وارد کنید.":"Choose a PGN file or paste a game first.";
+          return;
+        }
+        if(source.length>2*1024*1024) {
+          status.dataset.state="error";status.textContent=isPersian?"حجم متن PGN نباید از ۲ مگابایت بیشتر باشد.":"PGN text must be 2 MB or smaller.";
+          return;
+        }
+        button.disabled=true;status.dataset.state="pending";status.textContent=isPersian?"در حال بررسی و ذخیرهٔ بازی…":"Validating and saving the game…";
+        try {
+          const {parsePgn}=await import("./pgn-import.mjs");
+          const parsed=parsePgn(source);
+          if(parsed.moves.length>1000)throw new Error("PGN imports are limited to 1000 half-moves.");
+          const result=parsed.result||"*";
+          if(!["1-0","0-1","1/2-1/2","*"].includes(result))throw new Error("The PGN result header is invalid.");
+          const initial=parsed.headers.FEN?stateFromImportedFen(parsed.headers.FEN):startState();
+          if(parsed.headers.SetUp==="1"&&!parsed.headers.FEN)throw new Error("The PGN declares a custom starting position but has no FEN tag.");
+          let position=copyState(initial),entries=[];
+          for(const [index,token] of parsed.moves.entries()) {
+            const move=resolveImportedSan(token,position),before=copyState(position),after=applyMove(position,move);
+            entries.push({before,after:copyState(after),move,san:token,ply:index,prefix:entries.map(entry=>moveToUci(entry.move))});
+            position=after;
+          }
+          const date=importedGameDate(parsed.headers.Date),finishedAt=date.toISOString();
+          const record={
+            id:crypto.randomUUID(),startedAt:date.toISOString(),finishedAt,durationMs:0,
+            outcome:"imported",resultText:result==="*"?"Imported game · unfinished":`Imported game · ${result}`,
+            pgnResult:result,mode:"imported",rating:null,color:"w",plies:entries.length,
+            opening:parsed.headers.Opening||"",timeControl:parsed.headers.TimeControl||"-",
+            players:{
+              w:{name:parsed.headers.White||"White",rating:parsed.headers.WhiteElo||"?"},
+              b:{name:parsed.headers.Black||"Black",rating:parsed.headers.BlackElo||"?"}
+            },
+            entries,pgn:source.trim()+"\r\n"
+          };
+          await (await archiveApiPromise).saveGame(record);
+          recentGames=[record,...recentGames.filter(game=>game.id!==record.id)].sort((a,b)=>Date.parse(b.finishedAt)-Date.parse(a.finishedAt));
+          renderRecentGames();renderJourney();
+          status.dataset.state="success";status.textContent=isPersian
+            ?`بازی ${entries.length} حرکتی در بایگانی ذخیره شد؛ مرور Stockfish باز می‌شود.`
+            :`Saved ${entries.length} moves to your Game Archive. Opening Stockfish review…`;
+          await openArchivedGame(record.id);
+        } catch(error) {
+          console.error("PGN import failed:",error);
+          status.dataset.state="error";status.textContent=isPersian?`واردکردن PGN ناموفق بود: ${error.message}`:`PGN import failed: ${error.message}`;
+        } finally {
+          button.disabled=false;
+        }
       }
       function resultToken(outcome) { return outcome==="win"?"1-0":outcome==="loss"?"0-1":"1/2-1/2"; }
       function pgnResultFromText(text,outcome) {
@@ -4312,16 +4427,17 @@
           :(isPersian?"بایگانی این مرورگر خالی است. بازی‌های کامل‌شده روی همین دستگاه ذخیره می‌شوند و بین مرورگرها همگام نمی‌شوند.":"This browser’s archive is empty. Completed games are saved on this device and don’t sync across browsers.");
         $("recentGamesEmpty").hidden=filtered.length>0;
         $("recentGameList").innerHTML=filtered.map(record=>{
-          const outcome=isPersian?({win:"برد",draw:"مساوی",loss:"باخت"}[record.outcome]):({win:"Win",draw:"Draw",loss:"Loss"}[record.outcome]);
+          const outcome=isPersian?({win:"برد",draw:"مساوی",loss:"باخت",imported:"واردشده"}[record.outcome]):({win:"Win",draw:"Draw",loss:"Loss",imported:"Imported"}[record.outcome]);
           const whiteName=record.players?.w?.name||"White",blackName=record.players?.b?.name||(record.mode==="ai"?"Stockfish 19":"Black");
           const matchup=`${whiteName} vs ${blackName}`;
-          const ratingSummary=`${isPersian?"ریتینگ":"Ratings"} · ${record.players?.w?.rating||"?"} / ${record.players?.b?.rating||"?"}`;
+          const ratings=[record.players?.w?.rating,record.players?.b?.rating].filter(value=>value&&value!=="?");
+          const ratingSummary=ratings.length?`${isPersian?"ریتینگ":"Ratings"} · ${ratings.join(" / ")}`:"";
           const date=new Date(record.finishedAt).toLocaleDateString(isPersian?"fa-IR":undefined,{month:"short",day:"numeric",year:"numeric"});
           const moveCount=Math.ceil(record.plies/2),moves=isPersian?`${String(moveCount).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])} حرکت`:`${moveCount} ${moveCount===1?"move":"moves"}`;
           const opening=record.opening?(isPersian?openingNameInPersian(record.opening):record.opening):"";
           const duration=record.durationMs?formatTime(Math.floor(record.durationMs/1000)):"";
           const canReview=Array.isArray(record.entries)&&record.entries.length===record.plies;
-          return `<li class="recent-game-row" data-game-id="${escapeHtml(record.id)}"><span class="recent-game-outcome ${record.outcome}">${outcome}</span><span class="recent-game-details"><strong>${escapeHtml(matchup)}</strong><small>${date} · ${moves}${duration?` · ${duration}`:""} · ${escapeHtml(ratingSummary)}${opening?` · ${escapeHtml(opening)}`:""}</small></span><div class="recent-game-actions"><button class="subtle-button" type="button" data-archive-action="review" ${canReview?"":"disabled"}>${isPersian?"مرور":"Review"}</button><button class="subtle-button" type="button" data-archive-action="replay" ${canReview?"":"disabled"}>${isPersian?"بازپخش":"Replay"}</button><button class="subtle-button" type="button" data-archive-action="pgn" ${record.pgn?"":"disabled"}>PGN</button><button class="subtle-button" type="button" data-archive-action="favorite" aria-pressed="${record.favorite===true}" title="${isPersian?"بازی برگزیده":"Favorite game"}">${record.favorite===true?"★":"☆"}</button><button class="subtle-button" type="button" data-archive-action="delete">${isPersian?"حذف":"Delete"}</button></div></li>`;
+          return `<li class="recent-game-row" data-game-id="${escapeHtml(record.id)}"><span class="recent-game-outcome ${record.outcome}">${outcome}</span><span class="recent-game-details"><strong>${escapeHtml(matchup)}</strong><small>${date} · ${moves}${duration?` · ${duration}`:""}${ratingSummary?` · ${escapeHtml(ratingSummary)}`:""}${opening?` · ${escapeHtml(opening)}`:""}</small></span><div class="recent-game-actions"><button class="subtle-button" type="button" data-archive-action="review" ${canReview?"":"disabled"}>${isPersian?"مرور":"Review"}</button><button class="subtle-button" type="button" data-archive-action="replay" ${canReview?"":"disabled"}>${isPersian?"بازپخش":"Replay"}</button><button class="subtle-button" type="button" data-archive-action="pgn" ${record.pgn?"":"disabled"}>PGN</button><button class="subtle-button" type="button" data-archive-action="favorite" aria-pressed="${record.favorite===true}" title="${isPersian?"بازی برگزیده":"Favorite game"}">${record.favorite===true?"★":"☆"}</button><button class="subtle-button" type="button" data-archive-action="delete">${isPersian?"حذف":"Delete"}</button></div></li>`;
         }).join("");
       }
       async function recordRecentGame(outcome) {
@@ -4947,6 +5063,7 @@
           if(!record||!Array.isArray(record.entries)||record.entries.length!==record.plies)throw new Error("This archived game does not contain a complete move history.");
           cancelAIRequest();stopClock();analysisGeneration++;puzzleMode=false;dailyChallengeMode=false;reviewRetryMode=false;
           mode=record.mode;humanColor=record.color;orientation=record.color;history=structuredClone(record.entries);redoStack=[];
+          if(record.mode==="imported")onlinePlayers=["w","b"].map(color=>({color,name:record.players?.[color]?.name|| (color==="w"?"White":"Black")}));
           state=history.length?copyState(history.at(-1).after):startState();
           gameOver=true;matchActive=false;aiThinking=false;resultRecorded=true;lastGameResult=record.resultText||({win:"White wins",loss:"Black wins",draw:"Draw"}[record.outcome]);
           gameStartedAt=new Date(record.startedAt||record.finishedAt);activeArchiveId=record.id;          openingIdentity=archivedOpeningIdentity(record.opening);openingByColor={w:null,b:null};
@@ -5139,16 +5256,17 @@
       }
       function playerHtml(color,top) {
         const isAI=mode==="ai"&&color!==humanColor;
-        const isProfileSide=puzzleMode?color===puzzleColor:mode==="ai"?color===humanColor:color===orientation;
+        const isProfileSide=puzzleMode?color===puzzleColor:mode==="imported"?false:mode==="ai"?color===humanColor:color===orientation;
         const isPuzzleOpponent=puzzleMode&&!isProfileSide, isWhite=color==="w", active=state.turn===color&&!gameOver;
         const onlinePlayer=onlinePlayers.find(player=>player.color===color);
         const name=isAI?isPersian?"هوش مصنوعی":"AI"
-          :mode==="online"?(onlinePlayer?.name||onlinePlayer?.display_name||(isPersian?"حریف آنلاین":"Online opponent"))
+          :mode==="online"||mode==="imported"?(onlinePlayer?.name||onlinePlayer?.display_name||(isPersian?"حریف آنلاین":"Online opponent"))
           :isProfileSide?playerProfile.username
             :isPuzzleOpponent?isPersian?"حریف معما":"Puzzle opponent"
               :isPersian?"مهمان محلی":"Local guest";
         const detail=isAI?isPersian?`${$("strength").value} درجه`:`${$("strength").value} rating`
           :mode==="online"?(isProfileSide?(isPersian?"شما":"You"):(isPersian?"بازیکن آنلاین":"Online player"))
+          :mode==="imported"?(isPersian?"بازی واردشده":"Imported PGN")
           :isProfileSide?isPersian?"نمایهٔ شما":"Your profile"
             :isPersian?"بازیکن محلی":"Local player";
         const openingInfo=openingForPlayer(color);
@@ -5212,8 +5330,8 @@
         updateStrategyReport();
         renderBoard(); renderPlayers(); renderMoves();
         $("cancelPremoveButton").hidden=!premove;
-        $("undoButton").hidden=puzzleMode||mode==="online"||!gameplaySettings.takebacks;
-        $("redoButton").hidden=puzzleMode||mode==="online"||!gameplaySettings.takebacks;
+        $("undoButton").hidden=puzzleMode||mode==="online"||mode==="imported"||!gameplaySettings.takebacks;
+        $("redoButton").hidden=puzzleMode||mode==="online"||mode==="imported"||!gameplaySettings.takebacks;
         $("undoButton").disabled=!history.length||aiThinking||boardAnimating;
         $("redoButton").disabled=!redoStack.length||aiThinking||boardAnimating;
         $("hintButton").hidden=!matchActive||gameOver||!gameplaySettings.hints;
@@ -5780,8 +5898,9 @@
         renderLessonList();
       }
       function switchLobbyPage(page) {
-        if(!["play","puzzles","progress","achievements"].includes(page))return;
+        if(!["play","puzzles","progress","achievements","import"].includes(page))return;
         $("lobby").dataset.page=page;
+        $("pgnImportSection").hidden=page!=="import";
         document.querySelectorAll("[data-lobby-page]").forEach(button=>{
           const active=button.dataset.lobbyPage===page;
           button.classList.toggle("active",active);
@@ -8295,6 +8414,28 @@
       $("recentGameList").addEventListener("click",event=>{void handleArchiveAction(event);});
       $("archiveResultFilter").addEventListener("change",renderRecentGames);
       $("archiveDateFilter").addEventListener("change",renderRecentGames);
+      $("importPgnButton").addEventListener("click",()=>void importPgnGame());
+      $("pgnImportFile").addEventListener("change",async event=>{
+        const file=event.currentTarget.files?.[0];
+        if(!file)return;
+        const status=$("pgnImportStatus");
+        if(file.size>2*1024*1024) {
+          event.currentTarget.value="";status.dataset.state="error";status.textContent=isPersian?"حجم فایل PGN نباید از ۲ مگابایت بیشتر باشد.":"PGN files must be 2 MB or smaller.";
+          return;
+        }
+        try {
+          $("pgnImportText").value=await file.text();$("pgnFileName").textContent=file.name;
+          status.dataset.state="";status.textContent=isPersian?"فایل بارگیری شد؛ برای بررسی، واردکردن را انتخاب کنید.":"File loaded. Select Import and review to continue.";
+        } catch(error) {
+          console.error("PGN file could not be read:",error);
+          status.dataset.state="error";status.textContent=isPersian?`خواندن فایل PGN ناموفق بود: ${error.message}`:`Could not read the PGN file: ${error.message}`;
+        }
+      });
+      $("clearPgnImportButton").addEventListener("click",()=>{
+        $("pgnImportText").value="";$("pgnImportFile").value="";$("pgnFileName").textContent=".pgn files up to 2 MB";
+        $("pgnImportStatus").textContent="";$("pgnImportStatus").dataset.state="";
+      });
+      $("viewImportedArchiveButton").addEventListener("click",()=>switchLobbyPage("progress"));
       $("saveMomentButton").addEventListener("click",()=>{void saveCurrentMoment();});
       $("saveCurrentMomentButton").addEventListener("click",()=>{void saveCurrentMoment();});
       $("momentList").addEventListener("click",event=>{void handleMomentAction(event);});

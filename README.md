@@ -67,7 +67,7 @@ The first puzzle request streams the full 309 MB compressed Lichess archive into
 
 ## Game archive and review
 
-Completed games and saved Chess Moments are stored in browser IndexedDB on the current device. The archive keeps full move/state history and PGN metadata, supports replay, review, PGN download, result/date filters, favorites, and confirmed deletion. Stockfish review results are cached with each archived game so later reviews can reuse completed analysis. Daily challenge completion is stored locally; the featured position is selected from the included rated puzzle sample. These records are device-local and are not synchronized between browsers.
+Completed games, imported PGNs, and saved Chess Moments are stored in browser IndexedDB on the current device. Use **Import PGN** from the main menu to choose a `.pgn` file or paste PGN text; Nightfall validates and replays its moves, stores the full source and position history in the Game Archive, and opens it in Game Review. The archive supports replay, review, PGN download, result/date filters, favorites, and confirmed deletion. Stockfish review results are cached with each archived game so later reviews can reuse completed analysis. Daily challenge completion is stored locally; the featured position is selected from the included rated puzzle sample. These records are device-local and are not synchronized between browsers.
 
 AI move searches run in the existing local Stockfish worker. The engine can calculate while the player sees the thinking indicator; the reply waits at least 2.7 seconds from the player's move before animating, unless calculation takes longer. Reduced-motion preferences intentionally disable piece animations.
 

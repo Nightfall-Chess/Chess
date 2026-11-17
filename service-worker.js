@@ -1,12 +1,13 @@
-const CACHE_VERSION = "nightfall-v28";
+const CACHE_VERSION = "nightfall-v29";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./nightfall-redesign.css?v=28",
+  "./nightfall-redesign.css?v=29",
   "./game-archive.mjs",
+  "./pgn-import.mjs",
   "./achievements.mjs",
   "./opening-book.mjs",
   "./chess-icon.svg"

@@ -14,6 +14,7 @@ test("offline cache version matches the stylesheet and includes app, study, and 
   assert.equal(cacheVersion, stylesheetVersion);
   for (const asset of [
     "./index.html",
+    "./pgn-import.mjs",
     "./openings.json",
     "./puzzles.json",
     "./assets/stockfish/stockfish-19-lite-single.js",
