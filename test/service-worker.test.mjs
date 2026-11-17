@@ -15,10 +15,16 @@ async function createWorkerHarness() {
       precached.push(...requests.map(request => request.url || request.href));
     },
     async match(request) {
-      return cached.get(request.url);
+      return cached.get(typeof request === "string" ? request : request.url);
     },
     async put(request, response) {
-      cached.set(request.url, response);
+      cached.set(typeof request === "string" ? request : request.url, response);
+    },
+    async keys() {
+      return Array.from(cached.keys()).map(url => ({ url }));
+    },
+    async delete(request) {
+      return cached.delete(typeof request === "string" ? request : request.url);
     }
   };
   const self = {
@@ -63,6 +69,9 @@ test("service worker pre-caches the app shell, leaves puzzle APIs uncached, and 
   assert.ok(harness.precached.includes(`${harness.scope}index.html`), `Precacher received: ${harness.precached.join(", ")}`);
   assert.ok(harness.precached.includes(`${harness.scope}opening-book.mjs`));
   assert.ok(harness.precached.includes(`${harness.scope}pgn-import.mjs`));
+  assert.ok(harness.precached.includes(`${harness.scope}manifest.webmanifest`));
+  assert.ok(harness.precached.includes(`${harness.scope}orbit-enhancements.css?v=1`));
+  assert.ok(harness.precached.includes(`${harness.scope}orbit-enhancements.js`));
   // Large files must not slow down the first page load while the worker installs.
   assert.equal(harness.precached.some(url => url.endsWith(".wasm") || url.endsWith("openings.json")), false);
 
@@ -73,12 +82,32 @@ test("service worker pre-caches the app shell, leaves puzzle APIs uncached, and 
   assert.equal(harness.cached.has(wasmUrl), true);
   assert.equal(harness.cached.has(`${harness.scope}openings.json`), true);
 
-  let audioIntercepted = false;
+  let audioResponsePromise;
+  const audioRequest = {
+    method: "GET",
+    url: `${harness.scope}Music/song.mp3`,
+    destination: "audio",
+    headers: new Headers()
+  };
   harness.listeners.get("fetch")({
-    request: new Request(`${harness.scope}Music/song.mp3`),
-    respondWith() { audioIntercepted = true; }
+    request: audioRequest,
+    respondWith(promise) { audioResponsePromise = promise; }
   });
-  assert.equal(audioIntercepted, false);
+  assert.ok(audioResponsePromise, "Local music requests should use the offline audio cache.");
+  assert.equal((await audioResponsePromise).status, 200);
+  await new Promise(resolve => setImmediate(resolve));
+
+  harness.setOnline(false);
+  let cachedAudioPromise;
+  const rangeRequest = { ...audioRequest, headers: new Headers({ Range: "bytes=0-3" }) };
+  harness.listeners.get("fetch")({
+    request: rangeRequest,
+    respondWith(promise) { cachedAudioPromise = promise; }
+  });
+  const cachedAudio = await cachedAudioPromise;
+  assert.equal(cachedAudio.status, 206);
+  assert.ok(cachedAudio.headers.get("Content-Range").startsWith("bytes 0-3/"));
+  assert.equal((await cachedAudio.text()).length, 4);
 
   let puzzleApiIntercepted = false;
   harness.listeners.get("fetch")({
@@ -87,6 +116,7 @@ test("service worker pre-caches the app shell, leaves puzzle APIs uncached, and 
   });
   assert.equal(puzzleApiIntercepted, false);
 
+  harness.setOnline(true);
   const staticRequest = new Request(`${harness.scope}boards/board.png`);
   let responsePromise;
   harness.listeners.get("fetch")({ request: staticRequest, respondWith(promise) { responsePromise = promise; } });

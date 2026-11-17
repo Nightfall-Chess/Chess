@@ -1,0 +1,48 @@
+/* Orbit-inspired interaction layer for Nightfall Chess.
+   Keeps Nightfall's existing colors, layout and chess controls intact. */
+:root {
+  --orbit-glow: rgba(183, 163, 255, .14);
+  --orbit-border: rgba(183, 163, 255, .34);
+}
+[data-orbit-surface] {
+  --orbit-x: 50%;
+  --orbit-y: 50%;
+  --orbit-tilt-x: 0deg;
+  --orbit-tilt-y: 0deg;
+  position: relative;
+  isolation: isolate;
+  transform: perspective(900px) rotateX(var(--orbit-tilt-y)) rotateY(var(--orbit-tilt-x));
+  transform-style: preserve-3d;
+  transition: transform .22s cubic-bezier(.2,.7,.25,1), border-color .2s ease, box-shadow .2s ease;
+  will-change: transform;
+}
+[data-orbit-surface]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(260px circle at var(--orbit-x) var(--orbit-y), var(--orbit-glow), transparent 72%);
+  transition: opacity .2s ease;
+}
+[data-orbit-surface]:hover::after,
+[data-orbit-surface]:focus-within::after { opacity: 1; }
+[data-orbit-surface]:hover {
+  transform: perspective(900px) rotateX(var(--orbit-tilt-y)) rotateY(var(--orbit-tilt-x)) translateY(-1px);
+  border-color: var(--orbit-border);
+  box-shadow: 0 12px 30px rgba(0,0,0,.18), 0 0 22px rgba(183,163,255,.07);
+}
+[data-orbit-surface]:focus-visible {
+  outline: 2px solid var(--accent, #b7a3ff);
+  outline-offset: 3px;
+}
+@media (hover: none), (pointer: coarse) {
+  [data-orbit-surface] { transform: none !important; will-change: auto; }
+  [data-orbit-surface]::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-orbit-surface] { transform: none !important; transition: none !important; }
+  [data-orbit-surface]::after { transition: none !important; }
+}
