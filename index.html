@@ -942,6 +942,10 @@
     .online-card .field { margin-top: 14px; }
     .room-code { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 17px 0; padding: 13px 15px; border: 1px dashed #c4f58a70; border-radius: 11px; background: #c4f58a0c; }
     .room-code strong { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: clamp(19px, 3vw, 26px); letter-spacing: .16em; }
+    .online-match-invite { align-items: center; flex-wrap: wrap; margin: 10px 0; }
+    .online-match-invite > div { display: grid; gap: 4px; }
+    .online-match-invite span { color: var(--muted); font-size: 11px; }
+    .online-match-invite[hidden] { display: none !important; }
     .online-actions { display: flex; flex-wrap: wrap; gap: 9px; }
     .room-status { min-height: 42px; margin: 15px 0 0 !important; padding: 10px 12px; border: 1px solid #ffffff15; border-radius: 9px; background: #ffffff07; }
     .room-status[data-state="error"] { border-color: #f3837655; color: #ffaaa0; }
@@ -1863,6 +1867,10 @@
           </div>
         </div>
         <p class="board-help" id="boardHelp" aria-live="polite"></p>
+        <section class="room-code online-match-invite" id="onlineMatchInvite" hidden aria-label="Online room invitation">
+          <div><span id="onlineMatchInviteLabel">Room code · share with your opponent</span><strong id="onlineMatchInviteCode"></strong></div>
+          <button class="subtle-button" id="copyMatchRoomCodeButton" type="button">Copy code</button>
+        </section>
         <div class="player" id="bottomPlayer"></div>
         <section class="card" id="puzzleGameCard" hidden>
           <div class="card-heading"><span class="card-title" id="puzzleGameTitle">Chess puzzle</span><span class="eyebrow" id="puzzleGameRating"></span></div>
@@ -7361,6 +7369,16 @@
       }
       let onlineJoinNoticeRoomId="";
       let onlineMyColor="";
+      function updateOnlineMatchInvite(room) {
+        const code=String(room?.code||roomInviteCode||"").trim().toUpperCase();
+        roomInviteCode=code;
+        const bar=$("onlineMatchInvite");
+        if(!bar)return;
+        $("onlineMatchInviteCode").textContent=code;
+        $("onlineMatchInviteLabel").textContent=isPersian?"کد اتاق · برای حریف بفرستید":"Room code · share with your opponent";
+        $("copyMatchRoomCodeButton").textContent=isPersian?"کپی کد":"Copy code";
+        bar.hidden=mode!=="online"||!code;
+      }
       async function startOnlineMatch(room) {
         if(mode==="online"&&onlineRoomId===room.id&&!$("gameScreen").hidden) {
           applyOnlineSnapshot(room);
@@ -7369,7 +7387,7 @@
         const ownColor=onlineMyColor||room.myColor||humanColor;
         if(ownColor==="w"||ownColor==="b")onlineMyColor=ownColor;
         const isFirstJoinNotice=ownColor==="w"&&Array.isArray(room.players)&&room.players.length===2&&onlineJoinNoticeRoomId!==room.id;
-        onlineRoomId=room.id;mode="online";humanColor=onlineMyColor;orientation=humanColor;onlinePlayers=room.players||[];
+        onlineRoomId=room.id;mode="online";humanColor=onlineMyColor;orientation=humanColor;onlinePlayers=room.players||[];updateOnlineMatchInvite(room);
         cancelAIRequest();stopClock();clockOn=false;clocks={w:0,b:0};resultRecorded=false;lastGameResult="";
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;
         $("onlineScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
@@ -8350,6 +8368,7 @@
       $("onlineTransport").addEventListener("change",updateOnlineTransport);
       updateOnlineTransport();
       $("createRoomButton").addEventListener("click",createRoom);
+      $("copyMatchRoomCodeButton").addEventListener("click",()=>{void copyRoomCode();});
       $("joinRoomButton").addEventListener("click",joinRoom);
       $("joinRoomCode").addEventListener("keydown",event=>{if(event.key==="Enter")joinRoom();});
       $("copyInviteButton").addEventListener("click",()=>{void copyInvite().catch(()=>{});});
