@@ -7045,6 +7045,27 @@
         }
       }
       async function ensureOnlineApi() {
+      async function copyRoomCode() {
+        if(!roomInviteCode)throw new Error("No room code is available to copy.");
+        try {
+          if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(roomInviteCode);
+          else {
+            const input=document.createElement("textarea");
+            input.value=roomInviteCode;input.setAttribute("readonly","");
+            input.style.position="fixed";input.style.opacity="0";
+            document.body.append(input);input.select();
+            const copied=document.execCommand("copy");input.remove();
+            if(!copied)throw new Error("Clipboard access is unavailable.");
+          }
+          showToast(isPersian?"کد اتاق کپی شد.":"Room code copied.");
+          return true;
+        } catch(error) {
+          console.error("Room code could not be copied:",error);
+          showToast(isPersian?"کپی کد اتاق ناموفق بود.":"Could not copy the room code.");
+          return false;
+        }
+      }
+
         if(!onlineApi) {
           onlineApi=import("./online-supabase.js?v=online-private-realtime-20261116")
             .catch(error=>{
@@ -7398,6 +7419,7 @@
           if($("onlineTransport").value==="self-hosted") {
             await connectSelfHosted({type:"create",url:selfHostedServerAddress()});
             status.dataset.state="ready";
+            await copyRoomCode();
             return;
           }
           const api=await ensureOnlineApi(),result=await api.create({name:classroomPlayerName()});
@@ -7405,6 +7427,7 @@
           $("roomCodeValue").textContent=roomInviteCode;$("createdRoom").hidden=false;
           $("copyInviteButton").disabled=false;$("shareInviteButton").disabled=false;
           status.textContent=isPersian?"اتاق ساخته شد؛ کد را برای حریف بفرستید.":"Room created. Share this code with your opponent.";
+          await copyRoomCode();
           try { await watchOnlineRoom(room.id); }
           catch(error) { console.error("Online Realtime subscription failed:",error);status.textContent=isPersian?"اتاق ساخته شد، اما اتصال زنده برقرار نشد.":"Room created, but live connection failed."; }
         } catch(error) {
