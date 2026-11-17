@@ -1,0 +1,22 @@
+{
+  "id": "./",
+  "name": "Nightfall Chess",
+  "short_name": "Nightfall",
+  "description": "Play chess, learn openings and improve with Nightfall Chess.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090b13",
+  "theme_color": "#090b13",
+  "icons": [
+    {
+      "src": "./chess-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
