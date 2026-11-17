@@ -1,4 +1,3 @@
-const PROFILE_KEY = "nightfall-chess-player-profile-v1";
 const IDENTITY_KEY = "nightfall-orbit-identity-v1";
 const $ = id => document.getElementById(id);
 
@@ -19,7 +18,8 @@ const copy = {
     notFound: "That GitHub user could not be found.",
     rateLimit: "GitHub's public API rate limit was reached. Try again later.",
     failed: "Could not sync the GitHub profile. Check your connection and try again.",
-    ownership: "This reads public profile data only; it does not verify account ownership."
+    ownership: "This reads public profile data only; it does not verify account ownership.",
+    viewProfile: "View GitHub profile"
   },
   fa: {
     title: "هویت Orbit · گیت‌هاب",
@@ -37,7 +37,8 @@ const copy = {
     notFound: "این کاربر GitHub پیدا نشد.",
     rateLimit: "محدودیت درخواست عمومی GitHub تمام شده است. کمی بعد دوباره تلاش کن.",
     failed: "همگام‌سازی پروفایل انجام نشد. اتصال اینترنت را بررسی و دوباره تلاش کن.",
-    ownership: "این قابلیت فقط اطلاعات عمومی را می‌خواند و مالکیت حساب را تأیید نمی‌کند."
+    ownership: "این قابلیت فقط اطلاعات عمومی را می‌خواند و مالکیت حساب را تأیید نمی‌کند.",
+    viewProfile: "نمایش پروفایل GitHub"
   }
 };
 
@@ -73,6 +74,7 @@ function renderCopy() {
   root.querySelector("[data-copy=connect]").textContent = t("connect");
   root.querySelector("[data-copy=disconnect]").textContent = t("disconnect");
   root.querySelector("[data-copy=ownership]").textContent = t("ownership");
+  $("githubIdentityLink").textContent = t("viewProfile");
   $("githubIdentityUsername").placeholder = t("placeholder");
   if (!connectedIdentity && !root.dataset.hasStatus) status(t("idle"));
 }
@@ -82,12 +84,14 @@ function mount() {
   const panel = document.createElement("section");
   panel.id = "githubIdentityPanel";
   panel.className = "github-identity-panel";
-  panel.innerHTML = '<div class="github-identity-heading"><strong data-copy="title"></strong><span class="github-identity-mark" aria-hidden="true">GH</span></div><p class="github-identity-description" data-copy="description"></p><label class="field github-identity-field"><span class="field-label" data-copy="label"></span><input id="githubIdentityUsername" type="text" maxlength="39" autocomplete="off" autocapitalize="none" spellcheck="false"></label><div class="github-identity-actions"><button class="primary-button" id="githubIdentityConnect" type="button" data-copy="connect"></button><button class="subtle-button" id="githubIdentityDisconnect" type="button" data-copy="disconnect"></button></div><p class="github-identity-status" id="githubIdentityStatus" role="status" aria-live="polite"></p><p class="github-identity-note" data-copy="ownership"></p>';
+  panel.innerHTML = '<div class="github-identity-heading"><strong data-copy="title"></strong><span class="github-identity-mark" aria-hidden="true">GH</span></div><p class="github-identity-description" data-copy="description"></p><label class="field github-identity-field"><span class="field-label" data-copy="label"></span><input id="githubIdentityUsername" type="text" maxlength="39" autocomplete="off" autocapitalize="none" spellcheck="false"></label><div class="github-identity-actions"><button class="primary-button" id="githubIdentityConnect" type="button" data-copy="connect"></button><button class="subtle-button" id="githubIdentityDisconnect" type="button" data-copy="disconnect"></button></div><p class="github-identity-status" id="githubIdentityStatus" role="status" aria-live="polite"></p><a id="githubIdentityLink" class="github-identity-link" target="_blank" rel="noopener noreferrer" hidden></a><p class="github-identity-note" data-copy="ownership"></p>';
   fields.append(panel);
   connectedIdentity = readSavedIdentity();
   if (connectedIdentity) {
     $("githubIdentityUsername").value = connectedIdentity.login;
     status(t("connected") + " (@" + connectedIdentity.login + ")", "ready");
+    $("githubIdentityLink").href = connectedIdentity.profileUrl || ("https://github.com/" + encodeURIComponent(connectedIdentity.login));
+    $("githubIdentityLink").hidden = false;
     panel.dataset.hasStatus = "true";
   }
   $("githubIdentityConnect").addEventListener("click", () => void connect());
@@ -183,6 +187,8 @@ async function applyProfile(profile, avatarFile) {
   localStorage.setItem(IDENTITY_KEY, JSON.stringify(identity));
   connectedIdentity = identity;
   $("githubIdentityUsername").value = profile.login;
+  $("githubIdentityLink").href = profile.html_url;
+  $("githubIdentityLink").hidden = false;
   $("githubIdentityPanel").dataset.hasStatus = "true";
   status((avatarFile ? t("connected") : t("avatarFallback")) + " (@" + profile.login + ")", "ready");
 }
@@ -220,6 +226,8 @@ function disconnect() {
   localStorage.removeItem(IDENTITY_KEY);
   connectedIdentity = null;
   $("githubIdentityUsername").value = "";
+  $("githubIdentityLink").hidden = true;
+  $("githubIdentityLink").removeAttribute("href");
   $("githubIdentityPanel").dataset.hasStatus = "true";
   status(t("disconnected"), "");
 }
@@ -227,5 +235,8 @@ function observeLanguage() {
   const observer = new MutationObserver(renderCopy);
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
 }
+const style = document.createElement("style");
+style.textContent = ".github-identity-panel{margin-top:14px;padding:13px;border:1px solid #ffffff18;border-radius:12px;background:linear-gradient(145deg,#c4f58a0c,#ffffff04)}.github-identity-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--text);font-size:12px;font-weight:700}.github-identity-mark{display:grid;place-items:center;width:27px;height:27px;border:1px solid #c4f58a45;border-radius:8px;background:#c4f58a12;color:var(--accent);font:700 10px/1 system-ui,sans-serif}.github-identity-description,.github-identity-note{margin:7px 0;color:var(--muted);font-size:10px;line-height:1.6}.github-identity-field{display:block;margin-top:9px!important}.github-identity-field input{width:100%;height:37px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:#111512;color:var(--text);font:inherit;font-size:12px}.github-identity-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.github-identity-actions .primary-button{width:auto;min-height:34px;margin:0;padding:0 12px;font-size:10px}.github-identity-actions .subtle-button{min-height:34px;padding:0 12px;font-size:10px}.github-identity-status{min-height:18px;margin:8px 0 0;color:var(--muted);font-size:10px;line-height:1.55}.github-identity-status[data-state=\"ready\"]{color:#c8e9a5}.github-identity-status[data-state=\"error\"]{color:#ffaaa0}.github-identity-status[data-state=\"pending\"]{color:#e8d69a}.github-identity-link{display:inline-block;margin-top:5px;color:var(--accent);font-size:10px;text-decoration:underline;text-underline-offset:3px}.github-identity-note{padding-top:7px;border-top:1px solid #ffffff10}.github-identity-actions button:disabled{opacity:.55;cursor:wait}@media(max-width:450px){.github-identity-panel{padding:10px}.github-identity-actions .primary-button,.github-identity-actions .subtle-button{flex:1}}";
+document.head.append(style);
 mount();
 observeLanguage();
