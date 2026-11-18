@@ -379,3 +379,32 @@ test("self-hosted server synchronizes checkmate and closes the result", async t 
   assert.equal(room.result, "Black wins by checkmate");
   assert.equal(room.moves.at(-1).san, "Qh4#");
 });
+
+test("self-hosted rooms honor an explicit black host and default missing preference to white", async t => {
+  const url = await startChessServer(t);
+  const open = async () => {
+    const socket = await openWebSocket(url);
+    t.after(() => socket.close());
+    return socket;
+  };
+
+  const defaultHost = await open();
+  const defaultCreatedPromise = nextMessage(defaultHost, message => message.type === "created");
+  defaultHost.send(JSON.stringify({ type: "create", name: "Default host", timeControlSeconds: 0 }));
+  const defaultCreated = await defaultCreatedPromise;
+  assert.equal(defaultCreated.color, "w");
+
+  const blackHost = await open();
+  const blackCreatedPromise = nextMessage(blackHost, message => message.type === "created");
+  blackHost.send(JSON.stringify({ type: "create", name: "Black host", timeControlSeconds: 0, color: "b" }));
+  const blackCreated = await blackCreatedPromise;
+  assert.equal(blackCreated.color, "b");
+
+  const whiteGuest = await open();
+  const joinedPromise = nextMessage(whiteGuest, message => message.type === "joined");
+  whiteGuest.send(JSON.stringify({ type: "join", code: blackCreated.room.code, name: "White guest" }));
+  const joined = await joinedPromise;
+  assert.equal(joined.color, "w");
+  assert.deepEqual(joined.room.players.map(player => player.color), ["w", "b"]);
+  assert.equal(joined.room.status, "playing");
+});
