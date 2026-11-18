@@ -1459,6 +1459,9 @@
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
     .online-endgame-card { padding: 14px; }
+    #onlineEndgameCard:not([hidden]) { position: sticky; top: 0; z-index: 5; border: 1px solid var(--accent); box-shadow: 0 10px 28px rgba(0,0,0,.28); }
+    #onlineEndgameCard .online-endgame-result { font-size: 15px; }
+    #onlineEndgameCard .online-endgame-actions button { min-height: 42px; font-size: 12px; }
     .online-endgame-result { margin: 0 0 8px; color: var(--text); font-size: 13px; font-weight: 650; }
     .online-endgame-state { min-height: 18px; margin: 0 0 10px; color: var(--muted); font-size: 11px; }
     .online-endgame-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
@@ -6346,6 +6349,24 @@
         $("onlineScreen").hidden=true;$("settingsScreen").hidden=true;$("classroomScreen").hidden=true;$("lobby").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;
       }
+      async function returnToOnlineLobby() {
+        pauseSelfHostedConnection();
+        if(onlineSubscription){await onlineSubscription.unsubscribe().catch(()=>{});onlineSubscription=null;}
+        onlineSubscriptionRoomId="";onlineRoomId="";onlineVersion=0;onlineMyColor="";onlinePlayers=[];
+        selfHostedRoom=null;selfHostedSession=null;selfHostedMovePending=false;roomInviteCode="";
+        try { localStorage.removeItem("nightfall-self-hosted-room-v1"); } catch(error) { console.warn("Could not clear the previous room session:",error); }
+        history=[];redoStack=[];state=startState();selected=null;legalTargets=[];premove=null;
+        gameOver=false;matchActive=false;resultRecorded=false;lastGameResult="";mode="ai";
+        $("onlineEndgameCard").hidden=true;$("createdRoom").hidden=true;
+        $("copyInviteButton").disabled=true;$("shareInviteButton").disabled=true;
+        $("createRoomStatus").textContent=isPersian?"هنوز اتاقی ساخته نشده است.":"No room created yet.";
+        $("joinRoomStatus").textContent=isPersian?"کد اتاق دوستتان را وارد کنید.":"Enter a room code shared by your friend.";
+        $("joinRoomCode").value="";$("roomCodeValue").textContent="";
+        $("gameScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("classroomScreen").hidden=true;$("onlineScreen").hidden=false;
+        $("newGameTop").hidden=true;$("flipButton").hidden=true;
+        setSelfHostedConnectionStatus(isPersian?"آمادهٔ ساخت اتاق جدید هستید.":"Ready to create a new room.");
+        try { const cleanUrl=new URL(location.href);cleanUrl.hash="";history.replaceState(null,"",cleanUrl.href); } catch(error) { console.warn("Could not clear the old room invite from the URL:",error); }
+      }
       function classroomPlayerName() {
         return (playerProfile.username||$("profileName").value||"Player").trim().slice(0,24)||"Player";
       }
@@ -7563,7 +7584,7 @@
             :(isPersian?"برای شروع دوباره، درخواست بازی مجدد بدهید.":"Request a rematch when you are ready.");
           $("onlineRematchButton").disabled=requested||$("onlineTransport").value!=="self-hosted";
           $("onlineRematchButton").textContent=requested?(isPersian?"در انتظار حریف…":"Waiting for opponent…"):(isPersian?"بازی دوباره":"Rematch");
-          $("onlineReturnLobbyButton").textContent=isPersian?"بازگشت به منو":"Return to lobby";
+          $("onlineReturnLobbyButton").textContent=isPersian?"ساخت اتاق آنلاین جدید":"New online room";
           $("onlineReviewButton").textContent=isPersian?"مرور بازی":"Game review";
           $("onlineExportButton").textContent=isPersian?"دریافت PGN":"Export PGN";
         }
@@ -8723,7 +8744,7 @@
         $("onlineRematchState").textContent=isPersian?"درخواست شما ثبت شد؛ منتظر تأیید حریف هستیم.":"Request sent. Waiting for your opponent…";
         selfHostedSocket.send(JSON.stringify({type:"rematch"}));
       });
-      $("onlineReturnLobbyButton").addEventListener("click",showLobby);
+      $("onlineReturnLobbyButton").addEventListener("click",()=>void returnToOnlineLobby());
       $("onlineReviewButton").addEventListener("click",()=>showAnalysis(lastGameResult||$("statusText").textContent));
       $("onlineExportButton").addEventListener("click",exportPgn);
       $("reviewGameButton").addEventListener("click",()=>showAnalysis(lastGameResult||$("statusText").textContent));
