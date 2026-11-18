@@ -1460,11 +1460,11 @@
     }
   </style>
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=40">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=43">
   <link rel="stylesheet" href="./orbit-enhancements.css?v=1">
   <link rel="stylesheet" href="./nightfall-themes.css?v=5">
   <link rel="stylesheet" href="./nightfall-visual-system.css?v=1">
-  <link rel="stylesheet" href="./nightfall-theme-contrast.css?v=3">
+  <link rel="stylesheet" href="./nightfall-theme-contrast.css?v=5">
   <script src="./orbit-enhancements.js" defer></script>
 </head>
 <body>
@@ -1793,19 +1793,56 @@
             <div class="theme-preview-wrap"><div class="theme-preview-label">Preview</div><div class="theme-preview-board" id="themePreviewBoard" role="img" aria-label="Board and piece theme preview"></div></div>
           </section>
           <section class="card settings-panel" data-settings-content="audio" hidden>
-            <div class="card-heading"><span class="card-title">Sound & music</span><span class="eyebrow">FOUR INCLUDED TRACKS</span></div>
+            <div class="card-heading"><span class="card-title">Sound & music</span><span class="eyebrow">TUNE EACH CHANNEL</span></div>
             <div class="settings-audio-controls">
-              <button class="sound-toggle" id="musicToggle" type="button" aria-pressed="true">♫ Music on</button>
-              <label class="field"><span class="field-label">Starting track</span><select id="musicTrack" aria-label="Starting music track"><option value="electric-1">Electric Melody 1</option><option value="electric-2">Electric Melody 2</option><option value="warm-1">Warm Overdrive Sustain 1</option><option value="warm-2">Warm Overdrive Sustain 2</option></select></label>
-              <label class="field"><span class="field-label">Volume</span><span class="music-volume-control"><span aria-hidden="true">♫</span><input id="musicVolume" type="range" min="0" max="100" step="1" value="75" aria-label="Music volume"><output id="musicVolumeValue" for="musicVolume">75%</output></span></label>
-              <button class="sound-toggle" id="effectsToggle" type="button" aria-pressed="true">♬ Effects on</button>
-              <label class="field"><span class="field-label">Game sound volume</span><span class="music-volume-control"><span aria-hidden="true">♟</span><input id="gameVolume" type="range" min="0" max="100" step="1" value="72" aria-label="Game sound volume"><output id="gameVolumeValue" for="gameVolume">72%</output></span></label>
-              <button class="sound-toggle" id="uiSoundsToggle" type="button" aria-pressed="true">♩ UI sounds on</button>
-              <label class="field"><span class="field-label">Interface volume</span><span class="music-volume-control"><span aria-hidden="true">⌘</span><input id="uiVolume" type="range" min="0" max="100" step="1" value="18" aria-label="Interface sound volume"><output id="uiVolumeValue" for="uiVolume">18%</output></span></label>
-              <label class="field"><span class="field-label">Achievement volume</span><span class="music-volume-control"><span aria-hidden="true">✦</span><input id="achievementVolume" type="range" min="0" max="100" step="1" value="45" aria-label="Achievement sound volume"><output id="achievementVolumeValue" for="achievementVolume">45%</output></span></label>
-              <div class="settings-actions"><button class="sound-toggle" id="masterMuteToggle" type="button" aria-pressed="false">◖ Master sound on</button><button class="subtle-button" id="previewSoundButton" type="button">Preview sound</button></div>
+              <div class="audio-settings-grid">
+                <section class="audio-channel-card audio-channel-card-music" aria-labelledby="musicChannelTitle">
+                  <div class="audio-channel-heading">
+                    <div class="audio-channel-title">
+                      <span class="audio-channel-icon" aria-hidden="true">♫</span>
+                      <div><strong id="musicChannelTitle">Background music</strong><span>Four included tracks, played in order</span></div>
+                    </div>
+                    <button class="sound-toggle" id="musicToggle" type="button" aria-pressed="true">♫ Music on</button>
+                  </div>
+                  <label class="field"><span class="field-label">Starting track</span><span class="music-track-control"><span aria-hidden="true">♫</span><select id="musicTrack" aria-label="Starting music track"><option value="electric-1">Electric Melody 1</option><option value="electric-2">Electric Melody 2</option><option value="warm-1">Warm Overdrive Sustain 1</option><option value="warm-2">Warm Overdrive Sustain 2</option></select></span></label>
+                  <label class="field"><span class="field-label">Music volume</span><span class="music-volume-control"><span aria-hidden="true">♫</span><input id="musicVolume" type="range" min="0" max="100" step="1" value="25" aria-label="Music volume"><output id="musicVolumeValue" for="musicVolume">25%</output></span></label>
+                </section>
+                <section class="audio-channel-card" aria-labelledby="effectsChannelTitle">
+                  <div class="audio-channel-heading">
+                    <div class="audio-channel-title">
+                      <span class="audio-channel-icon" aria-hidden="true">♟</span>
+                      <div><strong id="effectsChannelTitle">Game effects</strong><span>Moves, captures, checks and more</span></div>
+                    </div>
+                    <button class="sound-toggle" id="effectsToggle" type="button" aria-pressed="true">♬ Effects on</button>
+                  </div>
+                  <label class="field"><span class="field-label">Effects volume</span><span class="music-volume-control"><span aria-hidden="true">♟</span><input id="gameVolume" type="range" min="0" max="100" step="1" value="35" aria-label="Game sound volume"><output id="gameVolumeValue" for="gameVolume">35%</output></span></label>
+                </section>
+                <section class="audio-channel-card" aria-labelledby="interfaceChannelTitle">
+                  <div class="audio-channel-heading">
+                    <div class="audio-channel-title">
+                      <span class="audio-channel-icon" aria-hidden="true">⌘</span>
+                      <div><strong id="interfaceChannelTitle">Interface sounds</strong><span>Gentle feedback for controls</span></div>
+                    </div>
+                    <button class="sound-toggle" id="uiSoundsToggle" type="button" aria-pressed="true">♩ UI sounds on</button>
+                  </div>
+                  <label class="field"><span class="field-label">Interface volume</span><span class="music-volume-control"><span aria-hidden="true">⌘</span><input id="uiVolume" type="range" min="0" max="100" step="1" value="20" aria-label="Interface sound volume"><output id="uiVolumeValue" for="uiVolume">20%</output></span></label>
+                </section>
+                <section class="audio-channel-card" aria-labelledby="achievementChannelTitle">
+                  <div class="audio-channel-heading">
+                    <div class="audio-channel-title">
+                      <span class="audio-channel-icon" aria-hidden="true">✦</span>
+                      <div><strong id="achievementChannelTitle">Achievements</strong><span>A little fanfare for milestones</span></div>
+                    </div>
+                  </div>
+                  <label class="field"><span class="field-label">Achievement volume</span><span class="music-volume-control"><span aria-hidden="true">✦</span><input id="achievementVolume" type="range" min="0" max="100" step="1" value="25" aria-label="Achievement sound volume"><output id="achievementVolumeValue" for="achievementVolume">25%</output></span></label>
+                </section>
+              </div>
+              <div class="audio-settings-actions">
+                <div><strong>Master audio</strong><span>Mute every channel at once</span></div>
+                <div class="settings-actions"><button class="sound-toggle" id="masterMuteToggle" type="button" aria-pressed="false">◖ Master sound on</button><button class="subtle-button" id="previewSoundButton" type="button">Preview sound</button></div>
+              </div>
             </div>
-            <p class="note">Game, interface, achievements and music have separate levels. Master mute silences every channel. Music continues through the included tracks in order.</p>
+            <p class="note audio-settings-note">Adjust each level independently, or use master audio to silence everything.</p>
           </section>
           <section class="card settings-panel" data-settings-content="language" hidden>
             <div class="card-heading"><span class="card-title">Language</span><span class="eyebrow">INTERFACE</span></div>
@@ -2947,7 +2984,7 @@
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
       const stockfishSearchCache=new Map();
       let clocks = { w: 0, b: 0 }, clockOn = false, clockStamp = Date.now(), toastTimer;
-      let aiTimer = null, analysisShown = false, resultRecorded = false, lastGameResult = "", audioContext = null, audioResumePromise = null, masterBus = null, effectsBus = null, uiBus = null, achievementBus = null, musicVolume = .75, gameVolume = .72, uiVolume = .18, achievementVolume = .45, masterMuted = false, musicStyle = "electric-1", musicEnabled = true, effectsEnabled = true, uiSoundsEnabled = true, musicHasStarted = false, musicRequest = 0,musicIslandTimer=null,achievementTimer=null,achievementLoadPromise=null,achievementQueue=[],achievementRecords=new Map(),achievementDetailReturnFocus=null;
+      let aiTimer = null, analysisShown = false, resultRecorded = false, lastGameResult = "", audioContext = null, audioResumePromise = null, masterBus = null, effectsBus = null, uiBus = null, achievementBus = null, musicVolume = .25, gameVolume = .35, uiVolume = .20, achievementVolume = .25, masterMuted = false, musicStyle = "electric-1", musicEnabled = true, effectsEnabled = true, uiSoundsEnabled = true, musicHasStarted = false, musicRequest = 0,musicIslandTimer=null,achievementTimer=null,achievementLoadPromise=null,achievementQueue=[],achievementRecords=new Map(),achievementDetailReturnFocus=null;
       let matchActive = false, boardAnimating = false, trainingReturn = "lobby", currentLesson = 0, quizAnswered = false, gameStartedAt=new Date();
       const gameplaySettings={takebacks:true,hints:true,suggestions:true,moveAnnotations:true};
       let aiRequestVersion=0,assistanceGeneration=0,moveSuggestion=null,roomInviteCode="",aiSearchController=null;

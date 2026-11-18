@@ -987,3 +987,223 @@ html[data-theme="night-sky"] .achievement-badge-copy small {
     outline: 2px solid Highlight;
   }
 }
+
+/* Finish the responsive shell after the legacy layout layers. */
+html[data-theme] .settings-head p,
+html[data-theme] .online-head p,
+html[data-theme] .training-head p,
+html[data-theme] .classroom-page-head p {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+html[data-theme] .header-actions .classroom-nav-button {
+  border-color: var(--theme-border-readable) !important;
+  background: var(--theme-glass) !important;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme] .header-actions .classroom-nav-button:hover,
+html[data-theme] .header-actions .classroom-nav-button:focus-visible {
+  border-color: var(--theme-accent-strong) !important;
+  background: var(--theme-control-hover) !important;
+}
+
+@media (max-width: 1100px) {
+  html[data-theme] .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html[data-theme] .settings-nav {
+    position: static;
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    gap: 6px;
+    scrollbar-width: thin;
+  }
+
+  html[data-theme] .settings-nav-button {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: max-content;
+    min-height: 44px;
+    padding-inline: 14px;
+    white-space: nowrap;
+  }
+
+  html[data-theme] .home-shortcuts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme] .home-shortcut > span:nth-child(2) {
+    min-width: 0;
+  }
+
+  html[data-theme] .home-shortcut strong,
+  html[data-theme] .home-shortcut small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+}
+
+[data-settings-content="audio"] .settings-audio-controls {
+  display: grid;
+  align-items: stretch;
+  gap: 16px;
+}
+
+.audio-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.audio-channel-card {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--theme-line);
+  border-radius: 16px;
+  background: var(--theme-panel-raised);
+}
+
+.audio-channel-card-music {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--theme-accent) 9%, var(--theme-panel-raised)), var(--theme-panel-raised));
+}
+
+.audio-channel-heading,
+.audio-channel-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 11px;
+}
+
+.audio-channel-heading {
+  justify-content: space-between;
+}
+
+.audio-channel-title {
+  flex: 1 1 auto;
+}
+
+.audio-channel-title > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.audio-channel-title strong,
+.audio-settings-actions strong {
+  color: var(--theme-text);
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.audio-channel-title > div > span,
+.audio-settings-actions > div > span {
+  color: var(--theme-muted-readable);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.audio-channel-icon {
+  display: grid;
+  flex: 0 0 38px;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--theme-line);
+  border-radius: 12px;
+  background: var(--theme-control);
+  color: var(--theme-accent-strong);
+  font-size: 16px;
+}
+
+.audio-channel-card .sound-toggle {
+  flex: 0 0 auto;
+  padding-inline: 10px;
+  white-space: nowrap;
+}
+
+.audio-channel-card .field {
+  min-width: 0;
+  margin: 0;
+}
+
+.audio-channel-card .field-label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--theme-text);
+}
+
+.audio-channel-card .music-volume-control,
+.audio-channel-card .music-track-control {
+  width: 100%;
+  min-height: 40px;
+}
+
+.audio-channel-card .music-volume-control input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+.audio-channel-card .music-track-control select {
+  flex: 1;
+  max-width: none;
+  min-width: 0;
+}
+
+.audio-settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--theme-line);
+  border-radius: 15px;
+  background: var(--theme-panel-soft);
+}
+
+.audio-settings-actions > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.audio-settings-actions .settings-actions {
+  justify-content: flex-end;
+}
+
+.audio-settings-note {
+  margin-top: 14px;
+}
+
+@media (max-width: 700px) {
+  .audio-settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 460px) {
+  .audio-channel-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .audio-settings-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .audio-settings-actions .settings-actions {
+    justify-content: flex-start;
+  }
+}
