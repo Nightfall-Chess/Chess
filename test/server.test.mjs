@@ -93,7 +93,50 @@ test("puzzle API CORS allows loopback pages and rejects other origins", async t 
     stdio: ["ignore", "pipe", "pipe"]
   });
 
-  test("self-hosted rooms enforce seats, validate moves, sync, resign, and resume", async t => {
+  t.after(async () => {
+    if (child.exitCode === null) {
+      child.kill();
+      await once(child, "exit");
+    }
+  });
+
+  await new Promise((resolve, reject) => {
+    let output = "";
+    const timer = setTimeout(() => reject(new Error(`Puzzle server did not start: ${output}`)), 5000);
+    child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
+    child.stdout.on("data", chunk => {
+      output += chunk;
+      if (output.includes("Nightfall Chess available at")) {
+        clearTimeout(timer);
+        resolve();
+      }
+    });
+    child.stderr.on("data", chunk => { output += chunk; });
+    child.once("error", error => {
+      clearTimeout(timer);
+      reject(error);
+    });
+    child.once("exit", code => {
+      clearTimeout(timer);
+      reject(new Error(`Puzzle server exited before starting (code ${code}): ${output}`));
+    });
+  });
+
+  const endpoint = `http://127.0.0.1:${address.port}/api/puzzles/status`;
+  const allowedOrigin = "http://127.0.0.1:5501";
+  const allowed = await fetch(endpoint, { method: "OPTIONS", headers: { Origin: allowedOrigin } });
+  assert.equal(allowed.status, 204);
+  assert.equal(allowed.headers.get("access-control-allow-origin"), allowedOrigin);
+  assert.equal(allowed.headers.get("access-control-allow-methods"), "GET, OPTIONS");
+
+  const denied = await fetch(endpoint, { method: "OPTIONS", headers: { Origin: "https://example.com" } });
+  assert.equal(denied.status, 403);
+  assert.equal(denied.headers.get("access-control-allow-origin"), null);
+});
+
+
+test("self-hosted rooms enforce seats, validate moves, sync, resign, and resume", async t => {
     const url = await startChessServer(t);
     const sockets = new Set();
     const connect = async () => {
@@ -176,47 +219,6 @@ test("puzzle API CORS allows loopback pages and rejects other origins", async t 
     assert.equal(timeout.room.clocks.w, 0);
     assert.equal(timeout.room.clocks.b, 1000);
   });
-  t.after(async () => {
-    if (child.exitCode === null) {
-      child.kill();
-      await once(child, "exit");
-    }
-  });
-
-  await new Promise((resolve, reject) => {
-    let output = "";
-    const timer = setTimeout(() => reject(new Error(`Puzzle server did not start: ${output}`)), 5000);
-    child.stdout.setEncoding("utf8");
-    child.stderr.setEncoding("utf8");
-    child.stdout.on("data", chunk => {
-      output += chunk;
-      if (output.includes("Nightfall Chess available at")) {
-        clearTimeout(timer);
-        resolve();
-      }
-    });
-    child.stderr.on("data", chunk => { output += chunk; });
-    child.once("error", error => {
-      clearTimeout(timer);
-      reject(error);
-    });
-    child.once("exit", code => {
-      clearTimeout(timer);
-      reject(new Error(`Puzzle server exited before starting (code ${code}): ${output}`));
-    });
-  });
-
-  const endpoint = `http://127.0.0.1:${address.port}/api/puzzles/status`;
-  const allowedOrigin = "http://127.0.0.1:5501";
-  const allowed = await fetch(endpoint, { method: "OPTIONS", headers: { Origin: allowedOrigin } });
-  assert.equal(allowed.status, 204);
-  assert.equal(allowed.headers.get("access-control-allow-origin"), allowedOrigin);
-  assert.equal(allowed.headers.get("access-control-allow-methods"), "GET, OPTIONS");
-
-  const denied = await fetch(endpoint, { method: "OPTIONS", headers: { Origin: "https://example.com" } });
-  assert.equal(denied.status, 403);
-  assert.equal(denied.headers.get("access-control-allow-origin"), null);
-});
 
 test("self-hosted room joins serialize concurrent guests and recover after abrupt disconnect", async t => {
   const url = await startChessServer(t);
