@@ -5,7 +5,7 @@ const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./nightfall-redesign.css?v=38",
+  "./nightfall-redesign.css?v=39",
   "./nightfall-themes.css?v=4",
   "./orbit-enhancements.css?v=1",
   "./orbit-enhancements.js",
