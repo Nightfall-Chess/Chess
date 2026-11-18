@@ -5524,7 +5524,7 @@
           :isProfileSide?isPersian?"نمایهٔ شما":"Your profile"
             :isPersian?"بازیکن محلی":"Local player";
         const openingInfo=openingForPlayer(color);
-        const opening=openingInfo?`<div class="player-opening" title="${isPersian?"گشایش این بازیکن":`${isWhite?"White":"Black"} opening`}">${openingInfo.label}</div>`:"";
+        const opening=`<div class="player-opening" title="${isPersian?"گشایش این بازیکن":`${isWhite?"White":"Black"} opening`}" hidden></div>`;
         const time=clockOn?formatTime(clocks[color]):"—";
         const avatar=isProfileSide&&playerProfile.avatarData?`<img src="${escapeHtml(playerProfile.avatarData)}" alt="">`:isAI?"✦":isWhite?"♙":"♟";
         return `<div class="avatar" aria-hidden="true">${avatar}</div><div class="player-info"><div class="player-name">${escapeHtml(name)}</div><div class="player-detail">${escapeHtml(detail)}</div>${opening}${capturedPiecesHtml(color,top)}</div><div class="clock" aria-label="${isWhite?"White":"Black"} clock"><span class="clock-time">${time}</span></div>`;
@@ -5562,11 +5562,21 @@
         const topColor=orientation==="w"?"b":"w";
         for(const [id,color,top] of [["topPlayer",topColor,true],["bottomPlayer",orientation,false]]) {
           const container=$(id),markup=playerHtml(color,top);
-          // Keep the player card DOM stable while the clock ticks. Replacing
-          // innerHTML every 250ms made the opening badge visibly blink.
-          if(container.dataset.playerMarkup!==markup.replace(/<span class="clock-time">.*?<\/span>/,"<span class=\"clock-time\"></span>")) {
+          // Keep both the player card and opening badge mounted during clock
+          // ticks. Opening text is updated in place, never by replacing the card.
+          const stableMarkup=markup
+            .replace(/<span class="clock-time">.*?<\/span>/,"<span class=\"clock-time\"></span>")
+            .replace(/<div class="player-opening"[^>]*>.*?<\/div>/,"<div class=\"player-opening\"></div>");
+          if(container.dataset.playerMarkup!==stableMarkup) {
             container.innerHTML=markup;
-            container.dataset.playerMarkup=markup.replace(/<span class="clock-time">.*?<\/span>/,"<span class=\"clock-time\"></span>");
+            container.dataset.playerMarkup=stableMarkup;
+          }
+          const openingNode=container.querySelector(".player-opening");
+          if(openingNode) {
+            const openingInfo=openingForPlayer(color);
+            const nextLabel=openingInfo?.label||"";
+            openingNode.hidden=!nextLabel;
+            if(openingNode.textContent!==nextLabel)openingNode.textContent=nextLabel;
           }
           const clock=container.querySelector(".clock");
           if(clock) {
@@ -5624,8 +5634,10 @@
           :isPersian?"با ادامهٔ بازی، نام گشایش پس از رسیدن به یک وضعیت ثبت‌شده در پایگاه ECO نمایش داده می‌شود.":"The ECO opening name will appear when the game reaches a position listed in the database.";
         $("strategyTitle").dataset.english=englishTitle;
         const onlineOpeningLabel=$("onlineOpeningLabel");
-        onlineOpeningLabel.hidden=mode!=="online"||!openingIdentity;
-        onlineOpeningLabel.textContent=openingIdentity?`${openingIdentity.eco||""} · ${isPersian?openingIdentity.nameFa||openingIdentity.name:openingIdentity.name}`:"";
+        const nextOnlineOpening=openingIdentity?`${openingIdentity.eco||""} · ${isPersian?openingIdentity.nameFa||openingIdentity.name:openingIdentity.name}`:"";
+        const shouldShowOnlineOpening=mode==="online"&&Boolean(openingIdentity);
+        if(onlineOpeningLabel.hidden===shouldShowOnlineOpening)onlineOpeningLabel.hidden=!shouldShowOnlineOpening;
+        if(onlineOpeningLabel.textContent!==nextOnlineOpening)onlineOpeningLabel.textContent=nextOnlineOpening;
         $("strategyTitle").textContent=title;
         $("reportPieces").replaceChildren();
         $("strategyCopy").textContent=copy;
@@ -7742,7 +7754,7 @@
             await copyRoomCode();
             return;
           }
-          const api=await ensureOnlineApi(),result=await api.create({name:classroomPlayerName()});
+          const api=await ensureOnlineApi(),result=await api.create({name:classroomPlayerName(),color:$("onlineRoomColor").value});
           const room=result.room;onlineMyColor=room.myColor||"";const generatedCode=String(result.invitationCode||"").trim().toUpperCase();if(!/^[A-Z0-9]{7}$/.test(generatedCode))throw new Error("Server returned an invalid room code (expected exactly 7 characters).");roomInviteCode=generatedCode;onlineRoomId=room.id;
           $("roomCodeValue").textContent=roomInviteCode;$("createdRoom").hidden=false;
           $("copyInviteButton").disabled=false;$("shareInviteButton").disabled=false;
