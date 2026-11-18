@@ -6,7 +6,7 @@ create or replace function public.online_create_room(
   p_user_id uuid,
   p_display_name text,
   p_initial_fen text,
-  p_host_color text default 'random'
+  p_host_color text
 ) returns void
 language plpgsql
 security definer
