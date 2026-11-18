@@ -2,10 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [html, themes, worker] = await Promise.all([
+const [html, themes, visual, worker, redesign] = await Promise.all([
   readFile(new URL("../index.html", import.meta.url), "utf8"),
   readFile(new URL("../nightfall-themes.css", import.meta.url), "utf8"),
-  readFile(new URL("../service-worker.js", import.meta.url), "utf8")
+  readFile(new URL("../nightfall-visual-system.css", import.meta.url), "utf8"),
+  readFile(new URL("../service-worker.js", import.meta.url), "utf8"),
+  readFile(new URL("../nightfall-redesign.css", import.meta.url), "utf8")
 ]);
 
 test("website themes live in their own Settings section", () => {
@@ -38,11 +40,19 @@ test("all six complete website themes have centralized design tokens", () => {
 });
 
 test("the final theme stylesheet loads after other visual effects and is precached", () => {
-  const themeLink = html.indexOf('href="./nightfall-themes.css?v=4"');
+  const themeLink = html.indexOf('href="./nightfall-themes.css?v=5"');
+  const visualLink = html.indexOf('href="./nightfall-visual-system.css?v=1"');
   const orbitLink = html.indexOf('href="./orbit-enhancements.css?v=1"');
-  assert.ok(themeLink > orbitLink, "theme layer must load after Orbit's optional hover effects");
-  assert.match(worker, /nightfall-v39/);
-  assert.ok(worker.includes('"./nightfall-themes.css?v=4"'));
+  assert.ok(themeLink > orbitLink, "theme tokens must load after Orbit effects");
+  assert.ok(visualLink > themeLink, "visual system must load after theme tokens");
+  assert.match(worker, /nightfall-v40/);
+  assert.ok(worker.includes('"./nightfall-themes.css?v=5"'));
+  assert.ok(worker.includes('"./nightfall-visual-system.css?v=1"'));
+  assert.ok(worker.includes('"./assets/nightfall-king-mask.svg"'));
+  assert.ok(html.includes('class="hero-king-art"'));
+  assert.ok(visual.includes('#gameScreen.layout'));
+  assert.ok(visual.includes('#lobby[data-page=play] .lobby-dashboard'));
+  assert.ok(!redesign.includes('lobby-dashboard > :not(.profile-stats)'));
 });
 
 test("visual theme styles cover game, training, analysis, classroom and dialog surfaces", () => {
