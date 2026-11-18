@@ -36,6 +36,7 @@
   --theme-particle-b:#83c7e8;
   --theme-particle-c:#e3c98c;
   --theme-theme-color:#090b13;
+  --theme-king-light:#f4f2ff;--theme-king-mid:#a9b8ff;--theme-king-dark:#596a9c;--theme-king-glow:rgba(169,184,255,.22);
   --bg:var(--theme-bg);
   --panel:var(--theme-panel);
   --panel-raised:var(--theme-panel-raised);
@@ -84,6 +85,7 @@ html[data-theme="night-sky"] {
   --theme-particle-b:#86bde3;
   --theme-particle-c:#fff;
   --theme-theme-color:#edf5fc;
+  --theme-king-light:#fff;--theme-king-mid:#9cc8eb;--theme-king-dark:#4d83b2;--theme-king-glow:rgba(57,126,183,.24);
 }
 html[data-theme="midnight"] {
   color-scheme:dark;
@@ -98,6 +100,7 @@ html[data-theme="midnight"] {
   --theme-button-gradient:linear-gradient(135deg,#d8dfe6,#929da9);--theme-nav-active:rgba(196,204,213,.12);
   --theme-focus:rgba(196,204,213,.85);--theme-orbit:rgba(196,204,213,.12);
   --theme-particle-a:#d8dfe6;--theme-particle-b:#929da9;--theme-particle-c:#737d88;--theme-theme-color:#08090b;
+  --theme-king-light:#f3f5f7;--theme-king-mid:#b8c1cb;--theme-king-dark:#626c78;--theme-king-glow:rgba(196,204,213,.18);
 }
 html[data-theme="royal"] {
   color-scheme:dark;
@@ -112,6 +115,7 @@ html[data-theme="royal"] {
   --theme-button-gradient:linear-gradient(135deg,#f0d58d,#c79c45);--theme-nav-active:rgba(224,189,104,.14);
   --theme-focus:rgba(240,213,141,.82);--theme-orbit:rgba(240,213,141,.14);
   --theme-particle-a:#f0d58d;--theme-particle-b:#7898d0;--theme-particle-c:#fff1c4;--theme-theme-color:#08152f;
+  --theme-king-light:#fff0c6;--theme-king-mid:#e0bd68;--theme-king-dark:#82632e;--theme-king-glow:rgba(224,189,104,.22);
 }
 html[data-theme="emerald"] {
   color-scheme:dark;
@@ -126,6 +130,7 @@ html[data-theme="emerald"] {
   --theme-button-gradient:linear-gradient(135deg,#a0e4bd,#64b98a);--theme-nav-active:rgba(131,209,164,.13);
   --theme-focus:rgba(131,209,164,.82);--theme-orbit:rgba(131,209,164,.13);
   --theme-particle-a:#83d1a4;--theme-particle-b:#54b7aa;--theme-particle-c:#c0dcae;--theme-theme-color:#081912;
+  --theme-king-light:#e3ffed;--theme-king-mid:#83d1a4;--theme-king-dark:#397c5a;--theme-king-glow:rgba(131,209,164,.2);
 }
 html[data-theme="aurora"] {
   color-scheme:dark;
@@ -140,6 +145,7 @@ html[data-theme="aurora"] {
   --theme-button-gradient:linear-gradient(135deg,#8ce0d0,#b19cf0);--theme-nav-active:rgba(140,224,208,.13);
   --theme-focus:rgba(140,224,208,.82);--theme-orbit:rgba(140,224,208,.14);
   --theme-particle-a:#8ce0d0;--theme-particle-b:#b19cf0;--theme-particle-c:#d9c9a5;--theme-theme-color:#11152a;
+  --theme-king-light:#d8fff4;--theme-king-mid:#8ce0d0;--theme-king-dark:#7f6fd0;--theme-king-glow:rgba(140,224,208,.22);
 }
 
 /* Global foundations and shared design tokens */
