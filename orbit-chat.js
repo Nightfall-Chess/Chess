@@ -22,7 +22,7 @@ const EMO = [
 const EMO_DEF=["❤️","😂","🥰","😍","😘","🥺","😭","💜","🤣","😊","👍","🙏"];
 let emoOpen=false,emoTab=0,emoCnt={};try{emoCnt=JSON.parse(localStorage.getItem("nc_emo_cnt")||"{}")||{};}catch{}
 const splitEmo=str=>{try{return Array.from(new Intl.Segmenter("en",{granularity:"grapheme"}).segment(str),x=>x.segment);}catch{return Array.from(str);}};
-const emoRe=/(?:\\p{Extended_Pictographic}(?:️|‍\\p{Extended_Pictographic}|[\\u{1F3FB}-\\u{1F3FF}])*)/gu;
+const emoRe=/(?:\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*)/gu;
 const emoIn=t=>String(t||"").match(emoRe)||[];
 function bumpEmo(list){if(!list?.length)return;list.forEach(e=>{if(e&&e.length<16)emoCnt[e]=(emoCnt[e]||0)+1;});const top=Object.entries(emoCnt).sort((a,b)=>b[1]-a[1]).slice(0,40);emoCnt=Object.fromEntries(top);try{localStorage.setItem("nc_emo_cnt",JSON.stringify(emoCnt));}catch{}renderEmoFav();}
 function favList(){const h={};msgs.forEach(m=>{if(m?.text)emoIn(m.text).forEach(e=>h[e]=(h[e]||0)+1);});const total={...emoCnt};Object.keys(h).forEach(k=>total[k]=(total[k]||0)+h[k]*2);const out=Object.entries(total).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,12).map(x=>x[0]);for(const e of EMO_DEF){if(out.length>=12)break;if(!out.includes(e))out.push(e);}return out;}
