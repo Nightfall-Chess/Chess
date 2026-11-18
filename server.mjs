@@ -226,7 +226,8 @@ function roomSnapshot(room) {
     clocks: { w: remainingClock(room, "w", now), b: remainingClock(room, "b", now) },
     timeControlSeconds: room.timeControlSeconds,
     startedAt: room.startedAt ? new Date(room.startedAt).toISOString() : "",
-    result: room.result
+    result: room.result,
+    rematchRequests: (room.rematchRequests || []).map(color => ({ color, name: room.players[color === "w" ? 0 : 1]?.name || (color === "w" ? "White" : "Black") }))
   };
 }
 
@@ -241,6 +242,7 @@ function finishRoom(room, winnerColor, reason) {
   room.turnStartedAt = 0;
   room.result = roomResult(room.game, winnerColor, reason);
   room.status = "finished";
+  room.rematchRequests = [];
   room.version++;
   broadcastRoom(room);
 }
@@ -293,6 +295,7 @@ function handleMessage(client, message) {
       timeControlSeconds: seconds,
       turnStartedAt: 0,
       result: "",
+      rematchRequests: [],
       createdAt: Date.now()
     };
     const player = joinPlayer(room, "w", sanitizeName(message.name), client);
@@ -358,6 +361,23 @@ function handleMessage(client, message) {
       if (room.game.isCheckmate()) finishRoom(room, player.color, "checkmate");
       else finishRoom(room, null, "draw");
     } else broadcastRoom(room);
+    return;
+  }
+  if (message.type === "rematch") {
+    if (room.status !== "finished") return reject(client, "The current game has not finished.");
+    if (!room.players.every(Boolean)) return reject(client, "Both players must still belong to this room.");
+    if (!room.rematchRequests.includes(player.color)) room.rematchRequests.push(player.color);
+    if (room.rematchRequests.length === 2) {
+      room.game = new Chess();
+      room.clocks = { w: room.timeControlSeconds * 1000, b: room.timeControlSeconds * 1000 };
+      room.status = "playing";
+      room.result = "";
+      room.rematchRequests = [];
+      room.turnStartedAt = Date.now();
+      room.startedAt = room.turnStartedAt;
+    }
+    room.version++;
+    broadcastRoom(room);
     return;
   }
   if (message.type === "resign") {
