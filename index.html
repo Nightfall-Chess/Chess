@@ -6365,7 +6365,7 @@
         $("gameScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("classroomScreen").hidden=true;$("onlineScreen").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;
         setSelfHostedConnectionStatus(isPersian?"آمادهٔ ساخت اتاق جدید هستید.":"Ready to create a new room.");
-        try { const cleanUrl=new URL(location.href);cleanUrl.hash="";history.replaceState(null,"",cleanUrl.href); } catch(error) { console.warn("Could not clear the old room invite from the URL:",error); }
+        try { const cleanUrl=new URL(location.href);cleanUrl.hash="";window.history.replaceState(null,"",cleanUrl.href); } catch(error) { console.warn("Could not clear the old room invite from the URL:",error); }
       }
       function classroomPlayerName() {
         return (playerProfile.username||$("profileName").value||"Player").trim().slice(0,24)||"Player";
