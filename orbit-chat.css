@@ -124,3 +124,14 @@ body.nc-open > #ncChatDock{position:fixed;left:18px;right:auto;top:18px;bottom:1
  #ncChatDock .nc-head{padding:10px 12px;flex-shrink:0}
  #ncLauncher{left:auto;right:12px;bottom:14px;top:auto;transform:none}
 }
+
+.nc-dots{display:inline-flex;gap:3px;vertical-align:middle}
+.nc-dots i{width:5px;height:5px;border-radius:50%;background:#ffd27a;animation:ncDot 1s infinite}
+.nc-dots i:nth-child(2){animation-delay:.15s}
+.nc-dots i:nth-child(3){animation-delay:.3s}
+@keyframes ncDot{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@media(min-width:1280px){
+ #ncChatDock .nc-emoji{position:fixed;left:330px;top:0;bottom:0;width:300px;height:auto;z-index:120;background:#15101f;border:0;border-right:1px solid rgba(212,165,255,.3);box-shadow:8px 0 30px rgba(0,0,0,.4)}
+ #ncChatDock .nc-emoji .em-grid{grid-template-columns:repeat(7,1fr)}
+ #ncChatDock .nc-emoji .em-tabs{flex-wrap:wrap;overflow:visible}
+}
