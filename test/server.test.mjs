@@ -8,7 +8,7 @@ import { WebSocket } from "ws";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 
-async function startChessServer(t, { heartbeatIntervalMs } = {}) {
+async function startChessServer(t, { heartbeatIntervalMs, puzzleArchivePath } = {}) {
   const probe = createServer();
   probe.listen(0, "127.0.0.1");
   await once(probe, "listening");
@@ -21,7 +21,8 @@ async function startChessServer(t, { heartbeatIntervalMs } = {}) {
       ...process.env,
       HOST: "127.0.0.1",
       PORT: String(address.port),
-      ...(heartbeatIntervalMs ? { ONLINE_HEARTBEAT_MS: String(heartbeatIntervalMs) } : {})
+      ...(heartbeatIntervalMs ? { ONLINE_HEARTBEAT_MS: String(heartbeatIntervalMs) } : {}),
+      ...(puzzleArchivePath ? { CHESS_PUZZLE_ARCHIVE: puzzleArchivePath } : {})
     },
     stdio: ["ignore", "pipe", "pipe"]
   });
@@ -419,4 +420,15 @@ test("static server safely rejects malformed paths and supports HEAD requests", 
 
   const malformed = await fetch(base.replace("/ws/online", "/%E0%A4%A"));
   assert.equal(malformed.status, 400);
+});
+
+ 
+test("missing Lichess archive returns an actionable setup error", async t => {
+  const url = await startChessServer(t, { puzzleArchivePath: root + "missing-puzzle-archive-test.zst" });
+  const endpoint = url.replace("ws://", "http://").replace("/ws/online", "/api/puzzles/status");
+  const response = await fetch(endpoint);
+  assert.equal(response.status, 503);
+  const payload = await response.json();
+  assert.match(payload.error, /Lichess puzzle archive is missing/);
+  assert.ok(payload.error.includes("database.lichess.org"));
 });
