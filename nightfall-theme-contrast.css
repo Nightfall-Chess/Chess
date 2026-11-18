@@ -319,3 +319,671 @@ html[data-theme="night-sky"] .primary-button {
     forced-color-adjust: auto;
   }
 }
+
+
+/* ================================================================
+   Deep feature surfaces: Game Review, openings, move list, Classroom
+   and Achievements. These selectors intentionally override legacy
+   hard-coded colors from nightfall-redesign.css.
+   ================================================================ */
+
+html[data-theme] {
+  --theme-surface-strong: var(--theme-panel-raised);
+  --theme-surface-soft: var(--theme-panel-soft);
+  --theme-table-head: var(--theme-panel-raised);
+  --theme-table-row: var(--theme-panel);
+  --theme-table-hover: var(--theme-nav-active);
+  --theme-chip-bg: var(--theme-nav-active);
+  --theme-chip-text: var(--theme-text);
+}
+
+/* GAME REVIEW — modal, summary cards, filters, graph, table and move rows. */
+html[data-theme] .analysis-dialog,
+html[data-theme] .analysis-dialog .analysis-content-column,
+html[data-theme] .analysis-dialog .analysis-board-column {
+  color: var(--theme-text);
+}
+
+html[data-theme] .analysis-dialog {
+  border: 1px solid var(--theme-line);
+  background: var(--theme-card-gradient);
+  color: var(--theme-text);
+}
+
+html[data-theme] .analysis-head,
+html[data-theme] .analysis-head h2,
+html[data-theme] .analysis-head .analysis-result,
+html[data-theme] .analysis-player-head,
+html[data-theme] .analysis-player-head > strong,
+html[data-theme] .analysis-player-count b,
+html[data-theme] .analysis-summary strong,
+html[data-theme] .analysis-stat strong,
+html[data-theme] .analysis-tips strong {
+  color: var(--theme-text);
+}
+
+html[data-theme] .analysis-summary,
+html[data-theme] .analysis-player-report,
+html[data-theme] .analysis-stat,
+html[data-theme] .analysis-tips,
+html[data-theme] .analysis-table-wrap,
+html[data-theme] .analysis-content-column,
+html[data-theme] .evaluation-graph-wrap,
+html[data-theme] .evaluation-grid {
+  border-color: var(--theme-line);
+  background: var(--theme-panel);
+  color: var(--theme-text);
+}
+
+html[data-theme] .analysis-player-report,
+html[data-theme] .analysis-stat {
+  border: 1px solid var(--theme-line);
+  background: var(--theme-panel-raised);
+}
+
+html[data-theme] .analysis-player-head,
+html[data-theme] .analysis-player-count,
+html[data-theme] .analysis-progress,
+html[data-theme] .analysis-summary,
+html[data-theme] .analysis-summary p,
+html[data-theme] .analysis-tips,
+html[data-theme] .analysis-tips p {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+html[data-theme] .analysis-player-count {
+  background: var(--theme-control);
+  border: 1px solid var(--theme-line);
+}
+
+html[data-theme] .analysis-player-head > strong,
+html[data-theme] .analysis-player-count b,
+html[data-theme] .analysis-player-head b {
+  color: var(--theme-text);
+}
+
+html[data-theme] .analysis-tips {
+  border: 1px solid color-mix(in srgb, var(--theme-gold) 48%, var(--theme-line));
+  background: color-mix(in srgb, var(--theme-gold) 9%, var(--theme-panel));
+}
+
+html[data-theme] .analysis-table-wrap {
+  border: 1px solid var(--theme-border-readable);
+  background: var(--theme-panel);
+}
+
+html[data-theme] .analysis-table {
+  color: var(--theme-text);
+  background: var(--theme-panel);
+}
+
+html[data-theme] .analysis-table thead,
+html[data-theme] .analysis-table th {
+  background: var(--theme-table-head);
+  color: var(--theme-text);
+  border-color: var(--theme-line);
+}
+
+html[data-theme] .analysis-table td {
+  color: var(--theme-text);
+  background: transparent;
+  border-color: var(--theme-line);
+}
+
+html[data-theme] .analysis-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--theme-panel-raised) 58%, transparent);
+}
+
+html[data-theme] .analysis-table tr[data-index]:hover,
+html[data-theme] .analysis-table tr[data-index][aria-current="true"],
+html[data-theme] .analysis-row:hover,
+html[data-theme] .analysis-row[aria-current="true"] {
+  background: var(--theme-table-hover);
+}
+
+html[data-theme] .analysis-table tr[data-index][aria-current="true"] {
+  box-shadow: inset 3px 0 var(--theme-accent);
+}
+
+html[dir="rtl"][data-theme] .analysis-table tr[data-index][aria-current="true"] {
+  box-shadow: inset -3px 0 var(--theme-accent);
+}
+
+html[data-theme] .analysis-table tr.critical-move {
+  box-shadow: inset 3px 0 var(--theme-danger);
+}
+
+html[dir="rtl"][data-theme] .analysis-table tr.critical-move {
+  box-shadow: inset -3px 0 var(--theme-danger);
+}
+
+html[data-theme] .analysis-table td .grade,
+html[data-theme] .analysis-table td,
+html[data-theme] .analysis-table td strong {
+  opacity: 1;
+}
+
+html[data-theme] .analysis-navigation,
+html[data-theme] .review-autoplay-controls,
+html[data-theme] .analysis-filter-row {
+  color: var(--theme-text);
+}
+
+html[data-theme] .analysis-filter-row label,
+html[data-theme] .review-autoplay-controls label,
+html[data-theme] #reviewPositionLabel {
+  color: var(--theme-muted-readable);
+}
+
+html[data-theme] .analysis-filter-row select,
+html[data-theme] .review-autoplay-controls select {
+  border-color: var(--theme-border-readable);
+  background: var(--theme-control);
+  color: var(--theme-text);
+}
+
+html[data-theme] .analysis-backdrop {
+  background: color-mix(in srgb, var(--theme-bg) 76%, transparent);
+}
+
+/* OPENINGS — remove the legacy purple/grey text and fixed navy cards. */
+html[data-theme] .quick-reviews,
+html[data-theme] #openingExplorer,
+html[data-theme] .quick-review-content,
+html[data-theme] .quick-review-plan,
+html[data-theme] .quick-board-wrap,
+html[data-theme] .scenario-board-wrap {
+  border-color: var(--theme-line);
+  background: var(--theme-card-gradient);
+  color: var(--theme-text);
+}
+
+html[data-theme] .quick-reviews > summary,
+html[data-theme] .quick-review-plan h3,
+html[data-theme] .quick-review-plan strong,
+html[data-theme] .opening-scenarios-heading,
+html[data-theme] .opening-line-note strong {
+  color: var(--theme-text);
+}
+
+html[data-theme] .opening-search-label,
+html[data-theme] .opening-line-note,
+html[data-theme] .quick-review-plan,
+html[data-theme] .quick-review-plan p,
+html[data-theme] .opening-card-copy small,
+html[data-theme] .opening-card-moves {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+html[data-theme] .opening-search,
+html[data-theme] #openingSearch {
+  border-color: var(--theme-border-readable);
+  background: var(--theme-control);
+  color: var(--theme-text);
+}
+
+html[data-theme] .opening-categories .opening-category,
+html[data-theme] .opening-category {
+  border: 1px solid var(--theme-border-readable);
+  background: var(--theme-control);
+  color: var(--theme-text);
+  opacity: 1;
+}
+
+html[data-theme] .opening-category:hover,
+html[data-theme] .opening-category.active,
+html[data-theme] .opening-category[aria-pressed="true"] {
+  border-color: var(--theme-accent);
+  background: var(--theme-nav-active);
+  color: var(--theme-accent-strong);
+}
+
+html[data-theme] .quick-review-button,
+html[data-theme] .opening-card {
+  border: 1px solid var(--theme-line);
+  background: var(--theme-control);
+  color: var(--theme-text);
+}
+
+html[data-theme] .quick-review-button:hover,
+html[data-theme] .quick-review-button.active,
+html[data-theme] .quick-review-button[aria-pressed="true"],
+html[data-theme] .opening-card:hover {
+  border-color: var(--theme-accent);
+  background: var(--theme-nav-active);
+  color: var(--theme-text);
+}
+
+html[data-theme] .opening-card-icon {
+  border-color: color-mix(in srgb, var(--theme-gold) 42%, var(--theme-line));
+  background: color-mix(in srgb, var(--theme-gold) 12%, var(--theme-panel));
+  color: var(--theme-gold);
+}
+
+html[data-theme] .opening-card-copy strong,
+html[data-theme] .opening-card-moves,
+html[data-theme] .quick-review-button .opening-card-copy strong {
+  color: var(--theme-text);
+}
+
+html[data-theme] .opening-side-button {
+  border-color: var(--theme-border-readable);
+  background: var(--theme-control);
+  color: var(--theme-text);
+}
+
+html[data-theme] .opening-side-button.active,
+html[data-theme] .opening-side-button[aria-pressed="true"] {
+  border-color: var(--theme-accent);
+  background: var(--theme-nav-active);
+  color: var(--theme-accent-strong);
+}
+
+html[data-theme] .quick-review-plan {
+  border: 1px solid var(--theme-line);
+  background: var(--theme-panel);
+}
+
+html[data-theme] .opening-line-note {
+  border-color: var(--theme-line);
+}
+
+/* MOVE LIST — SAN, move numbers, active move and annotations. */
+html[data-theme] .moves-list,
+html[data-theme] #movesList {
+  border-color: var(--theme-line);
+  background: var(--theme-panel);
+  color: var(--theme-text);
+}
+
+html[data-theme] .move-row {
+  border-color: var(--theme-line);
+  background: transparent;
+  color: var(--theme-text);
+}
+
+html[data-theme] .move-number {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+html[data-theme] .board-move-button,
+html[data-theme] .move-row button {
+  color: var(--theme-text);
+  opacity: 1;
+}
+
+html[data-theme] .board-move-button:hover,
+html[data-theme] .move-row button:hover {
+  background: var(--theme-control-hover);
+  color: var(--theme-text);
+}
+
+html[data-theme] .board-move-button.move-current,
+html[data-theme] .move-row .move-current,
+html[data-theme] .move-row button[aria-current="true"] {
+  border-color: var(--theme-accent);
+  background: var(--theme-nav-active);
+  color: var(--theme-accent-strong);
+}
+
+html[data-theme] .empty-moves,
+html[data-theme] .move-quality,
+html[data-theme] .move-annotation,
+html[data-theme] .move-evaluation {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+/* CLASSROOM — every room surface, nested list, input, label and message. */
+html[data-theme] .classroom-screen,
+html[data-theme] .classroom-layout,
+html[data-theme] .classroom-main-column,
+html[data-theme] .classroom-side-column,
+html[data-theme] .classroom-page-head,
+html[data-theme] .classroom-welcome,
+html[data-theme] .classroom-entry-card,
+html[data-theme] .classroom-recent,
+html[data-theme] .classroom-room-bar,
+html[data-theme] .classroom-board-tools,
+html[data-theme] .classroom-board-stage,
+html[data-theme] .classroom-board-frame,
+html[data-theme] .classroom-history-card,
+html[data-theme] .classroom-participants-card,
+html[data-theme] .classroom-annotations-card,
+html[data-theme] .classroom-host-card,
+html[data-theme] .classroom-info-card,
+html[data-theme] .classroom-chat-card,
+html[data-theme] .classroom-analysis-card,
+html[data-theme] .classroom-load-card,
+html[data-theme] .classroom-notice {
+  border-color: var(--theme-line);
+  background: var(--theme-card-gradient);
+  color: var(--theme-text);
+}
+
+html[data-theme] .classroom-entry-card,
+html[data-theme] .classroom-recent,
+html[data-theme] .classroom-history-card,
+html[data-theme] .classroom-participants-card,
+html[data-theme] .classroom-annotations-card,
+html[data-theme] .classroom-host-card,
+html[data-theme] .classroom-info-card,
+html[data-theme] .classroom-chat-card,
+html[data-theme] .classroom-analysis-card,
+html[data-theme] .classroom-load-card {
+  border: 1px solid var(--theme-line);
+  box-shadow: var(--theme-shadow-soft);
+}
+
+html[data-theme] .classroom-page-head h1,
+html[data-theme] .classroom-page-head h2,
+html[data-theme] .classroom-welcome h1,
+html[data-theme] .classroom-welcome h2,
+html[data-theme] .classroom-entry-card h2,
+html[data-theme] .classroom-card-title,
+html[data-theme] .classroom-room-bar strong,
+html[data-theme] .classroom-history-card .card-title,
+html[data-theme] .classroom-participants-card .card-title,
+html[data-theme] .classroom-annotations-card .card-title,
+html[data-theme] .classroom-host-card .card-title,
+html[data-theme] .classroom-info-card .card-title,
+html[data-theme] .classroom-chat-card .card-title {
+  color: var(--theme-text);
+}
+
+html[data-theme] .classroom-page-head p,
+html[data-theme] .classroom-welcome p,
+html[data-theme] .classroom-entry-card > p,
+html[data-theme] .classroom-panel-note,
+html[data-theme] .classroom-empty,
+html[data-theme] .classroom-load-card > p,
+html[data-theme] .classroom-info-card p,
+html[data-theme] .classroom-info-footer,
+html[data-theme] .classroom-analysis-result,
+html[data-theme] .classroom-shared-analysis,
+html[data-theme] .classroom-chat-message span,
+html[data-theme] .classroom-chat-message time,
+html[data-theme] .classroom-tool-label,
+html[data-theme] .classroom-board-hint,
+html[data-theme] .classroom-board-status,
+html[data-theme] .classroom-position-label,
+html[data-theme] .classroom-navigation #classroomMoveLabel,
+html[data-theme] .classroom-history-row > span,
+html[data-theme] .classroom-participant-copy small,
+html[data-theme] .classroom-participant-status,
+html[data-theme] .classroom-connection,
+html[data-theme] .classroom-room-meta {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+html[data-theme] .classroom-history,
+html[data-theme] .classroom-chat-messages,
+html[data-theme] .classroom-shared-analysis,
+html[data-theme] .classroom-room-meta,
+html[data-theme] .classroom-connection,
+html[data-theme] .classroom-participants,
+html[data-theme] .classroom-annotations-card {
+  border-color: var(--theme-line);
+  color: var(--theme-text);
+}
+
+html[data-theme] .classroom-history-row,
+html[data-theme] .classroom-participant,
+html[data-theme] .classroom-annotation-item,
+html[data-theme] .classroom-chat-message,
+html[data-theme] .classroom-capabilities span,
+html[data-theme] .classroom-recent-item {
+  border: 1px solid var(--theme-line);
+  background: var(--theme-control);
+  color: var(--theme-text);
+}
+
+html[data-theme] .classroom-history-row button,
+html[data-theme] .classroom-history-row button.current,
+html[data-theme] .classroom-participant-copy strong,
+html[data-theme] .classroom-annotation-item,
+html[data-theme] .classroom-chat-message strong {
+  color: var(--theme-text);
+}
+
+html[data-theme] .classroom-history-row button:hover,
+html[data-theme] .classroom-history-row button.current {
+  background: var(--theme-nav-active);
+  color: var(--theme-accent-strong);
+}
+
+html[data-theme] .classroom-participant {
+  background: var(--theme-panel-raised);
+}
+
+html[data-theme] .classroom-avatar {
+  border-color: var(--theme-line);
+  background: var(--theme-nav-active);
+  color: var(--theme-accent-strong);
+}
+
+html[data-theme] .classroom-avatar.disconnected {
+  background: var(--theme-panel-soft);
+  color: var(--theme-muted-readable);
+}
+
+html[data-theme] .classroom-permission-select,
+html[data-theme] .classroom-load-row select,
+html[data-theme] .classroom-load-card textarea,
+html[data-theme] .classroom-chat-form input,
+html[data-theme] .classroom-entry-card input {
+  border-color: var(--theme-border-readable);
+  background: var(--theme-control);
+  color: var(--theme-text);
+}
+
+html[data-theme] .classroom-load-card summary,
+html[data-theme] .classroom-lock-toggle,
+html[data-theme] .classroom-count-pill {
+  color: var(--theme-text);
+}
+
+html[data-theme] .classroom-count-pill {
+  border-color: var(--theme-line);
+  background: var(--theme-nav-active);
+}
+
+html[data-theme] .classroom-info-card {
+  border-color: var(--theme-line);
+  background: var(--theme-card-gradient);
+}
+
+html[data-theme] .classroom-info-card p,
+html[data-theme] .classroom-info-footer {
+  color: var(--theme-muted-readable);
+}
+
+html[data-theme] .classroom-info-footer {
+  border-color: var(--theme-line);
+}
+
+html[data-theme] .classroom-tool,
+html[data-theme] .classroom-nav-button,
+html[data-theme] .classroom-side-column button {
+  border-color: var(--theme-border-readable);
+  background: var(--theme-control);
+  color: var(--theme-text);
+}
+
+html[data-theme] .classroom-tool:hover,
+html[data-theme] .classroom-nav-button:hover,
+html[data-theme] .classroom-side-column button:hover,
+html[data-theme] .classroom-tool.active,
+html[data-theme] .classroom-nav-button.active {
+  border-color: var(--theme-accent);
+  background: var(--theme-nav-active);
+  color: var(--theme-accent-strong);
+}
+
+html[data-theme] .classroom-close-room {
+  border-color: color-mix(in srgb, var(--theme-danger) 48%, var(--theme-line));
+  color: var(--theme-danger);
+}
+
+html[data-theme] .classroom-sync-error {
+  color: var(--theme-danger);
+}
+
+/* ACHIEVEMENTS — earned/unearned states, tiers, descriptions and progress. */
+html[data-theme] .achievement-island,
+html[data-theme] .achievement-details-dialog,
+html[data-theme] .achievement-detail-card,
+html[data-theme] .achievement-badge {
+  border-color: var(--theme-line);
+  background: var(--theme-card-gradient);
+  color: var(--theme-text);
+}
+
+html[data-theme] .achievement-island {
+  box-shadow: var(--theme-shadow);
+}
+
+html[data-theme] .achievement-island-icon,
+html[data-theme] .achievement-badge-icon {
+  border-color: var(--theme-line);
+  background: var(--theme-nav-active);
+  color: var(--theme-gold);
+}
+
+html[data-theme] .achievement-island-copy strong,
+html[data-theme] .achievement-details-dialog h2,
+html[data-theme] .achievement-detail-head strong,
+html[data-theme] .achievement-badge-copy strong {
+  color: var(--theme-text);
+}
+
+html[data-theme] .achievement-island-copy small,
+html[data-theme] .achievement-detail-head small,
+html[data-theme] .achievement-detail-copy,
+html[data-theme] .achievement-stage-list li,
+html[data-theme] .achievement-badge-copy small {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+html[data-theme] .achievement-island-tier {
+  color: var(--theme-gold);
+}
+
+html[data-theme] .achievement-badge {
+  border: 1px solid var(--theme-line);
+  background: var(--theme-panel);
+}
+
+html[data-theme] .achievement-badge.earned,
+html[data-theme] .achievement-badge[aria-current="true"],
+html[data-theme] .achievement-detail-card:has(.achievement-stage-list li.earned) {
+  border-color: color-mix(in srgb, var(--theme-gold) 55%, var(--theme-line));
+  background: color-mix(in srgb, var(--theme-gold) 8%, var(--theme-panel));
+}
+
+html[data-theme] .achievement-stage-list li {
+  border: 1px solid transparent;
+  background: var(--theme-control);
+}
+
+html[data-theme] .achievement-stage-list li.earned {
+  border-color: color-mix(in srgb, var(--theme-gold) 38%, var(--theme-line));
+  background: color-mix(in srgb, var(--theme-gold) 13%, var(--theme-panel));
+  color: var(--theme-gold);
+}
+
+html[data-theme] .achievement-badge-track,
+html[data-theme] .achievement-island-progress {
+  height: 6px;
+  border: 1px solid var(--theme-line);
+  background: var(--theme-panel-soft);
+}
+
+html[data-theme] .achievement-badge-track i,
+html[data-theme] .achievement-island-progress i {
+  background: var(--theme-button-gradient);
+}
+
+html[data-theme] .achievement-details-backdrop {
+  background: color-mix(in srgb, var(--theme-bg) 78%, transparent);
+}
+
+/* The light theme needs its own readable modal and list surfaces too. */
+html[data-theme="night-sky"] .analysis-dialog,
+html[data-theme="night-sky"] .analysis-player-report,
+html[data-theme="night-sky"] .analysis-stat,
+html[data-theme="night-sky"] .analysis-table,
+html[data-theme="night-sky"] .analysis-table th,
+html[data-theme="night-sky"] .quick-review-plan,
+html[data-theme="night-sky"] .classroom-participant,
+html[data-theme="night-sky"] .classroom-history-row,
+html[data-theme="night-sky"] .classroom-annotation-item,
+html[data-theme="night-sky"] .classroom-chat-message,
+html[data-theme="night-sky"] .achievement-details-dialog,
+html[data-theme="night-sky"] .achievement-detail-card,
+html[data-theme="night-sky"] .achievement-badge,
+html[data-theme="night-sky"] .achievement-island {
+  background: #fff;
+  color: #172c43;
+}
+
+html[data-theme="night-sky"] .analysis-table tbody tr:nth-child(even),
+html[data-theme="night-sky"] .analysis-player-count,
+html[data-theme="night-sky"] .achievement-stage-list li,
+html[data-theme="night-sky"] .classroom-participant {
+  background: #f3f8fc;
+}
+
+html[data-theme="night-sky"] .analysis-table td,
+html[data-theme="night-sky"] .analysis-table th,
+html[data-theme="night-sky"] .analysis-head h2,
+html[data-theme="night-sky"] .analysis-player-head > strong,
+html[data-theme="night-sky"] .analysis-player-count b,
+html[data-theme="night-sky"] .quick-review-plan h3,
+html[data-theme="night-sky"] .quick-review-plan strong,
+html[data-theme="night-sky"] .opening-card-copy strong,
+html[data-theme="night-sky"] .opening-card-moves,
+html[data-theme="night-sky"] .classroom-history-row button,
+html[data-theme="night-sky"] .classroom-participant-copy strong,
+html[data-theme="night-sky"] .classroom-chat-message strong,
+html[data-theme="night-sky"] .achievement-island-copy strong,
+html[data-theme="night-sky"] .achievement-details-dialog h2,
+html[data-theme="night-sky"] .achievement-detail-head strong,
+html[data-theme="night-sky"] .achievement-badge-copy strong {
+  color: #172c43;
+}
+
+html[data-theme="night-sky"] .analysis-player-head,
+html[data-theme="night-sky"] .analysis-progress,
+html[data-theme="night-sky"] .analysis-player-count,
+html[data-theme="night-sky"] .quick-review-plan,
+html[data-theme="night-sky"] .opening-card-copy small,
+html[data-theme="night-sky"] .opening-line-note,
+html[data-theme="night-sky"] .classroom-panel-note,
+html[data-theme="night-sky"] .classroom-empty,
+html[data-theme="night-sky"] .classroom-info-card p,
+html[data-theme="night-sky"] .classroom-info-footer,
+html[data-theme="night-sky"] .classroom-participant-copy small,
+html[data-theme="night-sky"] .classroom-participant-status,
+html[data-theme="night-sky"] .achievement-island-copy small,
+html[data-theme="night-sky"] .achievement-detail-copy,
+html[data-theme="night-sky"] .achievement-detail-head small,
+html[data-theme="night-sky"] .achievement-stage-list li,
+html[data-theme="night-sky"] .achievement-badge-copy small {
+  color: #526b84;
+}
+
+@media (forced-colors: active) {
+  html[data-theme] .analysis-table tr[data-index][aria-current="true"],
+  html[data-theme] .quick-review-button.active,
+  html[data-theme] .opening-category.active,
+  html[data-theme] .classroom-tool.active,
+  html[data-theme] .achievement-badge.earned {
+    outline: 2px solid Highlight;
+  }
+}
