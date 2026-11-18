@@ -370,8 +370,16 @@ function handleMessage(client, message) {
     return;
   }
   if (message.type === "rematch") {
-    if (room.status !== "finished") return reject(client, "The current game has not finished.");
-    if (!room.players.every(Boolean)) return reject(client, "Both players must still belong to this room.");
+    if (room.status === "playing") {
+      // A second rematch click can arrive just after the other player already
+      // started the new game. Return the authoritative state instead of an error.
+      broadcastRoom(room);
+      return;
+    }
+    if (room.status !== "finished") return reject(client, "The current game is not ready for a rematch.");
+    if (!room.players.every(Boolean) || !room.players.some(seat => seat === player)) {
+      return reject(client, "Both players must still belong to this room.");
+    }
     if (!room.rematchRequests.includes(player.color)) room.rematchRequests.push(player.color);
     if (room.rematchRequests.length === 2) {
       room.game = new Chess();
