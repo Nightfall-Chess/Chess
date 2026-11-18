@@ -5527,7 +5527,7 @@
         const opening=openingInfo?`<div class="player-opening" title="${isPersian?"گشایش این بازیکن":`${isWhite?"White":"Black"} opening`}">${openingInfo.label}</div>`:"";
         const time=clockOn?formatTime(clocks[color]):"—";
         const avatar=isProfileSide&&playerProfile.avatarData?`<img src="${escapeHtml(playerProfile.avatarData)}" alt="">`:isAI?"✦":isWhite?"♙":"♟";
-        return `<div class="avatar" aria-hidden="true">${avatar}</div><div class="player-info"><div class="player-name">${escapeHtml(name)}</div><div class="player-detail">${escapeHtml(detail)}</div>${opening}${capturedPiecesHtml(color,top)}</div><div class="clock${active?" active":""}" aria-label="${isWhite?"White":"Black"} clock">${time}</div>`;
+        return `<div class="avatar" aria-hidden="true">${avatar}</div><div class="player-info"><div class="player-name">${escapeHtml(name)}</div><div class="player-detail">${escapeHtml(detail)}</div>${opening}${capturedPiecesHtml(color,top)}</div><div class="clock" aria-label="${isWhite?"White":"Black"} clock"><span class="clock-time">${time}</span></div>`;
       }
       function capturedPiecesHtml(color,showAdvantage) {
         const pieceValues={p:1,n:3,b:3,r:5,q:9,k:0};
@@ -5560,10 +5560,22 @@
       }
       function renderPlayers() {
         const topColor=orientation==="w"?"b":"w";
-        $("topPlayer").innerHTML=playerHtml(topColor,true);
-        $("bottomPlayer").innerHTML=playerHtml(orientation,false);
-        $("topPlayer").classList.toggle("active-turn",state.turn===topColor&&!gameOver);
-        $("bottomPlayer").classList.toggle("active-turn",state.turn===orientation&&!gameOver);
+        for(const [id,color,top] of [["topPlayer",topColor,true],["bottomPlayer",orientation,false]]) {
+          const container=$(id),markup=playerHtml(color,top);
+          // Keep the player card DOM stable while the clock ticks. Replacing
+          // innerHTML every 250ms made the opening badge visibly blink.
+          if(container.dataset.playerMarkup!==markup.replace(/<span class="clock-time">.*?<\/span>/,"<span class=\"clock-time\"></span>")) {
+            container.innerHTML=markup;
+            container.dataset.playerMarkup=markup.replace(/<span class="clock-time">.*?<\/span>/,"<span class=\"clock-time\"></span>");
+          }
+          const clock=container.querySelector(".clock");
+          if(clock) {
+            clock.classList.toggle("active",state.turn===color&&!gameOver);
+            const timeNode=clock.querySelector(".clock-time");
+            if(timeNode)timeNode.textContent=clockOn?formatTime(clocks[color]):"—";
+          }
+          container.classList.toggle("active-turn",state.turn===color&&!gameOver);
+        }
       }
       function renderMoves() {
         const list=$("movesList"); $("moveCount").textContent=isPersian?`${String(history.length).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])} حرکت`:`${history.length} ${history.length===1?"move":"moves"}`;
