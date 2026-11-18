@@ -1,4 +1,4 @@
-const CACHE_VERSION = "nightfall-v43";
+const CACHE_VERSION = "nightfall-v44";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -12,6 +12,8 @@ const CORE_ASSETS = [
   "./assets/nightfall-king-mask.svg",
   "./orbit-enhancements.css?v=1",
   "./orbit-enhancements.js",
+  "./orbit-chat.css",
+  "./orbit-chat.js",
   "./manifest.webmanifest",
   "./online-supabase.js?v=online-authoritative-snapshot-20261117",
   "./game-archive.mjs",
