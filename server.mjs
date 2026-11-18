@@ -284,6 +284,9 @@ function handleMessage(client, message) {
     if (client.room) return reject(client, "This connection already belongs to a room.");
     const seconds = Number(message.timeControlSeconds ?? 300);
     if (!Number.isInteger(seconds) || seconds < 0 || seconds > 3600) return reject(client, "Time control must be between 0 and 3600 seconds.");
+    const requestedColor = String(message.color || "random").toLowerCase();
+    if (!["w", "b", "random"].includes(requestedColor)) return reject(client, "Choose white, black, or random for your room color.");
+    const hostColor = requestedColor === "random" ? (randomBytes(1)[0] % 2 === 0 ? "w" : "b") : requestedColor;
     const room = {
       id: randomUUID(),
       code: generateRoomCode(),
@@ -298,7 +301,7 @@ function handleMessage(client, message) {
       rematchRequests: [],
       createdAt: Date.now()
     };
-    const player = joinPlayer(room, "w", sanitizeName(message.name), client);
+    const player = joinPlayer(room, hostColor, sanitizeName(message.name), client);
     rooms.set(room.code, room);
     bindPlayer(client, room, player);
     return send(client, { type: "created", room: roomSnapshot(room), token: player.token, color: player.color });
@@ -309,7 +312,10 @@ function handleMessage(client, message) {
     const room = rooms.get(code);
     if (!room) return reject(client, "Room not found.");
     if (room.status !== "waiting" || room.players[1]) return reject(client, "This room already has two players or has finished.");
-    const player = joinPlayer(room, "b", sanitizeName(message.name), client);
+    const host = room.players.find(Boolean);
+    if (!host) return reject(client, "The room host is not available.");
+    const guestColor = host.color === "w" ? "b" : "w";
+    const player = joinPlayer(room, guestColor, sanitizeName(message.name), client);
     bindPlayer(client, room, player);
     send(client, { type: "joined", room: roomSnapshot(room), token: player.token, color: player.color });
     broadcastRoom(room);
