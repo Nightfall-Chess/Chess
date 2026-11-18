@@ -1,0 +1,321 @@
+/* Nightfall Chess — final theme contrast and visibility layer.
+   Loaded after every other stylesheet so legacy component colors cannot win.
+   Keeps each theme's identity while enforcing readable semantic states. */
+
+html[data-theme] {
+  --theme-text-strong: var(--theme-text);
+  --theme-muted-readable: var(--theme-muted);
+  --theme-border-readable: color-mix(in srgb, var(--theme-text) 20%, var(--theme-line));
+  --theme-control-text: var(--theme-text);
+  --theme-link: var(--theme-accent-strong);
+  --theme-danger-readable: var(--theme-danger);
+  --theme-success-readable: var(--theme-success);
+  --theme-warning-readable: var(--theme-gold);
+}
+
+/* Night Sky uses a light surface, so its secondary text needs a darker value
+   than the dark themes. This also improves placeholder and helper copy. */
+html[data-theme="night-sky"] {
+  --theme-muted: #526b84;
+  --theme-muted-readable: #526b84;
+  --theme-accent: #28699f;
+  --theme-accent-strong: #205985;
+  --theme-secondary: #397eb7;
+  --theme-gold: #426887;
+  --theme-danger: #a83e55;
+  --theme-success: #247454;
+  --theme-line: rgba(48, 83, 116, .24);
+  --theme-focus: #205985;
+  --theme-button-gradient: linear-gradient(135deg, #28699f, #397eb7);
+}
+
+/* Consistent foregrounds for the most common secondary-copy components. */
+html[data-theme] .note,
+html[data-theme] .muted,
+html[data-theme] .helper-text,
+html[data-theme] .field-hint,
+html[data-theme] .field-description,
+html[data-theme] .range-labels,
+html[data-theme] .player-detail,
+html[data-theme] .profile-chart-empty,
+html[data-theme] .lobby-intro,
+html[data-theme] .online-intro,
+html[data-theme] .puzzle-status,
+html[data-theme] .puzzle-copy,
+html[data-theme] .puzzle-feedback,
+html[data-theme] .analysis-summary,
+html[data-theme] .review-summary,
+html[data-theme] .theme-preview-label,
+html[data-theme] .site-theme-copy small,
+html[data-theme] .mode-card span,
+html[data-theme] .profile-stat span,
+html[data-theme] .lesson-meta,
+html[data-theme] .lesson-description,
+html[data-theme] .settings-description,
+html[data-theme] .empty-state,
+html[data-theme] .empty-state p {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+/* Labels, headings and important metadata must never inherit faded colors. */
+html[data-theme] .field-label,
+html[data-theme] .field-row,
+html[data-theme] label,
+html[data-theme] .card-title,
+html[data-theme] .section-title,
+html[data-theme] .modal-title,
+html[data-theme] .dialog-title,
+html[data-theme] .site-theme-copy strong,
+html[data-theme] .mode-card strong,
+html[data-theme] .player-name,
+html[data-theme] .clock,
+html[data-theme] .board-status,
+html[data-theme] .theme-option-label {
+  color: var(--theme-text-strong);
+  opacity: 1;
+}
+
+/* Navigation and selectable cards: readable in every interaction state. */
+html[data-theme] .lobby-nav-button,
+html[data-theme] .settings-nav-button,
+html[data-theme] .theme-option,
+html[data-theme] .mode-card,
+html[data-theme] .segment,
+html[data-theme] .game-info-tab,
+html[data-theme] .classroom-nav-button,
+html[data-theme] .classroom-tool,
+html[data-theme] .opening-side-button {
+  color: var(--theme-text);
+}
+
+html[data-theme] .lobby-nav-button:not(.active),
+html[data-theme] .settings-nav-button:not(.active),
+html[data-theme] .segment:not(.active) {
+  color: var(--theme-muted-readable);
+}
+
+html[data-theme] .lobby-nav-button.active,
+html[data-theme] .settings-nav-button.active,
+html[data-theme] .segment.active,
+html[data-theme] .game-info-tab.active,
+html[data-theme] .classroom-nav-button.active,
+html[data-theme] .classroom-tool.active,
+html[data-theme] .opening-side-button.active,
+html[data-theme] .theme-option[aria-checked="true"] {
+  color: var(--theme-accent-strong);
+}
+
+/* Controls use theme surfaces and readable foregrounds instead of legacy
+   fixed dark backgrounds or low-opacity text colors. */
+html[data-theme] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+html[data-theme] select,
+html[data-theme] textarea {
+  border-color: var(--theme-border-readable);
+  background-color: var(--theme-control);
+  color: var(--theme-control-text);
+  caret-color: var(--theme-accent-strong);
+}
+
+html[data-theme] input::placeholder,
+html[data-theme] textarea::placeholder {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+html[data-theme] select option {
+  background: var(--theme-panel);
+  color: var(--theme-text);
+}
+
+html[data-theme] input:disabled,
+html[data-theme] select:disabled,
+html[data-theme] textarea:disabled {
+  color: var(--theme-muted-readable);
+  opacity: .78;
+}
+
+html[data-theme] button:disabled,
+html[data-theme] [aria-disabled="true"] {
+  opacity: .62;
+}
+
+html[data-theme] .primary-button {
+  background: var(--theme-button-gradient);
+  color: var(--theme-accent-ink);
+  border-color: color-mix(in srgb, var(--theme-accent-strong) 62%, var(--theme-line));
+}
+
+html[data-theme] .subtle-button,
+html[data-theme] .icon-button,
+html[data-theme] .sound-toggle,
+html[data-theme] .game-menu-button,
+html[data-theme] .quick-step-button,
+html[data-theme] .board-tools button,
+html[data-theme] .classroom-tool,
+html[data-theme] .classroom-nav-button,
+html[data-theme] .game-info-tab,
+html[data-theme] .opening-side-button,
+html[data-theme] .segmented button {
+  background-color: var(--theme-control);
+  color: var(--theme-text);
+  border-color: var(--theme-border-readable);
+}
+
+html[data-theme] .subtle-button:hover,
+html[data-theme] .icon-button:hover,
+html[data-theme] .sound-toggle:hover,
+html[data-theme] .game-menu-button:hover,
+html[data-theme] .quick-step-button:hover,
+html[data-theme] .board-tools button:hover,
+html[data-theme] .classroom-tool:hover,
+html[data-theme] .classroom-nav-button:hover,
+html[data-theme] .game-info-tab:hover,
+html[data-theme] .opening-side-button:hover {
+  color: var(--theme-text);
+  border-color: var(--theme-accent-strong);
+}
+
+/* Cards, game panels and popups: normalize inherited text and separators. */
+html[data-theme] .card,
+html[data-theme] .lobby-card,
+html[data-theme] .online-card,
+html[data-theme] .settings-panel,
+html[data-theme] .settings-nav,
+html[data-theme] .player,
+html[data-theme] .board-status,
+html[data-theme] .moves-list,
+html[data-theme] .game-side-panel,
+html[data-theme] .game-menu-panel,
+html[data-theme] .room-code,
+html[data-theme] .online-match-invite,
+html[data-theme] .puzzle-area,
+html[data-theme] .puzzle-board-wrap,
+html[data-theme] .analysis-board-wrap,
+html[data-theme] .analysis-panel,
+html[data-theme] .review-panel,
+html[data-theme] .archive-panel,
+html[data-theme] .modal,
+html[data-theme] .dialog,
+html[data-theme] .analysis-modal,
+html[data-theme] .confirmation-dialog,
+html[data-theme] .promotion-dialog,
+html[data-theme] .game-over-dialog,
+html[data-theme] .profile-modal,
+html[data-theme] .analysis-dialog,
+html[data-theme] .confirm-dialog,
+html[data-theme] .achievement-details-dialog {
+  color: var(--theme-text);
+  border-color: var(--theme-line);
+}
+
+html[data-theme] .analysis-row,
+html[data-theme] .move-row,
+html[data-theme] .recent-game-row,
+html[data-theme] .moment-row,
+html[data-theme] .quiz-option,
+html[data-theme] .lesson-item,
+html[data-theme] .achievement-badge,
+html[data-theme] .classroom-room-meta,
+html[data-theme] .classroom-connection,
+html[data-theme] .classroom-participants,
+html[data-theme] .classroom-shared-analysis {
+  color: var(--theme-text);
+  border-color: var(--theme-line);
+}
+
+html[data-theme] .analysis-row small,
+html[data-theme] .move-row small,
+html[data-theme] .recent-game-row small,
+html[data-theme] .moment-row small,
+html[data-theme] .quiz-option small,
+html[data-theme] .lesson-item small,
+html[data-theme] .achievement-badge small {
+  color: var(--theme-muted-readable);
+  opacity: 1;
+}
+
+/* Semantic status colors stay legible and do not fade with their containers. */
+html[data-theme] .success,
+html[data-theme] .status-success,
+html[data-theme] .text-success { color: var(--theme-success-readable); }
+
+html[data-theme] .warning,
+html[data-theme] .status-warning,
+html[data-theme] .text-warning { color: var(--theme-warning-readable); }
+
+html[data-theme] .danger,
+html[data-theme] .error,
+html[data-theme] .status-error,
+html[data-theme] .text-danger { color: var(--theme-danger-readable); }
+
+html[data-theme] .site-footer,
+html[data-theme] .site-footer span:not(.site-footer-credit) {
+  color: var(--theme-muted-readable);
+}
+
+html[data-theme] .site-footer .site-footer-credit {
+  color: var(--theme-accent-strong);
+}
+
+/* Keyboard focus remains visible against both light and dark surfaces. */
+html[data-theme] button:focus-visible,
+html[data-theme] a:focus-visible,
+html[data-theme] input:focus-visible,
+html[data-theme] select:focus-visible,
+html[data-theme] textarea:focus-visible,
+html[data-theme] summary:focus-visible,
+html[data-theme] [tabindex]:focus-visible {
+  outline: 2px solid var(--theme-focus);
+  outline-offset: 3px;
+}
+
+/* Night Sky's translucent surfaces must remain bright enough for dark text. */
+html[data-theme="night-sky"] .lobby-navigation,
+html[data-theme="night-sky"] .settings-nav,
+html[data-theme="night-sky"] .theme-option-list,
+html[data-theme="night-sky"] .segmented,
+html[data-theme="night-sky"] .site-theme-option,
+html[data-theme="night-sky"] .mode-card,
+html[data-theme="night-sky"] .game-info-tab,
+html[data-theme="night-sky"] .classroom-tool,
+html[data-theme="night-sky"] .classroom-nav-button {
+  background-color: rgba(255, 255, 255, .94);
+}
+
+html[data-theme="night-sky"] .card,
+html[data-theme="night-sky"] .lobby-card,
+html[data-theme="night-sky"] .online-card,
+html[data-theme="night-sky"] .settings-panel,
+html[data-theme="night-sky"] .player,
+html[data-theme="night-sky"] .board-status,
+html[data-theme="night-sky"] .moves-list,
+html[data-theme="night-sky"] .game-side-panel,
+html[data-theme="night-sky"] .game-menu-panel,
+html[data-theme="night-sky"] .puzzle-area,
+html[data-theme="night-sky"] .analysis-panel,
+html[data-theme="night-sky"] .review-panel,
+html[data-theme="night-sky"] .archive-panel,
+html[data-theme="night-sky"] .modal,
+html[data-theme="night-sky"] .dialog,
+html[data-theme="night-sky"] .analysis-dialog,
+html[data-theme="night-sky"] .confirm-dialog,
+html[data-theme="night-sky"] .promotion-dialog,
+html[data-theme="night-sky"] .achievement-details-dialog {
+  background-color: #fff;
+  color: #172c43;
+}
+
+html[data-theme="night-sky"] .primary-button {
+  color: #fff;
+}
+
+@media (forced-colors: active) {
+  html[data-theme] button,
+  html[data-theme] a,
+  html[data-theme] input,
+  html[data-theme] select,
+  html[data-theme] textarea {
+    forced-color-adjust: auto;
+  }
+}
