@@ -143,7 +143,7 @@ html[data-theme="aurora"] {
 }
 
 /* Global foundations and shared design tokens */
-html[data-theme] { background:var(--theme-bg); color-scheme:inherit; }
+html[data-theme] { background:var(--theme-bg); }
 html[data-theme] body {
   color:var(--theme-text);
   background:var(--theme-backdrop);
@@ -383,5 +383,136 @@ html[dir="rtl"][data-theme] .home-shortcut-arrow { transform:scaleX(-1); }
 @media (prefers-reduced-motion:reduce) {
   html[data-theme] *,html[data-theme] *::before,html[data-theme] *::after {
     scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;
+  }
+}
+
+/* Product-specific surfaces: game review, dialogs, classroom, achievements and utilities. */
+html[data-theme] .analysis-dialog,
+html[data-theme] .confirm-dialog,
+html[data-theme] .promotion-dialog,
+html[data-theme] .achievement-details-dialog,
+html[data-theme] .game-menu-panel,
+html[data-theme] .side-panel,
+html[data-theme] .music-island,
+html[data-theme] .achievement-island,
+html[data-theme] .achievement-detail-card,
+html[data-theme] .classroom-entry-card,
+html[data-theme] .classroom-info-card,
+html[data-theme] .classroom-host-card,
+html[data-theme] .classroom-chat-card,
+html[data-theme] .classroom-participants-card,
+html[data-theme] .classroom-annotations-card,
+html[data-theme] .classroom-analysis-card,
+html[data-theme] .classroom-history-card,
+html[data-theme] .classroom-load-card,
+html[data-theme] .classroom-welcome,
+html[data-theme] .classroom-notice,
+html[data-theme] .classroom-room-bar,
+html[data-theme] .pgn-import-section,
+html[data-theme] .opening-card,
+html[data-theme] .journey-card,
+html[data-theme] .profile-learning,
+html[data-theme] .moment-row,
+html[data-theme] .recent-game-row,
+html[data-theme] .achievement-badge,
+html[data-theme] .analysis-row,
+html[data-theme] .move-row,
+html[data-theme] .quiz-option,
+html[data-theme] .scenario-board-wrap,
+html[data-theme] .lesson-animation,
+html[data-theme] .quick-board-wrap,
+html[data-theme] .evaluation-graph-wrap,
+html[data-theme] .evaluation-grid {
+  border-color:var(--theme-line);
+  background-color:var(--theme-panel);
+  color:var(--theme-text);
+}
+html[data-theme] .analysis-dialog,
+html[data-theme] .confirm-dialog,
+html[data-theme] .promotion-dialog,
+html[data-theme] .achievement-details-dialog {
+  border:1px solid var(--theme-line);
+  border-radius:22px;
+  box-shadow:var(--theme-shadow);
+}
+html[data-theme] .analysis-backdrop,
+html[data-theme] .confirm-backdrop,
+html[data-theme] .promotion-backdrop,
+html[data-theme] .achievement-details-backdrop,
+html[data-theme] .game-menu-backdrop {
+  background:rgba(4,8,16,.62);
+  backdrop-filter:blur(9px);
+}
+html[data-theme] .analysis-head,
+html[data-theme] .classroom-page-head,
+html[data-theme] .classroom-room-meta,
+html[data-theme] .classroom-history,
+html[data-theme] .classroom-connection,
+html[data-theme] .classroom-participants,
+html[data-theme] .classroom-annotations-card,
+html[data-theme] .classroom-chat-messages,
+html[data-theme] .classroom-shared-analysis,
+html[data-theme] .classroom-board-status {
+  border-color:var(--theme-line);
+  color:var(--theme-text);
+}
+html[data-theme] .analysis-row:hover,
+html[data-theme] .move-row:hover,
+html[data-theme] .recent-game-row:hover,
+html[data-theme] .moment-row:hover,
+html[data-theme] .opening-card:hover,
+html[data-theme] .achievement-island:hover {
+  background:var(--theme-control-hover);
+}
+html[data-theme] .grade,html[data-theme] .move-quality,html[data-theme] .status-dot,
+html[data-theme] .classroom-live-dot,html[data-theme] .daily-check {
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--theme-accent) 12%,transparent);
+}
+html[data-theme] .classroom-tool,html[data-theme] .classroom-nav-button,
+html[data-theme] .classroom-side-column button,html[data-theme] .opening-side-button,
+html[data-theme] .segmented button,html[data-theme] .game-info-tab {
+  border:1px solid var(--theme-line);
+  border-radius:11px;
+  background:var(--theme-control);
+  color:var(--theme-text);
+}
+html[data-theme] .classroom-tool.active,html[data-theme] .classroom-nav-button.active,
+html[data-theme] .opening-side-button.active,html[data-theme] .segmented button.active,
+html[data-theme] .game-info-tab.active {
+  border-color:var(--theme-accent);
+  background:var(--theme-nav-active);
+  color:var(--theme-accent);
+}
+html[data-theme] .music-island { border:1px solid var(--theme-line);border-radius:16px;background:var(--theme-glass);box-shadow:var(--theme-shadow-soft); }
+html[data-theme] .achievement-island { border:1px solid var(--theme-line);border-radius:18px;background:var(--theme-card-gradient); }
+html[data-theme] .achievement-island-progress,html[data-theme] .achievement-badge-track { background:color-mix(in srgb,var(--theme-muted) 18%,transparent); }
+html[data-theme] .achievement-island-progress > span,html[data-theme] .achievement-badge-track > span { background:var(--theme-button-gradient); }
+html[data-theme] .opening-categories,html[data-theme] .opening-scenario-tabs,html[data-theme] .analysis-filter-row,
+html[data-theme] .review-autoplay-controls,html[data-theme] .puzzle-actions,html[data-theme] .classroom-tool-group {
+  gap:8px;
+}
+html[data-theme] .site-theme-field { margin:0; }
+html[data-theme] .themes-intro { max-width:720px;margin:0 0 20px; }
+html[data-theme] .settings-panel[data-settings-content="themes"] { overflow:hidden; }
+html[data-theme] .settings-panel[data-settings-content="themes"] .card-heading { margin-bottom:12px; }
+html[data-theme] .settings-panel[data-settings-content="themes"] .site-theme-grid { margin-top:8px; }
+html[data-theme] .settings-panel[data-settings-content="appearance"] .theme-settings-grid { margin-top:0; }
+html[data-theme] .settings-nav-button[data-settings-panel="themes"] .ui-icon { color:var(--theme-accent); }
+html[data-theme] .brand-mark img { filter:drop-shadow(0 2px 5px color-mix(in srgb,var(--theme-accent) 18%,transparent)); }
+html[data-theme="night-sky"] .analysis-backdrop,
+html[data-theme="night-sky"] .confirm-backdrop,
+html[data-theme="night-sky"] .promotion-backdrop,
+html[data-theme="night-sky"] .achievement-details-backdrop,
+html[data-theme="night-sky"] .game-menu-backdrop { background:rgba(35,62,86,.32); }
+html[data-theme="night-sky"] .analysis-dialog,
+html[data-theme="night-sky"] .confirm-dialog,
+html[data-theme="night-sky"] .promotion-dialog,
+html[data-theme="night-sky"] .achievement-details-dialog { background:#fff; }
+html[data-theme="night-sky"] .classroom-live-dot { background:#269c76; }
+@media (max-width:760px) {
+  html[data-theme] .site-theme-option { grid-template-columns:82px minmax(0,1fr); }
+  html[data-theme] .analysis-dialog,html[data-theme] .confirm-dialog,
+  html[data-theme] .promotion-dialog,html[data-theme] .achievement-details-dialog {
+    width:min(100% - 20px,560px);max-height:calc(100dvh - 24px);overflow:auto;
   }
 }
