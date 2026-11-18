@@ -1,11 +1,12 @@
-const CACHE_VERSION = "nightfall-v37";
+const CACHE_VERSION = "nightfall-v38";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./nightfall-redesign.css?v=37",
+  "./nightfall-redesign.css?v=38",
+  "./nightfall-themes.css?v=1",
   "./orbit-enhancements.css?v=1",
   "./orbit-enhancements.js",
   "./manifest.webmanifest",

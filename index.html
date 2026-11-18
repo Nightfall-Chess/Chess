@@ -1460,7 +1460,8 @@
     }
   </style>
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=37">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=38">
+  <link rel="stylesheet" href="./nightfall-themes.css?v=1">
   <link rel="stylesheet" href="./orbit-enhancements.css?v=1">
   <script src="./orbit-enhancements.js" defer></script>
 </head>
@@ -1772,7 +1773,11 @@
             <p class="note">Every move is analyzed asynchronously. The move list shows its classification and evaluation when Stockfish finishes.</p>
           </section>
           <section class="card settings-panel" data-settings-content="appearance" hidden>
-            <div class="card-heading"><span class="card-title">Board & pieces</span><span class="eyebrow">LIVE PREVIEW</span></div>
+            <div class="card-heading"><span class="card-title">Appearance</span><span class="eyebrow">LIVE PREVIEW</span></div>
+            <div class="field site-theme-field">
+              <div class="field-label" id="siteThemeLabel">Website theme</div>
+              <div class="site-theme-grid" id="siteThemeOptions" role="radiogroup" aria-labelledby="siteThemeLabel"></div>
+            </div>
             <div class="theme-settings-grid">
               <div class="field"><div class="field-label" id="boardThemeLabel">Board theme</div><div class="theme-option-list" id="boardThemeOptions" role="radiogroup" aria-labelledby="boardThemeLabel"></div></div>
               <div class="field"><div class="field-label" id="pieceThemeLabel">Piece style</div><div class="theme-option-list" id="pieceThemeOptions" role="radiogroup" aria-labelledby="pieceThemeLabel"></div></div>
@@ -1968,8 +1973,10 @@
       </aside>
     </div>
     <footer class="site-footer" aria-label="Credits">
-      <span class="site-footer-credit">Created by Love 😇</span>
-      <span class="site-footer-copyright">All rights reserved © Orbit Studios.</span>
+      <span>Online fixes</span>
+      <span>Created by Love 😇</span>
+      <span>All copyrights belongs to Orbit Studios. ©️</span>
+      <span>All rights reserved © Orbit Studios.</span>
     </footer>
   </main>
   <audio id="backgroundMusic" preload="none"></audio>
@@ -2058,6 +2065,15 @@
       const pieceAssetThemes=["3d_chesskid","3d_plastic","3d_staunton","3d_wood","8_bit","8qetl","alpha","bases","book","bubblegum","ca09k","cases","classic","club","condal","dash","ejgfv","game_room","glass","gothic","graffiti","icy_sea","light","lolz","luca","marble","maya","metal","modern","nature","neo_wood","neon","newspaper","ocean","sky","space","tigers","tournament","vintage","wood"];
       const boardThemeValues=new Set(["sage","arctic","walnut",...boardAssetThemes.map(theme=>`chess-${theme}`)]);
       const pieceThemeValues=new Set(["symbols","solid","outline",...pieceAssetThemes.map(theme=>`set-${theme}`)]);
+      const siteThemeValues=new Set(["default","night-sky","midnight","royal","emerald","aurora"]);
+      const siteThemeProfiles={
+        default:{name:"Default",faName:"پیش‌فرض",description:"Classic dark navy",faDescription:"سرمه‌ای تیرهٔ کلاسیک",previewBg:"#090b13",accent:"#b7a3ff",secondary:"#8eb6ff",pitch:1},
+        "night-sky":{name:"Night Sky",faName:"آسمان شب",description:"Elegant icy blue",faDescription:"آبی یخی و آرام",previewBg:"#edf5fb",accent:"#4f91c9",secondary:"#83bce6",pitch:1.04},
+        midnight:{name:"Midnight",faName:"نیمه‌شب",description:"Deep black and silver",faDescription:"مشکی عمیق با نقره‌ای",previewBg:"#070809",accent:"#c7ccd2",secondary:"#777f87",pitch:.82},
+        royal:{name:"Royal",faName:"سلطنتی",description:"Royal blue and gold",faDescription:"آبی سلطنتی و طلایی",previewBg:"#07132f",accent:"#d8b85c",secondary:"#5379bb",pitch:1.12},
+        emerald:{name:"Emerald",faName:"زمردی",description:"Dark green refinement",faDescription:"سبز تیرهٔ ظریف",previewBg:"#071510",accent:"#73c69a",secondary:"#49a9a1",pitch:.94},
+        aurora:{name:"Aurora",faName:"شفق قطبی",description:"Atmospheric northern lights",faDescription:"گرادیان شفق قطبی",previewBg:"#151934",accent:"#86d5c7",secondary:"#9b8ce8",pitch:1.08}
+      };
       function themeLabel(theme) {
         return theme.replace(/_/g," ").replace(/\b[a-z]/g,letter=>letter.toUpperCase());
       }
@@ -2110,7 +2126,82 @@
           buttons[next].focus();buttons[next].click();
         });
       }
+      function updateSiteThemeSelection() {
+        const container=$("siteThemeOptions");
+        if(!container)return;
+        for(const button of container.querySelectorAll("button[data-site-theme]")) {
+          const selected=button.dataset.siteTheme===visualTheme;
+          button.setAttribute("aria-checked",String(selected));
+          button.tabIndex=selected?0:-1;
+        }
+      }
+      function updateSiteThemeLabels() {
+        const container=$("siteThemeOptions");
+        if(!container)return;
+        for(const button of container.querySelectorAll("button[data-site-theme]")) {
+          const profile=siteThemeProfiles[button.dataset.siteTheme];
+          const name=button.querySelector("strong"),description=button.querySelector("small");
+          if(name)name.textContent=isPersian?profile.faName:profile.name;
+          if(description)description.textContent=isPersian?profile.faDescription:profile.description;
+        }
+      }
+      function applyVisualTheme(theme,persist=false) {
+        if(!siteThemeValues.has(theme))theme="default";
+        visualTheme=theme;
+        document.documentElement.dataset.theme=theme;
+        const profile=siteThemeProfiles[theme];
+        const themeMeta=document.querySelector('meta[name="theme-color"]');
+        if(themeMeta)themeMeta.setAttribute("content",profile.previewBg);
+        document.documentElement.classList.add("theme-switching");
+        window.setTimeout(()=>document.documentElement.classList.remove("theme-switching"),320);
+        if(persist) {
+          try{localStorage.setItem("nightfall-chess-site-theme-v1",theme);}
+          catch(error){showToast(`Theme preference could not be saved: ${error.message}`);}
+          playEventSound("button");
+        }
+        updateSiteThemeSelection();
+        if(typeof particlePresets==="object") {
+          for(const preset of Object.values(particlePresets))preset.colors=[profile.accent,profile.secondary,profile.previewBg===" "?"#ffffff":(theme==="night-sky"?"#ffffff":"#f4efff")];
+        }
+      }
+      function loadVisualTheme() {
+        let saved="default";
+        try{saved=localStorage.getItem("nightfall-chess-site-theme-v1")||"default";}
+        catch(error){showToast(`Theme preference could not be loaded: ${error.message}`);}
+        applyVisualTheme(saved,false);
+      }
       function populateThemeOptions() {
+        const container=$("siteThemeOptions");
+        container.replaceChildren();
+        for(const [theme,profile] of Object.entries(siteThemeProfiles)) {
+          const button=document.createElement("button"),preview=document.createElement("span"),copy=document.createElement("span"),name=document.createElement("strong"),description=document.createElement("small");
+          button.type="button";
+          button.className="site-theme-option";
+          button.dataset.siteTheme=theme;
+          button.setAttribute("role","radio");
+          button.setAttribute("aria-checked","false");
+          preview.className="site-theme-preview";
+          preview.style.setProperty("--preview-bg",profile.previewBg);
+          preview.style.setProperty("--preview-accent",profile.accent);
+          preview.style.setProperty("--preview-secondary",profile.secondary);
+          copy.className="site-theme-copy";
+          name.textContent=isPersian?profile.faName:profile.name;
+          description.textContent=isPersian?profile.faDescription:profile.description;
+          copy.append(name,description);
+          button.append(preview,copy);
+          button.addEventListener("click",()=>applyVisualTheme(theme,true));
+          container.append(button);
+        }
+        container.addEventListener("keydown",event=>{
+          if(!["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Home","End"].includes(event.key))return;
+          const buttons=[...container.querySelectorAll("button[data-site-theme]")],index=buttons.indexOf(document.activeElement);
+          if(index<0)return;
+          event.preventDefault();
+          const next=event.key==="Home"?0:event.key==="End"?buttons.length-1:
+            (index+(event.key==="ArrowRight"||event.key==="ArrowDown"?1:-1)+buttons.length)%buttons.length;
+          buttons[next].focus();buttons[next].click();
+        });
+        updateSiteThemeSelection();
         addThemeOptions($("boardThemeOptions"),[
           ["sage","Sage"],["arctic","Arctic blue"],["walnut","Walnut (classic)"],
           ...boardAssetThemes.map(theme=>[`chess-${theme}`,themeLabel(theme)])
@@ -2121,6 +2212,7 @@
         ],"piece");
       }
       const faText = {
+        "Online fixes":"بهبودهای آنلاین",
         "Created by Love 😇":"ساخته‌شده با عشق 😇",
         "All rights reserved © Orbit Studios.":"تمام حقوق برای Orbit Studios محفوظ است.",
         "Nightfall Chess":"شطرنج شبانه","A quieter kind of competition":"رقابتی آرام و هوشمندانه",
@@ -2468,6 +2560,7 @@
         document.documentElement.dir=isPersian?"rtl":"ltr";
         document.body.dir=document.documentElement.dir;
         $("languageSelect").value=isPersian?"fa":"en";
+        if(typeof updateSiteThemeLabels==="function")updateSiteThemeLabels();
         if(persist)try{localStorage.setItem("nightfall-chess-language-v1",isPersian?"fa":"en");}
         catch(error){showToast(`Language preference could not be saved: ${error.message}`);}
         localizeTree(document.body,true);
@@ -3039,7 +3132,7 @@
       let achievementProgress=[];
       let dailyChallenge=null,dailyChallengeMode=false,reviewRetryMode=false,loadedMoments=[];
       let playerProfile={username:"Player",avatarData:""},pendingProfileAvatar=null;
-      let boardTheme="sage",pieceTheme="symbols",settingsReturnScreen="lobby",settingsPausedMatch=false;
+      let boardTheme="sage",pieceTheme="symbols",visualTheme="default",settingsReturnScreen="lobby",settingsPausedMatch=false;
       let currentPuzzle=null,puzzleState=null,puzzleSelected=null,puzzleTargets=[],puzzleHintText="",puzzleHintSquare=null,puzzleMode=false,puzzleSolved=false,puzzleCursor=0,puzzleColor="w",puzzleReturnMode="ai",puzzleReplyTimer=null,puzzleWrongAttempts=0;
       let puzzleTotal=0,puzzleNextIndex=0,currentPuzzleIndex=-1,puzzleSolvedCount=0,puzzlePageCache=[],puzzlePageStart=-1,puzzleTimerStarted=0,puzzleTimerInterval=null,puzzleLoading=false,puzzleLoadError="",puzzleDatasetReady=false,puzzleStatusPromise=null;
       function puzzleApiUrl(path) {
@@ -6048,6 +6141,7 @@
           boardTheme="sage";pieceTheme="symbols";
           showToast(`Board themes could not be loaded: ${error.message}`);
         }
+        loadVisualTheme();
         applyAppearance();
       }
       function openTraining() {
@@ -7699,7 +7793,8 @@
         const event=soundEvents[eventName];
         if(!event||masterMuted||event.channel==="game"&&!effectsEnabled||event.channel==="ui"&&!uiSoundsEnabled)return;
         const channel=event.channel==="ui"?"ui":event.channel==="achievement"?"achievement":"effects";
-        event.notes.forEach((note,index)=>tone(note,event.duration,event.wave,event.volume,index*.085,channel));
+        const profile=siteThemeProfiles[visualTheme]||siteThemeProfiles.default;
+        event.notes.forEach((note,index)=>tone(note*profile.pitch,event.duration,event.wave,event.volume,index*.085,channel));
       }
       function playGameEnd(result,winnerColor,checkmate=false) {
         if(/draw|stalemate|insufficient|threefold|50-move/i.test(result))playEventSound("draw");
