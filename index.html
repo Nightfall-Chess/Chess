@@ -1728,11 +1728,12 @@
         <div class="field"><label class="field-label" for="onlineTransport">Connection mode</label><select id="onlineTransport"><option value="self-hosted" selected>Self-hosted WebSocket (this server)</option><option value="supabase">Supabase rooms</option></select></div>
         <div class="field" id="selfHostedServerField"><label class="field-label" for="selfHostedServerUrl">WebSocket server URL</label><input id="selfHostedServerUrl" type="url" autocomplete="url" placeholder="Auto: this website's server"><small>Use the Cloudflare Tunnel URL for games outside your network.</small></div>
         <div class="field" id="onlineTimeControlField"><label class="field-label" for="onlineTimeControl">Clock</label><select id="onlineTimeControl"><option value="180">3 minutes</option><option value="300" selected>5 minutes</option><option value="600">10 minutes</option><option value="0">No clock</option></select></div>
+        <div class="field" id="onlineRoomColorField"><label class="field-label" for="onlineRoomColor">Your color when creating a room</label><select id="onlineRoomColor"><option value="random" selected>Random</option><option value="w">White</option><option value="b">Black</option></select><small id="onlineRoomColorNote">Your opponent automatically gets the opposite color.</small></div>
       </section>
       <div class="online-grid">
         <section class="card online-card">
           <h2>Create a private room</h2>
-          <p>Create a room on this server. White hosts; one guest joins as Black. The server validates moves and clocks.</p>
+          <p>Create a room and choose your color. Your opponent automatically receives the opposite color.</p>
           <button class="primary-button" id="createRoomButton" type="button">Create room code</button>
           <div class="room-code" id="createdRoom" hidden><span>Invitation code</span><strong id="roomCodeValue"></strong></div>
           <div class="online-actions"><button class="subtle-button" id="copyInviteButton" type="button" disabled>Copy invite link</button><button class="subtle-button" id="shareInviteButton" type="button" disabled>Share invite</button></div>
@@ -2452,7 +2453,8 @@
         "Clock":"زمان","5 minutes":"۵ دقیقه","10 minutes":"۱۰ دقیقه","No clock":"بدون ساعت",
         "Room sharing is ready · live play is not connected":"اشتراک کد آماده است · بازی زنده هنوز وصل نیست",
         "Create a private room":"ساخت اتاق خصوصی",
-        "Create a room on this server. White hosts; one guest joins as Black. The server validates moves and clocks.":"روی این سرور اتاق بسازید. میزبان سفید است و یک مهمان با مهرهٔ سیاه می‌پیوندد. سرور حرکت‌ها و ساعت را بررسی می‌کند.",
+        "Create a room and choose your color. Your opponent automatically receives the opposite color.":"اتاق بسازید و رنگ مهره‌تان را انتخاب کنید؛ حریف به‌صورت خودکار رنگ مخالف را می‌گیرد.",
+        "Your color when creating a room":"رنگ مهرهٔ شما هنگام ساخت اتاق","Random":"تصادفی","White":"سفید","Black":"سیاه","Your opponent automatically gets the opposite color.":"حریف به‌صورت خودکار رنگ مخالف را می‌گیرد.",
         "Create room code":"ساخت کد اتاق","Invitation code":"کد دعوت","Copy invite link":"کپی پیوند دعوت","Share invite":"اشتراک دعوت",
         "No room created yet.":"هنوز اتاقی ساخته نشده است.","Join a friend's room":"پیوستن به اتاق دوست",
         "Enter the seven-character code shared by the host. A room admits exactly two players.":"کد هفت‌حرفی میزبان را وارد کنید. هر اتاق دقیقاً دو بازیکن می‌پذیرد.",
@@ -7407,6 +7409,7 @@
         const selfHosted=$("onlineTransport").value==="self-hosted";
         $("selfHostedServerField").hidden=!selfHosted;
         $("onlineTimeControlField").hidden=!selfHosted;
+        $("onlineRoomColorField").hidden=!selfHosted;
         setSelfHostedConnectionStatus(selfHosted
           ?(isPersian?"بازی زندهٔ خودمیزبان آماده است":"Self-hosted live play is ready")
           :(isPersian?"اتاق‌های Supabase":"Supabase rooms"));
@@ -7438,7 +7441,7 @@
           selfHostedSocket=socket;
           socket.addEventListener("open",()=>{
             if(generation!==selfHostedSocketGeneration)return;
-            if(request.type==="create")socket.send(JSON.stringify({type:"create",name:classroomPlayerName(),timeControlSeconds:Number($("onlineTimeControl").value)}));
+            if(request.type==="create")socket.send(JSON.stringify({type:"create",name:classroomPlayerName(),timeControlSeconds:Number($("onlineTimeControl").value),color:$("onlineRoomColor").value}));
             else if(request.type==="join")socket.send(JSON.stringify({type:"join",code:request.code,name:classroomPlayerName()}));
             else socket.send(JSON.stringify({type:"resume",code:request.code,token:request.token}));
           });
