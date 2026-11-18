@@ -1458,6 +1458,37 @@
       #lobby .lobby-navigation { overflow-x: auto; margin: 0; }
       #lobby .lobby-nav-button { flex: 0 0 auto; min-height: 40px; }
     }
+    .online-endgame-card { padding: 14px; }
+    .online-endgame-result { margin: 0 0 8px; color: var(--text); font-size: 13px; font-weight: 650; }
+    .online-endgame-state { min-height: 18px; margin: 0 0 10px; color: var(--muted); font-size: 11px; }
+    .online-endgame-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .online-endgame-actions button { min-height: 36px; margin: 0; padding: 7px 9px; font-size: 11px; }
+    @media (min-width: 821px) {
+      body:has(#gameScreen:not([hidden])) { overflow: hidden; }
+      .app:has(#gameScreen:not([hidden])) { width: 100%; max-width: 1500px; height: 100dvh; padding: 10px 22px 8px; overflow: hidden; display: flex; flex-direction: column; }
+      .app:has(#gameScreen:not([hidden])) > header { flex: 0 0 auto; margin-bottom: 8px; }
+      #gameScreen.layout { flex: 1 1 auto; min-height: 0; height: calc(100dvh - 72px); grid-template-columns: minmax(0, 1fr) minmax(270px, 330px); gap: 18px; align-items: stretch; overflow: hidden; }
+      #gameScreen .play-area { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; align-content: stretch; }
+      #gameScreen .player { min-height: 48px; padding: 5px 10px; }
+      #gameScreen .board-frame { width: min( min(72dvh, calc(100vw - 410px)), 760px); max-width: 100%; max-height: calc(100dvh - 150px); margin: 5px auto; padding: 6px; align-self: center; }
+      #gameScreen .board { width: 100%; }
+      #gameScreen .side-panel { min-height: 0; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: 0 3px 8px 0; gap: 9px; }
+      #gameScreen .game-menu-head { flex: 0 0 auto; }
+      #gameScreen .card { padding: 12px; }
+      #gameScreen .game-info-tabs { margin-bottom: 7px; }
+      #gameScreen .moves-list { max-height: min(25dvh, 210px); }
+      #gameScreen .site-footer { display: none; }
+    }
+    @media (max-width: 820px) {
+      body:has(#gameScreen:not([hidden])) { overflow: hidden; }
+      .app:has(#gameScreen:not([hidden])) { height: 100dvh; min-height: 0; padding: 6px 10px; overflow: hidden; }
+      .app:has(#gameScreen:not([hidden])) > header { flex: 0 0 auto; margin-bottom: 4px; }
+      #gameScreen.layout { height: calc(100dvh - 58px); min-height: 0; overflow: hidden; }
+      #gameScreen .play-area { min-height: 0; }
+      #gameScreen .board-frame { width: min(calc(100vw - 24px), calc(100dvh - 190px)); margin: 4px auto; padding: 5px; }
+      #gameScreen .side-panel { min-height: 0; overflow-y: auto; }
+      #gameScreen .site-footer { display: none; }
+    }
   </style>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./nightfall-redesign.css?v=43">
@@ -1466,6 +1497,36 @@
   <link rel="stylesheet" href="./nightfall-visual-system.css?v=1">
   <link rel="stylesheet" href="./nightfall-theme-contrast.css?v=5">
   <script src="./orbit-enhancements.js" defer></script>
+
+<style id="online-match-viewport-final">
+  .online-opening-indicator { max-width:min(34vw,260px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 8px;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-radius:7px;background:color-mix(in srgb,var(--accent) 9%,transparent);color:var(--accent);font-size:10px;font-weight:650; }
+  @media (max-width:820px) { .online-opening-indicator { max-width:28vw;font-size:9px;padding:4px 6px; } }
+  @media (min-width:821px) {
+    body:has(#gameScreen:not([hidden])) { overflow:hidden; }
+    .app:has(#gameScreen:not([hidden])) { width:100%;max-width:1500px;height:100dvh;padding:10px 22px 8px;overflow:hidden;display:flex;flex-direction:column; }
+    .app:has(#gameScreen:not([hidden]))>header { flex:0 0 auto;margin-bottom:8px; }
+    #gameScreen.layout { flex:1 1 auto;min-height:0;height:calc(100dvh - 72px);grid-template-columns:minmax(0,1fr) minmax(270px,330px);gap:18px;align-items:stretch;overflow:hidden; }
+    #gameScreen .play-area { min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;align-content:stretch; }
+    #gameScreen .player { min-height:48px;padding:5px 10px; }
+    #gameScreen .board-frame { width:min(min(72dvh,calc(100vw - 410px)),760px);max-width:100%;max-height:calc(100dvh - 150px);margin:5px auto;padding:6px;align-self:center; }
+    #gameScreen .board { width:100%; }
+    #gameScreen .side-panel { min-height:0;max-height:100%;overflow-y:auto;overscroll-behavior:contain;padding:0 3px 8px 0;gap:9px; }
+    #gameScreen .card { padding:12px; }
+    #gameScreen .game-info-tabs { margin-bottom:7px; }
+    #gameScreen .moves-list { max-height:min(25dvh,210px); }
+    #gameScreen .site-footer { display:none; }
+  }
+  @media (max-width:820px) {
+    body:has(#gameScreen:not([hidden])) { overflow:hidden; }
+    .app:has(#gameScreen:not([hidden])) { height:100dvh;min-height:0;padding:6px 10px;overflow:hidden; }
+    .app:has(#gameScreen:not([hidden]))>header { flex:0 0 auto;margin-bottom:4px; }
+    #gameScreen.layout { height:calc(100dvh - 58px);min-height:0;overflow:hidden; }
+    #gameScreen .play-area { min-height:0; }
+    #gameScreen .board-frame { width:min(calc(100vw - 24px),calc(100dvh - 190px));margin:4px auto;padding:5px; }
+    #gameScreen .side-panel { min-height:0;overflow-y:auto; }
+    #gameScreen .site-footer { display:none; }
+  }
+</style>
 </head>
 <body>
   <svg class="icon-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -1927,6 +1988,7 @@
         <div class="board-status">
           <button type="button" class="game-menu-button" id="gameMenuButton" aria-expanded="false" aria-controls="gameSidePanel"><span aria-hidden="true">☰</span> <span>Menu</span></button>
           <div class="status-copy"><span class="status-dot" id="statusDot"></span><span id="statusText" aria-live="polite">White to move</span></div>
+          <span class="online-opening-indicator" id="onlineOpeningLabel" hidden aria-live="polite"></span>
           <div class="board-tools">
             <button type="button" id="undoButton" aria-label="Undo move" title="Undo move">↶</button>
             <button type="button" id="redoButton" aria-label="Redo move" title="Redo move">↷</button>
@@ -1994,6 +2056,17 @@
           <button class="primary-button" id="startButton" type="button">Start new game</button>
         </section>
 
+        <section class="card online-endgame-card" id="onlineEndgameCard" hidden>
+          <div class="card-heading"><span class="card-title" id="onlineEndgameTitle">Game finished</span><span class="eyebrow">ONLINE</span></div>
+          <p class="online-endgame-result" id="onlineEndgameResult" aria-live="polite"></p>
+          <p class="online-endgame-state" id="onlineRematchState" aria-live="polite"></p>
+          <div class="online-endgame-actions">
+            <button class="primary-button" id="onlineRematchButton" type="button">Rematch</button>
+            <button class="subtle-button" id="onlineReturnLobbyButton" type="button">Return to lobby</button>
+            <button class="subtle-button" id="onlineReviewButton" type="button">Game review</button>
+            <button class="subtle-button" id="onlineExportButton" type="button">Export PGN</button>
+          </div>
+        </section>
         <section class="card game-info-card" aria-label="Game information">
           <div class="game-info-tabs" role="tablist" aria-label="Game information">
             <button class="game-info-tab" id="movesTab" type="button" role="tab" aria-selected="true" aria-controls="movesPanel">Moves <span id="moveCount">0</span></button>
@@ -2703,6 +2776,7 @@
         return `${letters[eco[0]]} ${digits}`;
       }
       function recognizeOpening() {
+        openingIdentity=null;openingByColor={w:null,b:null};
         if(history.length<2||!openingDatabaseByPosition.size)return;
         let bestMatch=null;
         for(let ply=2;ply<=history.length;ply++) {
@@ -5531,6 +5605,9 @@
             :isPersian?`گشایش ${openingName} برای این بازی ثبت شده است.`:`${openingIdentity.name} was recorded for this game.`
           :isPersian?"با ادامهٔ بازی، نام گشایش پس از رسیدن به یک وضعیت ثبت‌شده در پایگاه ECO نمایش داده می‌شود.":"The ECO opening name will appear when the game reaches a position listed in the database.";
         $("strategyTitle").dataset.english=englishTitle;
+        const onlineOpeningLabel=$("onlineOpeningLabel");
+        onlineOpeningLabel.hidden=mode!=="online"||!openingIdentity;
+        onlineOpeningLabel.textContent=openingIdentity?`${openingIdentity.eco||""} · ${isPersian?openingIdentity.nameFa||openingIdentity.name:openingIdentity.name}`:"";
         $("strategyTitle").textContent=title;
         $("reportPieces").replaceChildren();
         $("strategyCopy").textContent=copy;
@@ -7354,6 +7431,7 @@
               if(pending) {
                 clearTimeout(pending.timeout);selfHostedConnectPending=null;pending.reject(new Error(payload.message||"The game server rejected the request."));
               } else {
+                if(payload.message&&gameOver&&mode==="online")$("onlineRematchButton").disabled=false;
                 showToast(payload.message||"The game server rejected the request.");
                 setSelfHostedConnectionStatus(payload.message||"Game server error.",true);
               }
@@ -7441,6 +7519,7 @@
         }
         onlineVersion=nextVersion;
         history=built.entries;redoStack=[];state=built.position;
+        recognizeOpening();
         if(room.clocks) {
           clocks={w:Math.max(0,Number(room.clocks.w)||0)/1000,b:Math.max(0,Number(room.clocks.b)||0)/1000};
           clockOn=room.status==="playing"&&Number(room.timeControlSeconds)>0;
@@ -7471,8 +7550,24 @@
           ?(isPersian?"منتظر بازیکن دوم…":"Waiting for the second player…")
           :(isPersian?(state.turn===humanColor?"نوبت شماست":"نوبت حریف است"):(state.turn===humanColor?"Your turn":"Opponent's turn")));
         $("newGameCard").hidden=mode==="online"||!gameOver;$("newGameTop").hidden=mode==="online"||!gameOver;$("resetButton").hidden=true;
-        $("reviewGameButton").hidden=!gameOver||!history.length;$("exportPgnButton").hidden=!gameOver||!history.length;$("goMenuButton").hidden=false;
+        $("reviewGameButton").hidden=!gameOver||!history.length;$("exportPgnButton").hidden=!gameOver||!history.length;$("goMenuButton").hidden=mode==="online";
+        const onlineEndgame=mode==="online"&&gameOver;
+        $("onlineEndgameCard").hidden=!onlineEndgame;
+        if(onlineEndgame) {
+          const requests=Array.isArray(room.rematchRequests)?room.rematchRequests:[];
+          const requested=requests.some(item=>item.color===onlineMyColor);
+          $("onlineEndgameResult").textContent=room.result||lastGameResult;
+          $("onlineRematchState").textContent=requests.length
+            ?(isPersian?`${requests.length===1?"یک نفر":"هر دو بازیکن"} درخواست بازی دوباره داده‌اند.`:`${requests.length} of 2 players requested a rematch.`)
+            :(isPersian?"برای شروع دوباره، درخواست بازی مجدد بدهید.":"Request a rematch when you are ready.");
+          $("onlineRematchButton").disabled=requested||$("onlineTransport").value!=="self-hosted";
+          $("onlineRematchButton").textContent=requested?(isPersian?"در انتظار حریف…":"Waiting for opponent…"):(isPersian?"بازی دوباره":"Rematch");
+          $("onlineReturnLobbyButton").textContent=isPersian?"بازگشت به منو":"Return to lobby";
+          $("onlineReviewButton").textContent=isPersian?"مرور بازی":"Game review";
+          $("onlineExportButton").textContent=isPersian?"دریافت PGN":"Export PGN";
+        }
         if(gameOver) {matchActive=false;stopClock();if(justFinished)playGameEnd(room.result,room.result.startsWith("White")?"w":room.result.startsWith("Black")?"b":null);}
+        if(mode==="online"&&!gameOver)$("onlineEndgameCard").hidden=true;
       }
       async function syncOnlineRoom(quiet=false) {
         if($("onlineTransport").value==="self-hosted")return;
@@ -8618,6 +8713,18 @@
         if(!musicEnabled||musicVolume===0)return;
         advanceMusicTrack();
       });
+      $("onlineRematchButton").addEventListener("click",()=>{
+        if(mode!=="online"||!gameOver)return;
+        if($("onlineTransport").value!=="self-hosted"||!selfHostedSocket||selfHostedSocket.readyState!==WebSocket.OPEN) {
+          showToast(isPersian?"بازی دوباره در این اتصال در دسترس نیست.":"Rematch is currently available for self-hosted rooms only.");return;
+        }
+        $("onlineRematchButton").disabled=true;
+        $("onlineRematchState").textContent=isPersian?"درخواست شما ثبت شد؛ منتظر تأیید حریف هستیم.":"Request sent. Waiting for your opponent…";
+        selfHostedSocket.send(JSON.stringify({type:"rematch"}));
+      });
+      $("onlineReturnLobbyButton").addEventListener("click",showLobby);
+      $("onlineReviewButton").addEventListener("click",()=>showAnalysis(lastGameResult||$("statusText").textContent));
+      $("onlineExportButton").addEventListener("click",exportPgn);
       $("reviewGameButton").addEventListener("click",()=>showAnalysis(lastGameResult||$("statusText").textContent));
       $("exportPgnButton").addEventListener("click",exportPgn);
       $("recentGameList").addEventListener("click",event=>{void handleArchiveAction(event);});
