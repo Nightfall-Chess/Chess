@@ -3,25 +3,25 @@
    preferences remain independent from the website theme. */
 :root {
   color-scheme: dark;
-  --theme-bg:#090d18;
-  --theme-panel:#111a2a;
-  --theme-panel-raised:#17243a;
-  --theme-panel-soft:#1b2a42;
-  --theme-line:rgba(163,181,216,.16);
-  --theme-text:#edf3ff;
-  --theme-muted:#a2b0c8;
-  --theme-accent:#a9b8ff;
-  --theme-accent-strong:#8298f5;
+  --theme-bg:#090b13;
+  --theme-panel:#111522;
+  --theme-panel-raised:#181d2b;
+  --theme-panel-soft:#20263a;
+  --theme-line:#292e40;
+  --theme-text:#f0eff7;
+  --theme-muted:#9a9daf;
+  --theme-accent:#b7a3ff;
+  --theme-accent-strong:#9b86ef;
   --theme-accent-ink:#10162b;
-  --theme-secondary:#83c7e8;
-  --theme-gold:#e3c98c;
+  --theme-secondary:#8eb6ff;
+  --theme-gold:#d8bd83;
   --theme-danger:#ef8e9a;
   --theme-success:#7ed6b0;
   --theme-shadow:0 22px 60px rgba(0,0,0,.28);
   --theme-shadow-soft:0 10px 30px rgba(0,0,0,.16);
   --theme-radius:22px;
   --theme-radius-sm:14px;
-  --theme-backdrop:radial-gradient(ellipse at 82% 0%,rgba(82,104,177,.2),transparent 34rem),radial-gradient(ellipse at 4% 54%,rgba(95,72,151,.13),transparent 34rem),linear-gradient(145deg,#10182a,#090d18 64%,#111629);
+  --theme-backdrop:radial-gradient(ellipse at 82% 0%,rgba(32,39,71,.42),transparent 34rem),radial-gradient(ellipse at 4% 54%,rgba(48,35,71,.25),transparent 34rem),linear-gradient(155deg,#0d101b 0%,#090b13 58%,#0c0d16 100%);
   --theme-header:rgba(9,13,24,.78);
   --theme-glass:rgba(20,29,47,.76);
   --theme-control:rgba(8,14,26,.62);
@@ -35,7 +35,7 @@
   --theme-particle-a:#a9b8ff;
   --theme-particle-b:#83c7e8;
   --theme-particle-c:#e3c98c;
-  --theme-theme-color:#090d18;
+  --theme-theme-color:#090b13;
   --bg:var(--theme-bg);
   --panel:var(--theme-panel);
   --panel-raised:var(--theme-panel-raised);
