@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -50,4 +50,29 @@ test("compressed dataset is indexed on disk and pages keep source order", async 
   const archiveStats = await stat(archivePath);
   const manifest = JSON.parse(await readFile(join(directory, "cache", `lichess-${archiveStats.size}-${Math.trunc(archiveStats.mtimeMs)}`, "manifest.json"), "utf8"));
   assert.equal(manifest.checkpointStride, 128);
+});
+
+
+test("a stale or malformed on-disk manifest is rebuilt instead of reused", async t => {
+  const directory = await mkdtemp(join(tmpdir(), "nightfall-puzzle-stale-test-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const archivePath = join(directory, "puzzles.csv.zst");
+  const rows = [header, firstPuzzle].join("\n");
+  await writeFile(archivePath, zstdCompressSync(Buffer.from(rows)));
+  const archiveStats = await stat(archivePath);
+  const cachePath = join(directory, "cache", `lichess-${archiveStats.size}-${Math.trunc(archiveStats.mtimeMs)}`);
+  await mkdir(cachePath, { recursive: true });
+  await writeFile(join(cachePath, "manifest.json"), JSON.stringify({
+    schemaVersion: 0,
+    signature: "stale-signature",
+    total: 999
+  }));
+  await writeFile(join(cachePath, "puzzles.ndjson"), "not valid JSON\n");
+
+  const dataset = createPuzzleDataset({ archivePath, cacheRoot: join(directory, "cache") });
+  const status = await dataset.getStatus();
+  assert.equal(status.ready, true);
+  assert.equal(status.total, 1);
+  const page = await dataset.getPage(0, 1);
+  assert.equal(page.puzzles[0].puzzle.id, "00008");
 });
