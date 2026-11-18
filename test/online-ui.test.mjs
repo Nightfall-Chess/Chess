@@ -19,10 +19,10 @@ test("online matches block local engine assistance and local new-game controls",
   assert.match(html, /function startGame\(\) \{\s*if\(mode==="online"\)/);
 });
 
-test("the requested footer copy and Persian translations are present", async () => {
+test("removed footer labels stay removed while the remaining creator credit is preserved", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
-  assert.ok(html.includes("<span>Online fixes</span>"));
+  assert.equal(html.includes("<span>Online fixes</span>"), false);
+  assert.equal(html.includes("<span>All copyrights belongs to Orbit Studios. ©️</span>"), false);
   assert.ok(html.includes("<span>Created by Love 😇</span>"));
-  assert.ok(html.includes("<span>All copyrights belongs to Orbit Studios. ©️</span>"));
-  assert.ok(html.includes('"Online fixes":"بهبودهای آنلاین"'));
+  assert.equal(html.includes('"Online fixes":"بهبودهای آنلاین"'), false);
 });
