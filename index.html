@@ -5523,7 +5523,6 @@
           :mode==="imported"?(isPersian?"بازی واردشده":"Imported PGN")
           :isProfileSide?isPersian?"نمایهٔ شما":"Your profile"
             :isPersian?"بازیکن محلی":"Local player";
-        const openingInfo=openingForPlayer(color);
         const opening=`<div class="player-opening" title="${isPersian?"گشایش این بازیکن":`${isWhite?"White":"Black"} opening`}" hidden></div>`;
         const time=clockOn?formatTime(clocks[color]):"—";
         const avatar=isProfileSide&&playerProfile.avatarData?`<img src="${escapeHtml(playerProfile.avatarData)}" alt="">`:isAI?"✦":isWhite?"♙":"♟";
