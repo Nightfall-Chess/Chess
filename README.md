@@ -10,7 +10,9 @@ The bundled ECO opening data comes from Lichess's `chess-openings` project and i
 
 ## Lichess puzzle collection
 
-The included `lichess_db_puzzle.csv.zst` archive is indexed on the first puzzle request. Node.js streams and validates the compressed CSV into a disk-backed JSONL cache plus a sparse offset index under the operating-system temporary directory; the six-million-record collection is never loaded into memory at once. The cache is keyed by the archive size and modification time, so replacing the archive creates a fresh index.
+The official `lichess_db_puzzle.csv.zst` archive is a large external download and is not stored in this GitHub repository. Download it from the [Lichess puzzle database](https://database.lichess.org/#puzzles) and place the file in the repository root next to `server.mjs`. The server reports a clear setup error if the archive is missing. You can override its location with the `CHESS_PUZZLE_ARCHIVE` environment variable.
+
+The archive is indexed on the first puzzle request. Node.js streams and validates the compressed CSV into a disk-backed JSONL cache plus a sparse offset index under the operating-system temporary directory; the six-million-record collection is never loaded into memory at once. The cache is keyed by the archive size and modification time, so replacing the archive creates a fresh index.
 
 The first index build can take about a minute. Check readiness and the accepted/rejected row counts with `GET /api/puzzles/status`, then request bounded pages with `GET /api/puzzles?offset=0&limit=16` (maximum page size: 50). Puzzle pages preserve dataset order. The client stores a completed-puzzle cursor locally and skips malformed or illegal positions without repeating completed puzzles.
 
