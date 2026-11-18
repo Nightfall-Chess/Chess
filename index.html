@@ -1497,6 +1497,34 @@
   <link rel="stylesheet" href="./nightfall-visual-system.css?v=1">
   <link rel="stylesheet" href="./nightfall-theme-contrast.css?v=5">
   <script src="./orbit-enhancements.js" defer></script>
+
+<style id="online-match-viewport-final">
+  @media (min-width:821px) {
+    body:has(#gameScreen:not([hidden])) { overflow:hidden; }
+    .app:has(#gameScreen:not([hidden])) { width:100%;max-width:1500px;height:100dvh;padding:10px 22px 8px;overflow:hidden;display:flex;flex-direction:column; }
+    .app:has(#gameScreen:not([hidden]))>header { flex:0 0 auto;margin-bottom:8px; }
+    #gameScreen.layout { flex:1 1 auto;min-height:0;height:calc(100dvh - 72px);grid-template-columns:minmax(0,1fr) minmax(270px,330px);gap:18px;align-items:stretch;overflow:hidden; }
+    #gameScreen .play-area { min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;align-content:stretch; }
+    #gameScreen .player { min-height:48px;padding:5px 10px; }
+    #gameScreen .board-frame { width:min(min(72dvh,calc(100vw - 410px)),760px);max-width:100%;max-height:calc(100dvh - 150px);margin:5px auto;padding:6px;align-self:center; }
+    #gameScreen .board { width:100%; }
+    #gameScreen .side-panel { min-height:0;max-height:100%;overflow-y:auto;overscroll-behavior:contain;padding:0 3px 8px 0;gap:9px; }
+    #gameScreen .card { padding:12px; }
+    #gameScreen .game-info-tabs { margin-bottom:7px; }
+    #gameScreen .moves-list { max-height:min(25dvh,210px); }
+    #gameScreen .site-footer { display:none; }
+  }
+  @media (max-width:820px) {
+    body:has(#gameScreen:not([hidden])) { overflow:hidden; }
+    .app:has(#gameScreen:not([hidden])) { height:100dvh;min-height:0;padding:6px 10px;overflow:hidden; }
+    .app:has(#gameScreen:not([hidden]))>header { flex:0 0 auto;margin-bottom:4px; }
+    #gameScreen.layout { height:calc(100dvh - 58px);min-height:0;overflow:hidden; }
+    #gameScreen .play-area { min-height:0; }
+    #gameScreen .board-frame { width:min(calc(100vw - 24px),calc(100dvh - 190px));margin:4px auto;padding:5px; }
+    #gameScreen .side-panel { min-height:0;overflow-y:auto; }
+    #gameScreen .site-footer { display:none; }
+  }
+</style>
 </head>
 <body>
   <svg class="icon-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
