@@ -5769,9 +5769,8 @@
         if(puzzleMode&&state.turn!==puzzleColor)return;
         const p=state.board[r][c];
         const selectedPiece=selected&&state.board[selected[0]][selected[1]],selectedColor=colorOf(selectedPiece),clickedColor=colorOf(p);
-        if(mode==="online"&&state.turn!==humanColor)return;
         const queueColor=(mode==="ai"||mode==="online")?humanColor:selectedColor||(clickedColor&&clickedColor!==state.turn?clickedColor:(state.turn==="w"?"b":"w"));
-        const premoveInput=mode==="ai"?state.turn!==humanColor:mode==="online"?false:selectedColor?selectedColor!==state.turn:Boolean(clickedColor&&clickedColor!==state.turn);
+        const premoveInput=mode==="ai"||mode==="online"?state.turn!==humanColor:selectedColor?selectedColor!==state.turn:Boolean(clickedColor&&clickedColor!==state.turn);
         if(premoveInput) {
           if(selected) {
             const chosen=legalTargets.find(move=>same(move.to,[r,c]));
@@ -7532,6 +7531,8 @@
         const nextVersion=Number(room.version)||0;
         if(nextVersion<onlineVersion)return;
         const previousLength=history.length;
+        const previousVersion=onlineVersion;
+        const queuedPremove=premove;
         const wasSamePosition=nextVersion===onlineVersion;
         const built=onlineBuildHistory(room.moves);
         if(wasSamePosition&&built.entries.length===previousLength) {
@@ -7553,7 +7554,10 @@
           else if(!clockOn)stopClock();
           renderPlayers();
         }
-        selected=null;legalTargets=[];premove=null;
+        selected=null;legalTargets=[];
+        const latestOnlineMove=built.entries.at(-1)?.move;
+        const latestOnlineMover=built.entries.at(-1)?.before.turn;
+        premove=queuedPremove&&built.entries.length>previousLength&&previousVersion>0&&state.turn===humanColor&&latestOnlineMover!==humanColor?queuedPremove:null;
         onlinePlayers=Array.isArray(room.players)?room.players:[];
         gameOver=Boolean(room.result);matchActive=room.status==="playing"&&!gameOver;
         if(gameOver&&onlineRefreshTimer){clearInterval(onlineRefreshTimer);onlineRefreshTimer=0;}
@@ -7570,7 +7574,11 @@
           recordGameResult(room.result,winnerColor);
         }
         render();
-        if(history.length>previousLength&&history.length)animateMove(history.at(-1).move,history.at(-1).before);
+        if(history.length>previousLength&&history.length) {
+          const latest=history.at(-1),capture=Boolean(latest.before.board[latest.move.to[0]][latest.move.to[1]])||latest.move.enPassant;
+          if(previousVersion>0)playMoveSound(capture,inCheck(state,state.turn),Boolean(room.result&&/checkmate/i.test(room.result)),latest.move);
+          animateMove(latest.move,latest.before);
+        }
         $("statusText").textContent=room.result||(room.status==="waiting"
           ?(isPersian?"منتظر بازیکن دوم…":"Waiting for the second player…")
           :(isPersian?(state.turn===humanColor?"نوبت شماست":"نوبت حریف است"):(state.turn===humanColor?"Your turn":"Opponent's turn")));
@@ -7926,8 +7934,8 @@
         oscillator.start(start);oscillator.stop(start+duration+.04);
       }
       const soundEvents={
-        move:{notes:[293.66],wave:"sine",duration:.12,volume:.035,channel:"game"},
-        capture:{notes:[392,587.33],wave:"triangle",duration:.17,volume:.035,channel:"game"},
+        move:{notes:[155.56,311.13,466.16],wave:"triangle",duration:.14,volume:.062,channel:"game"},
+        capture:{notes:[110,220,440],wave:"square",duration:.17,volume:.058,channel:"game"},
         check:{notes:[523.25,659.25],wave:"sine",duration:.2,volume:.038,channel:"game"},
         checkmate:{notes:[523.25,659.25,783.99,1046.5],wave:"sine",duration:.28,volume:.04,channel:"game"},
         castle:{notes:[349.23,440,523.25],wave:"triangle",duration:.17,volume:.032,channel:"game"},
@@ -8745,7 +8753,8 @@
         }
         $("onlineRematchButton").disabled=true;
         $("onlineRematchState").textContent=isPersian?"درخواست شما ثبت شد؛ منتظر تأیید حریف هستیم.":"Request sent. Waiting for your opponent…";
-        selfHostedSocket.send(JSON.stringify({type:"rematch"}));
+        try { selfHostedSocket.send(JSON.stringify({type:"rematch"})); }
+        catch(error) { $("onlineRematchButton").disabled=false;showToast(isPersian?"ارسال درخواست بازی دوباره ناموفق بود.":"Could not send the rematch request.");console.error("Online rematch request failed:",error); }
       });
       $("onlineReturnLobbyButton").addEventListener("click",()=>void returnToOnlineLobby());
       $("onlineReviewButton").addEventListener("click",()=>showAnalysis(lastGameResult||$("statusText").textContent));
