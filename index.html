@@ -1499,6 +1499,8 @@
   <script src="./orbit-enhancements.js" defer></script>
 
 <style id="online-match-viewport-final">
+  .online-opening-indicator { max-width:min(34vw,260px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 8px;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-radius:7px;background:color-mix(in srgb,var(--accent) 9%,transparent);color:var(--accent);font-size:10px;font-weight:650; }
+  @media (max-width:820px) { .online-opening-indicator { max-width:28vw;font-size:9px;padding:4px 6px; } }
   @media (min-width:821px) {
     body:has(#gameScreen:not([hidden])) { overflow:hidden; }
     .app:has(#gameScreen:not([hidden])) { width:100%;max-width:1500px;height:100dvh;padding:10px 22px 8px;overflow:hidden;display:flex;flex-direction:column; }
@@ -1986,6 +1988,7 @@
         <div class="board-status">
           <button type="button" class="game-menu-button" id="gameMenuButton" aria-expanded="false" aria-controls="gameSidePanel"><span aria-hidden="true">☰</span> <span>Menu</span></button>
           <div class="status-copy"><span class="status-dot" id="statusDot"></span><span id="statusText" aria-live="polite">White to move</span></div>
+          <span class="online-opening-indicator" id="onlineOpeningLabel" hidden aria-live="polite"></span>
           <div class="board-tools">
             <button type="button" id="undoButton" aria-label="Undo move" title="Undo move">↶</button>
             <button type="button" id="redoButton" aria-label="Redo move" title="Redo move">↷</button>
@@ -5602,6 +5605,9 @@
             :isPersian?`گشایش ${openingName} برای این بازی ثبت شده است.`:`${openingIdentity.name} was recorded for this game.`
           :isPersian?"با ادامهٔ بازی، نام گشایش پس از رسیدن به یک وضعیت ثبت‌شده در پایگاه ECO نمایش داده می‌شود.":"The ECO opening name will appear when the game reaches a position listed in the database.";
         $("strategyTitle").dataset.english=englishTitle;
+        const onlineOpeningLabel=$("onlineOpeningLabel");
+        onlineOpeningLabel.hidden=mode!=="online"||!openingIdentity;
+        onlineOpeningLabel.textContent=openingIdentity?`${openingIdentity.eco||""} · ${isPersian?openingIdentity.nameFa||openingIdentity.name:openingIdentity.name}`:"";
         $("strategyTitle").textContent=title;
         $("reportPieces").replaceChildren();
         $("strategyCopy").textContent=copy;
