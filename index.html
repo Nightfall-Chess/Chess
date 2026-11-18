@@ -7431,6 +7431,7 @@
               if(pending) {
                 clearTimeout(pending.timeout);selfHostedConnectPending=null;pending.reject(new Error(payload.message||"The game server rejected the request."));
               } else {
+                if(payload.message&&gameOver&&mode==="online")$("onlineRematchButton").disabled=false;
                 showToast(payload.message||"The game server rejected the request.");
                 setSelfHostedConnectionStatus(payload.message||"Game server error.",true);
               }
@@ -7561,6 +7562,9 @@
             :(isPersian?"برای شروع دوباره، درخواست بازی مجدد بدهید.":"Request a rematch when you are ready.");
           $("onlineRematchButton").disabled=requested||$("onlineTransport").value!=="self-hosted";
           $("onlineRematchButton").textContent=requested?(isPersian?"در انتظار حریف…":"Waiting for opponent…"):(isPersian?"بازی دوباره":"Rematch");
+          $("onlineReturnLobbyButton").textContent=isPersian?"بازگشت به منو":"Return to lobby";
+          $("onlineReviewButton").textContent=isPersian?"مرور بازی":"Game review";
+          $("onlineExportButton").textContent=isPersian?"دریافت PGN":"Export PGN";
         }
         if(gameOver) {matchActive=false;stopClock();if(justFinished)playGameEnd(room.result,room.result.startsWith("White")?"w":room.result.startsWith("Black")?"b":null);}
         if(mode==="online"&&!gameOver)$("onlineEndgameCard").hidden=true;
