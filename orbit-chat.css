@@ -65,3 +65,7 @@ body:has(#gameScreen:not([hidden])){overflow-x:hidden;overflow-y:auto}
   body.nc-open #ncChatDock{min-height:360px}
   #ncChatDock .nc-emojis{grid-template-columns:repeat(8,minmax(0,1fr))}
 }
+
+/* The launcher and dock live under body, never inside the hidden game screen. */
+body.nc-open > #ncChatDock{position:fixed;left:18px;right:auto;top:18px;bottom:18px;width:min(390px,calc(100vw - 36px));height:auto;max-height:none;min-height:0;display:flex;z-index:1201}
+@media(max-width:520px){body.nc-open > #ncChatDock{left:8px;right:8px;top:8px;bottom:8px;width:auto;height:auto}}
