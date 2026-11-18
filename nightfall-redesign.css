@@ -269,7 +269,7 @@ input[type="range"] { accent-color: var(--accent); }
   gap: 0;
   margin-top: -6px;
 }
-#lobby[data-page="play"] .lobby-dashboard > :not(.profile-stats):not(#profilePerformance):not(#profileRecentGames):not(#profileLearning) { display: none !important; }
+/* Daily challenge and progress cards remain visible on the Play dashboard. */
 #lobby[data-page="play"] .profile-stats {
   width: min(100%, 590px);
   grid-template-columns: repeat(4, minmax(0, 1fr));
