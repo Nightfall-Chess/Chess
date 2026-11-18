@@ -101,12 +101,14 @@ async function main(req: Request) {
       const invite = code();
       const id = crypto.randomUUID();
       const name = cleanName(body.name, "Player");
+      const requestedColor = body.color === "b" ? "b" : body.color === "w" ? "w" : "random";
       const { error } = await db.rpc("online_create_room", {
         p_room_id: id,
         p_code_hash: await hash(invite),
         p_user_id: userId,
         p_display_name: name,
-        p_initial_fen: INITIAL_FEN
+        p_initial_fen: INITIAL_FEN,
+        p_host_color: requestedColor
       });
       if (error) throw error;
       data = { room: await snapshot(db, id, userId), invitationCode: invite };
