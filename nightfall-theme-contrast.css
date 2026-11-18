@@ -26,7 +26,7 @@ html[data-theme="night-sky"] {
   --theme-success: #247454;
   --theme-line: rgba(48, 83, 116, .24);
   --theme-focus: #205985;
-  --theme-button-gradient: linear-gradient(135deg, #28699f, #397eb7);
+  --theme-button-gradient: linear-gradient(135deg, #28699f, #3276ad);
 }
 
 /* Consistent foregrounds for the most common secondary-copy components. */
