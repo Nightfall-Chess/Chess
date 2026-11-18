@@ -297,3 +297,20 @@ body.nc-open > #ncChatDock{position:fixed;left:18px;right:auto;top:18px;bottom:1
   body.nc-open > main.app{visibility:hidden!important;pointer-events:none!important}
   body.nc-open > #ncLauncher{display:none!important}
 }
+
+/* Orbit-style chat alignment and readable message typography */
+#ncChatDock .nc-msg{
+  align-self:initial!important;
+  margin-left:auto!important;
+  margin-right:0!important;
+}
+#ncChatDock .nc-msg.mine{
+  margin-left:0!important;
+  margin-right:auto!important;
+}
+#ncChatDock .nc-msg>b{font-size:13px!important;line-height:1.5}
+#ncChatDock .nc-msg .nc-tx{font-size:16px!important;line-height:1.7!important}
+#ncChatDock .nc-msg .nc-rp{font-size:13px!important;line-height:1.55}
+#ncChatDock .nc-msg .nc-rp span{font-size:13px!important}
+#ncChatDock .nc-msg footer{font-size:11px!important}
+#ncChatDock .nc-msg footer small{font-size:10px!important}
