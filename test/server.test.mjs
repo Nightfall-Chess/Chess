@@ -408,3 +408,15 @@ test("self-hosted rooms honor an explicit black host and default missing prefere
   assert.deepEqual(joined.room.players.map(player => player.color), ["w", "b"]);
   assert.equal(joined.room.status, "playing");
 });
+
+
+test("static server safely rejects malformed paths and supports HEAD requests", async t => {
+  const wsUrl = await startChessServer(t);
+  const base = wsUrl.replace(/^ws:/, "http:");
+  const head = await fetch(base.replace("/ws/online", "/"), { method: "HEAD" });
+  assert.equal(head.status, 200);
+  assert.equal(await head.text(), "");
+
+  const malformed = await fetch(base.replace("/ws/online", "/%E0%A4%A"));
+  assert.equal(malformed.status, 400);
+});
