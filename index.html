@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b13">
   <meta name="description" content="شطرنج شبانه؛ با دوستتان یا هوش مصنوعی بازی کنید و شطرنج را گام‌به‌گام بیاموزید.">
-  <link rel="icon" type="image/svg+xml" sizes="any" href="./noun_Horse_6673779.svg">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="./chess-icon.svg">
   <link rel="apple-touch-icon" href="./chess-icon.svg">
   <link rel="mask-icon" href="./chess-icon.svg" color="#b7a3ff">
   <title>شطرنج شبانه</title>
@@ -1461,7 +1461,7 @@
   </style>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./nightfall-redesign.css?v=38">
-  <link rel="stylesheet" href="./nightfall-themes.css?v=1">
+  <link rel="stylesheet" href="./nightfall-themes.css?v=2">
   <link rel="stylesheet" href="./orbit-enhancements.css?v=1">
   <script src="./orbit-enhancements.js" defer></script>
 </head>
@@ -1751,6 +1751,7 @@
           <button type="button" class="settings-nav-button active" data-settings-panel="profile"><svg class="ui-icon" aria-hidden="true"><use href="#icon-profile"></use></svg>Profile</button>
           <button type="button" class="settings-nav-button" data-settings-panel="gameplay"><svg class="ui-icon" aria-hidden="true"><use href="#icon-gameplay"></use></svg>Gameplay</button>
           <button type="button" class="settings-nav-button" data-settings-panel="appearance"><svg class="ui-icon" aria-hidden="true"><use href="#icon-appearance"></use></svg>Board & pieces</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="themes"><svg class="ui-icon" aria-hidden="true"><use href="#icon-achievements"></use></svg>Themes</button>
           <button type="button" class="settings-nav-button" data-settings-panel="audio"><svg class="ui-icon" aria-hidden="true"><use href="#icon-sound"></use></svg>Sound</button>
           <button type="button" class="settings-nav-button" data-settings-panel="language"><svg class="ui-icon" aria-hidden="true"><use href="#icon-language"></use></svg>Language</button>
         </nav>
@@ -1772,12 +1773,16 @@
             <label class="gameplay-option"><input id="moveAnnotationsSetting" type="checkbox"><span>Show Stockfish move analysis in the move list</span></label>
             <p class="note">Every move is analyzed asynchronously. The move list shows its classification and evaluation when Stockfish finishes.</p>
           </section>
-          <section class="card settings-panel" data-settings-content="appearance" hidden>
-            <div class="card-heading"><span class="card-title">Appearance</span><span class="eyebrow">LIVE PREVIEW</span></div>
+          <section class="card settings-panel themes-settings-panel" data-settings-content="themes" hidden>
+            <div class="card-heading"><span class="card-title">Themes</span><span class="eyebrow">A NEW LOOK FOR EVERY MOVE</span></div>
+            <p class="note themes-intro">Choose a visual identity for the entire website. Every page, panel, button and game surface will follow your selection.</p>
             <div class="field site-theme-field">
               <div class="field-label" id="siteThemeLabel">Website theme</div>
               <div class="site-theme-grid" id="siteThemeOptions" role="radiogroup" aria-labelledby="siteThemeLabel"></div>
             </div>
+          </section>
+          <section class="card settings-panel" data-settings-content="appearance" hidden>
+            <div class="card-heading"><span class="card-title">Appearance</span><span class="eyebrow">LIVE PREVIEW</span></div>
             <div class="theme-settings-grid">
               <div class="field"><div class="field-label" id="boardThemeLabel">Board theme</div><div class="theme-option-list" id="boardThemeOptions" role="radiogroup" aria-labelledby="boardThemeLabel"></div></div>
               <div class="field"><div class="field-label" id="pieceThemeLabel">Piece style</div><div class="theme-option-list" id="pieceThemeOptions" role="radiogroup" aria-labelledby="pieceThemeLabel"></div></div>
@@ -2367,7 +2372,8 @@
         "Your level is set. Solve a few easier positions first, then difficulty will follow your results.":"سطح شما ثبت شد. ابتدا چند موقعیت ساده‌تر را حل کنید؛ سپس سختی با نتیجه‌های شما هماهنگ می‌شود.",
         "Adaptive puzzle selection":"انتخاب هوشمند معما","Puzzle rating":"درجهٔ سختی معما",
         "⚙ Settings":"⚙ تنظیمات","Settings":"تنظیمات","PERSONALIZE YOUR GAME":"شخصی‌سازی بازی","Make the board, sound and profile feel like yours.":"صفحه، صدا و نمایه را مطابق سلیقهٔ خود تنظیم کنید.",
-        "Profile":"نمایه","Gameplay":"روند بازی","Board & pieces":"صفحه و مهره‌ها","Sound":"صدا","Sound & music":"صدا و موسیقی","Language":"زبان","Display language":"زبان نمایش",
+        "Profile":"نمایه","Gameplay":"روند بازی","Board & pieces":"صفحه و مهره‌ها","Sound":"صدا","Sound & music":"صدا و موسیقی","Language":"زبان",
+        "Themes":"تم‌ها","Website theme":"تم ظاهری سایت","A NEW LOOK FOR EVERY MOVE":"ظاهری تازه برای هر حرکت","Choose a visual identity for the entire website. Every page, panel, button and game surface will follow your selection.":"هویت بصری دلخواهتان را برای تمام سایت انتخاب کنید. همه صفحه‌ها، پنل‌ها، دکمه‌ها و بخش‌های بازی با انتخاب شما هماهنگ می‌شوند.","Display language":"زبان نمایش",
         "Player profile":"نمایهٔ بازیکن","YOUR ACCOUNT ON THIS DEVICE":"حساب شما در این دستگاه","Username":"نام کاربری","Profile picture":"تصویر نمایه",
         "Save profile":"ذخیرهٔ نمایه","Remove picture":"حذف تصویر","Your profile is saved on this device and shown in local games. No account or image upload is required.":"نمایه در این دستگاه ذخیره و در بازی‌های محلی نمایش داده می‌شود. حساب کاربری یا بارگذاری تصویر لازم نیست.",
         "Board theme":"پوستهٔ صفحه","Piece style":"سبک مهره","LIVE PREVIEW":"پیش‌نمایش زنده","Preview":"پیش‌نمایش","Sage":"سبز ملایم","Arctic blue":"آبی یخی","Walnut":"گردویی",
