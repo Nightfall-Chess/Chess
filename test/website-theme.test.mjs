@@ -46,7 +46,7 @@ test("the final theme stylesheet loads after other visual effects and is precach
   const orbitLink = html.indexOf('href="./orbit-enhancements.css?v=1"');
   assert.ok(themeLink > orbitLink, "theme tokens must load after Orbit effects");
   assert.ok(visualLink > themeLink, "visual system must load after theme tokens");
-  assert.match(worker, /const CACHE_VERSION = "nightfall-v\\d+"/);
+  assert.match(worker, /const CACHE_VERSION = "nightfall-v[0-9]+"/);
   assert.ok(worker.includes('"./nightfall-themes.css?v=5"'));
   assert.ok(worker.includes('"./nightfall-visual-system.css?v=1"'));
   assert.ok(worker.includes('"./nightfall-theme-contrast.css?v=5"'));
