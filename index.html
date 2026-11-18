@@ -1460,9 +1460,10 @@
     }
   </style>
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./nightfall-redesign.css?v=39">
+  <link rel="stylesheet" href="./nightfall-redesign.css?v=40">
   <link rel="stylesheet" href="./orbit-enhancements.css?v=1">
-  <link rel="stylesheet" href="./nightfall-themes.css?v=4">
+  <link rel="stylesheet" href="./nightfall-themes.css?v=5">
+  <link rel="stylesheet" href="./nightfall-visual-system.css?v=1">
   <script src="./orbit-enhancements.js" defer></script>
 </head>
 <body>
@@ -1513,6 +1514,7 @@
           </div>
         </div>
         <div class="hero-scene" aria-hidden="true">
+          <div class="hero-king-art"></div>
           <div class="hero-moon"></div>
           <div class="hero-orbit hero-orbit-back"></div>
           <div class="hero-orbit hero-orbit-front"></div>
@@ -1751,7 +1753,7 @@
           <button type="button" class="settings-nav-button active" data-settings-panel="profile"><svg class="ui-icon" aria-hidden="true"><use href="#icon-profile"></use></svg>Profile</button>
           <button type="button" class="settings-nav-button" data-settings-panel="gameplay"><svg class="ui-icon" aria-hidden="true"><use href="#icon-gameplay"></use></svg>Gameplay</button>
           <button type="button" class="settings-nav-button" data-settings-panel="appearance"><svg class="ui-icon" aria-hidden="true"><use href="#icon-appearance"></use></svg>Board & pieces</button>
-          <button type="button" class="settings-nav-button" data-settings-panel="themes"><svg class="ui-icon" aria-hidden="true"><use href="#icon-achievements"></use></svg>Themes</button>
+          <button type="button" class="settings-nav-button" data-settings-panel="themes"><svg class="ui-icon" aria-hidden="true"><use href="#icon-appearance"></use></svg>Themes</button>
           <button type="button" class="settings-nav-button" data-settings-panel="audio"><svg class="ui-icon" aria-hidden="true"><use href="#icon-sound"></use></svg>Sound</button>
           <button type="button" class="settings-nav-button" data-settings-panel="language"><svg class="ui-icon" aria-hidden="true"><use href="#icon-language"></use></svg>Language</button>
         </nav>
@@ -2166,7 +2168,7 @@
         }
         updateSiteThemeSelection();
         if(typeof particlePresets==="object") {
-          for(const preset of Object.values(particlePresets))preset.colors=[profile.accent,profile.secondary,profile.previewBg===" "?"#ffffff":(theme==="night-sky"?"#ffffff":"#f4efff")];
+          for(const preset of Object.values(particlePresets))preset.colors=[profile.accent,profile.secondary,theme==="night-sky"?"#ffffff":profile.previewBg];
         }
       }
       function loadVisualTheme() {
