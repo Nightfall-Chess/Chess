@@ -103,6 +103,10 @@ export function createPuzzleDataset({
         } catch (error) {
           if (error.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
         }
+        // A cache directory with a missing, malformed, or stale manifest is not
+        // reusable. Remove it before the atomic rebuild so rename cannot mistake
+        // a broken old directory for another process's completed cache.
+        await rm(cachePath, { recursive: true, force: true });
         await mkdir(cacheRoot, { recursive: true });
         const stagePath = `${cachePath}.building-${process.pid}-${Date.now()}`;
         await mkdir(stagePath, { recursive: true });
