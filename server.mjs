@@ -10,7 +10,8 @@ import { createPuzzleDataset } from "./puzzle-dataset.mjs";
 const root = resolve(fileURLToPath(new URL(".", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
 const host = process.env.HOST || "0.0.0.0";
-const puzzles = createPuzzleDataset({ archivePath: resolve(root, "lichess_db_puzzle.csv.zst") });
+const puzzleArchivePath = resolve(root, process.env.CHESS_PUZZLE_ARCHIVE || "lichess_db_puzzle.csv.zst");
+const puzzles = createPuzzleDataset({ archivePath: puzzleArchivePath });
 const roomRetentionMs = 24 * 60 * 60 * 1000;
 const allowedOnlineOrigins = new Set((process.env.ONLINE_ALLOWED_ORIGINS || "").split(",").map(value => value.trim()).filter(Boolean));
 const rooms = new Map();
@@ -46,7 +47,13 @@ function getPuzzleCorsHeaders(request) {
 }
 
 const server = createServer((request, response) => {
-  const pathname = new URL(request.url || "/", "http://localhost").pathname;
+  let pathname;
+  try {
+    pathname = new URL(request.url || "/", "http://localhost").pathname;
+  } catch {
+    response.writeHead(400).end("Invalid request URL");
+    return;
+  }
   if (pathname === "/api/puzzles/status" || pathname === "/api/puzzles") {
     const corsHeaders = getPuzzleCorsHeaders(request);
     if (request.method === "OPTIONS") {
@@ -80,18 +87,32 @@ const server = createServer((request, response) => {
     }).catch(error => {
       if (response.destroyed) return;
       const badRequest = error instanceof RangeError;
+      const missingArchive = error.code === "ENOENT" && error.path === puzzleArchivePath;
       const unavailable = error.code === "ENOENT";
-      response.writeHead(badRequest ? 400 : unavailable ? 404 : 500, {
+      const message = missingArchive
+        ? "The Lichess puzzle archive is missing. Download lichess_db_puzzle.csv.zst from https://database.lichess.org/#puzzles, place it in the project root, and restart the server."
+        : error.message;
+      response.writeHead(badRequest ? 400 : missingArchive ? 503 : unavailable ? 404 : 500, {
         ...corsHeaders,
         "Content-Type": "application/json; charset=utf-8",
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff"
-      }).end(JSON.stringify({ error: error.message }));
+      }).end(JSON.stringify({ error: message }));
       if (!badRequest && !unavailable) console.error("Puzzle dataset request failed:", error);
     });
     return;
   }
-  const requested = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    response.writeHead(405, { Allow: "GET, HEAD" }).end("Method not allowed");
+    return;
+  }
+  let requested;
+  try {
+    requested = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
+  } catch {
+    response.writeHead(400).end("Invalid request path");
+    return;
+  }
   const file = resolve(root, `.${requested}`);
   if (file !== root && !file.startsWith(`${root}${sep}`)) {
     response.writeHead(403).end("Forbidden");
@@ -126,7 +147,8 @@ const server = createServer((request, response) => {
       "Last-Modified": stats.mtime.toUTCString(),
       "X-Content-Type-Options": "nosniff"
     });
-    createReadStream(file).pipe(response);
+    if (request.method === "HEAD") response.end();
+    else createReadStream(file).pipe(response);
   } catch (error) {
     if (error.code === "ENOENT" || error.code === "ENOTDIR") {
       response.writeHead(404).end("Not found");
