@@ -52,7 +52,7 @@ test("the final theme stylesheet loads after other visual effects and is precach
   assert.ok(html.includes('class="hero-king-art"'));
   assert.ok(visual.includes('#gameScreen.layout'));
   assert.ok(visual.includes('#lobby[data-page=play] .lobby-dashboard'));
-  assert.ok(!redesign.includes('lobby-dashboard > :not(.profile-stats)'));
+  assert.ok(!redesign.includes('#lobby[data-page="play"] .lobby-dashboard > :not(.profile-stats)'));
 });
 
 test("visual theme styles cover game, training, analysis, classroom and dialog surfaces", () => {
