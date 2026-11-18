@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 
-test("offline cache version matches the stylesheet and includes app, study, and engine assets", async () => {
+test("offline cache version is independent from asset query versions and includes app, study, and engine assets", async () => {
   const [html, worker] = await Promise.all([
     readFile(new URL("../index.html", import.meta.url), "utf8"),
     readFile(new URL("../service-worker.js", import.meta.url), "utf8")
@@ -11,7 +11,11 @@ test("offline cache version matches the stylesheet and includes app, study, and 
   const stylesheetVersion = html.match(/nightfall-redesign\.css\?v=(\d+)/)?.[1];
 
   assert.ok(cacheVersion);
-  assert.equal(cacheVersion, stylesheetVersion);
+  assert.match(cacheVersion, /^\\d+$/);
+  assert.ok(stylesheetVersion, "the redesign stylesheet has an explicit asset version");
+  assert.ok(worker.includes(`"./nightfall-redesign.css?v=${stylesheetVersion}"`));
+  assert.match(worker, /const STATIC_CACHE = \`\\$\\{CACHE_VERSION\\}-static\`/);
+  assert.match(worker, /const RUNTIME_CACHE = \`\\$\\{CACHE_VERSION\\}-runtime\`/);
   for (const asset of [
     "./index.html",
     "./online-supabase.js?v=online-authoritative-snapshot-20261117",
