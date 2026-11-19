@@ -1,4 +1,4 @@
-const CACHE_VERSION = "nightfall-v58";
+const CACHE_VERSION = "nightfall-v59";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -7,9 +7,10 @@ const CORE_ASSETS = [
   "./index.html",
   "./nightfall-redesign.css?v=43",
   "./nightfall-themes.css?v=5",
-  "./nightfall-visual-system.css?v=1",
+  "./nightfall-visual-system.css?v=2",
   "./nightfall-theme-contrast.css?v=5",
   "./assets/nightfall-king-mask.svg",
+  "./assets/nightfall-menu-art.svg",
   "./orbit-enhancements.css?v=1",
   "./orbit-enhancements.js",
   "./orbit-chat.css",
