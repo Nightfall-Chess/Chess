@@ -47,3 +47,8 @@ test("chat input and messages preserve automatic mixed Persian and English direc
   assert.match(css, /#ncChatDock \.nc-form input#ncInput[\s\S]*?overflow-x:auto/);
   assert.match(css, /#ncChatDock \.nc-msg \.nc-tx[\s\S]*?unicode-bidi:plaintext/);
 });
+
+test("online chessboard orientation follows the player's assigned color", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /humanColor=ownColor;orientation=ownColor;onlineMyColor=ownColor/);
+});
