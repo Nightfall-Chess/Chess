@@ -1625,6 +1625,69 @@
     #gameScreen .site-footer { display:none; }
   }
 </style>
+
+<style id="nightfall-chesscom-layout">
+  @media (min-width: 821px) {
+    body:has(#gameScreen:not([hidden])) { overflow: hidden; }
+    .app:has(#gameScreen:not([hidden])) {
+      width: 100%; max-width: 1760px; height: 100dvh; min-height: 0;
+      padding: 12px clamp(20px, 3vw, 48px) 8px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .app:has(#gameScreen:not([hidden])) > header { flex: 0 0 auto; margin-bottom: 12px; }
+    #gameScreen.layout {
+      flex: 1 1 auto; width: 100%; max-width: 1540px; height: auto; min-height: 0;
+      margin: 0 auto; display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 390px);
+      gap: clamp(22px, 2.4vw, 38px); align-items: start; overflow: hidden;
+    }
+    #gameScreen .play-area {
+      width: 100%; min-width: 0; min-height: 0; margin: 0;
+      display: grid; grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto auto auto auto; align-content: start;
+    }
+    #gameScreen .player { width: min(100%, var(--board-size)); margin-inline: auto; min-height: 48px; }
+    #gameScreen .board-frame {
+      width: min(100%, var(--board-size)); max-width: min(100%, var(--board-size));
+      margin: 8px auto; padding: 7px; align-self: start;
+    }
+    #gameScreen .board { width: 100%; }
+    #gameScreen .board-status { width: min(100%, var(--board-size)); margin: 0 auto 6px; }
+    #gameScreen .board-help { width: min(100%, var(--board-size)); margin: 0 auto 6px; }
+    #gameScreen .side-panel {
+      position: static; width: 100%; max-width: none; height: auto; min-height: 0;
+      max-height: 100%; padding: 0 2px 12px 0; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 12px; transform: none;
+      visibility: visible; border: 0; background: transparent; box-shadow: none;
+    }
+    #gameScreen .game-menu-head { min-height: 42px; padding: 3px 2px; }
+    #gameScreen .side-panel > .card,
+    #gameScreen .side-panel > .room-code { width: 100%; margin: 0; }
+    #gameScreen .room-code.online-match-invite {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 14px; flex-wrap: wrap; padding: 16px; min-height: 86px;
+    }
+    #gameScreen .room-code.online-match-invite[hidden] { display: none !important; }
+    #gameScreen .room-code.online-match-invite > div { min-width: 0; }
+    #gameScreen .room-code.online-match-invite strong { display: block; font-size: 20px; letter-spacing: .16em; }
+    #gameScreen .game-info-card { min-height: 0; }
+    #gameScreen .moves-list { max-height: min(34dvh, 320px); }
+    #gameScreen .site-footer { display: none; }
+  }
+  @media (min-width: 821px) and (min-height: 900px) {
+    #gameScreen { --board-size: min(76dvh, 780px); }
+  }
+  @media (min-width: 821px) and (max-height: 899px) {
+    #gameScreen { --board-size: min(calc(100dvh - 250px), 720px); }
+  }
+  @media (max-width: 820px) {
+    #gameScreen.layout { display: block; height: auto; min-height: 0; overflow: visible; }
+    #gameScreen .play-area { width: 100%; margin: 0 auto; }
+    #gameScreen .side-panel { position: fixed; }
+    #gameScreen .room-code.online-match-invite { display: flex; }
+  }
+</style>
+
   <link rel="stylesheet" href="./orbit-chat.css">
 </head>
 <body>
@@ -2102,10 +2165,6 @@
           </div>
         </div>
         <p class="board-help" id="boardHelp" aria-live="polite"></p>
-        <section class="room-code online-match-invite" id="onlineMatchInvite" hidden aria-label="Online room invitation">
-          <div><span id="onlineMatchInviteLabel">Room code · share with your opponent</span><strong id="onlineMatchInviteCode"></strong></div>
-          <button class="subtle-button" id="copyMatchRoomCodeButton" type="button">Copy code</button>
-        </section>
         <div class="player" id="bottomPlayer"></div>
         <section class="card" id="puzzleGameCard" hidden>
           <div class="card-heading"><span class="card-title" id="puzzleGameTitle">Chess puzzle</span><span class="eyebrow" id="puzzleGameRating"></span></div>
@@ -2120,6 +2179,10 @@
       <div class="game-menu-backdrop" id="gameMenuBackdrop"></div>
       <aside class="side-panel" id="gameSidePanel" aria-label="Game menu">
         <div class="game-menu-head"><strong>Menu</strong><button type="button" class="icon-button" id="gameMenuClose" aria-label="Close menu">×</button></div>
+        <section class="room-code online-match-invite" id="onlineMatchInvite" hidden aria-label="Online room invitation">
+          <div><span id="onlineMatchInviteLabel">Room code · share with your opponent</span><strong id="onlineMatchInviteCode"></strong></div>
+          <button class="subtle-button" id="copyMatchRoomCodeButton" type="button">Copy code</button>
+        </section>
         <section class="card" id="newGameCard">
           <div class="card-heading"><span class="card-title">New game</span><span class="eyebrow">PLAY</span></div>
           <div class="segmented" role="tablist" aria-label="Game mode">
