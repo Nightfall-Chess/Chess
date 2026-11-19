@@ -3059,6 +3059,7 @@
       let classroomOnlineUsers=new Set(),classroomChatMessages=[],classroomSavedGames=[];
       let classroomPointerDrag=null,classroomAnnotationDrag=null,classroomIgnoreClickUntil=0;
       let onlineApi=null,onlineSubscription=null,onlineSubscriptionRoomId="",onlineWatchPromise=null,onlineRoomId="",onlineVersion=0,onlineSyncBusy=false,onlineSnapshotBusy=false,onlineRefreshTimer=0,onlinePlayers=[];
+      let onlineAnnotations=[],onlineAnnotationDrag=null;
       let selfHostedSocket=null,selfHostedSocketGeneration=0,selfHostedRetryTimer=0,selfHostedConnectPending=null,selfHostedSession=null,selfHostedPaused=true,selfHostedRoom=null,selfHostedMovePending=false;
       let mode = "ai", humanColor = "w", aiThinking = false, gameOver = false;
       let stockfishWorker=null,stockfishReadyPromise=null,stockfishReadyResolve=null,stockfishReadyReject=null,stockfishReadyTimer=null,stockfishJob=null,stockfishQueue=Promise.resolve(),analysisGeneration=0,engineAnalysisGrades=[],engineAnalysisResult="";
@@ -5601,9 +5602,27 @@
         list.querySelectorAll("[data-ply]").forEach(button=>button.addEventListener("click",()=>showReviewPosition(Number(button.dataset.ply))));
         list.scrollTop=list.scrollHeight;
       }
+      function renderOnlineAnnotations() {
+        const board=$("board");if(!board||mode!=="online")return;
+        let layer=board.querySelector(":scope > .online-annotation-layer");
+        if(!layer){layer=document.createElementNS("http://www.w3.org/2000/svg","svg");layer.classList.add("online-annotation-layer");Object.assign(layer.style,{position:"absolute",inset:"0",width:"100%",height:"100%",zIndex:"8",pointerEvents:"none",overflow:"visible"});board.style.position="relative";board.append(layer);}
+        layer.replaceChildren();
+        const defs=document.createElementNS(layer.namespaceURI,"defs"),marker=document.createElementNS(layer.namespaceURI,"marker");
+        marker.id="online-arrow-head";marker.setAttribute("markerWidth","7");marker.setAttribute("markerHeight","7");marker.setAttribute("refX","5");marker.setAttribute("refY","3.5");marker.setAttribute("orient","auto");marker.setAttribute("markerUnits","strokeWidth");
+        const tip=document.createElementNS(layer.namespaceURI,"path");tip.setAttribute("d","M0,0 L7,3.5 L0,7 Z");tip.setAttribute("fill","#b69cff");marker.append(tip);defs.append(marker);layer.append(defs);
+        const rect=board.getBoundingClientRect();
+        for(const arrow of onlineAnnotations){const from=board.querySelector(`.square[data-row="${8-Number(arrow.from[1])}"][data-col="${"abcdefgh".indexOf(arrow.from[0])}"]`),to=board.querySelector(`.square[data-row="${8-Number(arrow.to[1])}"][data-col="${"abcdefgh".indexOf(arrow.to[0])}"]`);if(!from||!to)continue;
+          const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),line=document.createElementNS(layer.namespaceURI,"line");
+          line.setAttribute("x1",a.left-rect.left+a.width/2);line.setAttribute("y1",a.top-rect.top+a.height/2);line.setAttribute("x2",b.left-rect.left+b.width/2);line.setAttribute("y2",b.top-rect.top+b.height/2);
+          line.setAttribute("stroke","#b69cff");line.setAttribute("stroke-width",String(Math.max(5,a.width*.09)));line.setAttribute("stroke-linecap","round");line.setAttribute("marker-end","url(#online-arrow-head)");line.setAttribute("opacity",".82");layer.append(line);
+        }
+      }
+      function onlineSquareAtPoint(x,y){const square=document.elementFromPoint(x,y)?.closest("#board .square");return square?onlineSquare(Number(square.dataset.row),Number(square.dataset.col)):"";}
+      function publishOnlineAnnotations(){renderOnlineAnnotations();if($("onlineTransport").value==="self-hosted"){if(selfHostedSocket?.readyState===WebSocket.OPEN)selfHostedSocket.send(JSON.stringify({type:"annotations",annotations:onlineAnnotations}));}else onlineSubscription?.sendAnnotations?.(onlineAnnotations);}
       function render() {
         updateStrategyReport();
         renderBoard(); renderPlayers(); renderMoves();
+        if(mode==="online")renderOnlineAnnotations();
         $("cancelPremoveButton").hidden=!premove;
         $("undoButton").hidden=puzzleMode||mode==="online"||mode==="imported"||!gameplaySettings.takebacks;
         $("redoButton").hidden=puzzleMode||mode==="online"||mode==="imported"||!gameplaySettings.takebacks;
@@ -7550,6 +7569,7 @@
       }
       function applyOnlineSnapshot(room) {
         if(!room)return;
+        if(Array.isArray(room.annotations))onlineAnnotations=room.annotations.filter(item=>item&&/^[a-h][1-8]$/.test(item.from)&&/^[a-h][1-8]$/.test(item.to));
         if(room.startedAt)gameStartedAt=new Date(room.startedAt);
         const nextVersion=Number(room.version)||0;
         if(nextVersion<onlineVersion)return;
@@ -7672,7 +7692,7 @@
             if(onlineRoomId===roomId)void syncOnlineRoom(true);
           },(status,error)=>{
             if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Online realtime status:",status,error);
-          });
+          },annotations=>{onlineAnnotations=Array.isArray(annotations)?annotations:[];if(mode==="online"&&onlineRoomId===roomId)renderOnlineAnnotations();});
           onlineSubscription=subscription;
           return subscription;
         })();
@@ -7700,11 +7720,11 @@
         const ownColor=onlineMyColor||room.myColor||humanColor;
         if(ownColor==="w"||ownColor==="b")onlineMyColor=ownColor;
         const isFirstJoinNotice=ownColor==="w"&&Array.isArray(room.players)&&room.players.length===2&&onlineJoinNoticeRoomId!==room.id;
-        onlineRoomId=room.id;mode="online";humanColor=onlineMyColor;orientation=humanColor;onlinePlayers=room.players||[];updateOnlineMatchInvite(room);
+        onlineRoomId=room.id;mode="online";humanColor=onlineMyColor;orientation="w";onlineAnnotations=Array.isArray(room.annotations)?room.annotations:[];onlinePlayers=room.players||[];updateOnlineMatchInvite(room);
         cancelAIRequest();stopClock();clockOn=false;clocks={w:0,b:0};resultRecorded=false;lastGameResult="";
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;
         $("onlineScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
-        $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=false;
+        $("newGameCard").hidden=true;$("puzzleGameCard").hidden=true;$("newGameTop").hidden=true;$("flipButton").hidden=true;
         $("analysisBackdrop").classList.remove("open");analysisShown=false;
         gameStartedAt=room.startedAt?new Date(room.startedAt):new Date();
         showGameInfoTab("moves");applyOnlineSnapshot(room);playEventSound("gameStart");
@@ -8630,6 +8650,11 @@
         pendingProfileAvatar="";$("profileImage").value="";renderProfileAvatar($("profileAvatarPreview"),"");savePlayerProfile();
       });
       populateThemeOptions();
+      $("board").addEventListener("contextmenu",event=>{if(mode==="online")event.preventDefault();});
+      $("board").addEventListener("pointerdown",event=>{if(mode!=="online"||event.button!==2)return;const square=event.target.closest(".square");if(!square)return;onlineAnnotationDrag={pointerId:event.pointerId,from:onlineSquare(Number(square.dataset.row),Number(square.dataset.col)),to:""};event.preventDefault();});
+      document.addEventListener("pointermove",event=>{if(onlineAnnotationDrag?.pointerId===event.pointerId)onlineAnnotationDrag.to=onlineSquareAtPoint(event.clientX,event.clientY);},{passive:true});
+      document.addEventListener("pointerup",event=>{if(!onlineAnnotationDrag||onlineAnnotationDrag.pointerId!==event.pointerId)return;const drag=onlineAnnotationDrag;onlineAnnotationDrag=null;const to=onlineSquareAtPoint(event.clientX,event.clientY)||drag.to;if(!to||to===drag.from)return;const key=drag.from+to,existing=onlineAnnotations.findIndex(item=>item.from+item.to===key);if(existing>=0)onlineAnnotations.splice(existing,1);else onlineAnnotations=[...onlineAnnotations,{from:drag.from,to}].slice(-24);publishOnlineAnnotations();event.preventDefault();});
+      document.addEventListener("pointercancel",event=>{if(onlineAnnotationDrag?.pointerId===event.pointerId)onlineAnnotationDrag=null;});
       $("board").addEventListener("pointerdown",beginPieceDrag);
       document.addEventListener("pointermove",movePieceDrag,{passive:false});
       document.addEventListener("pointerup",endPieceDrag);
