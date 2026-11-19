@@ -1492,6 +1492,54 @@
       #gameScreen .side-panel { min-height: 0; overflow-y: auto; }
       #gameScreen .site-footer { display: none; }
     }
+  
+    /* Nightfall visual refinement — shared by every screen and theme. */
+    :root {
+      --panel: color-mix(in srgb, #191c1b 88%, #7665a8 12%);
+      --panel-raised: color-mix(in srgb, #202422 84%, #7665a8 16%);
+      --line: color-mix(in srgb, #41483f 76%, #9b8bd0 24%);
+    }
+    body {
+      background:
+        radial-gradient(ellipse at 12% 8%, #51447722 0, transparent 34%),
+        radial-gradient(ellipse at 88% 18%, #8a78b51a 0, transparent 30%),
+        linear-gradient(145deg, #0b0d12 0%, #111312 48%, #15121d 100%);
+      background-attachment: fixed;
+    }
+    .app { padding-top: 20px; }
+    header { padding: 10px 12px; border: 1px solid #ffffff0d; border-radius: 18px;
+      background: linear-gradient(120deg, #ffffff08, #8f7bc20a); backdrop-filter: blur(16px); }
+    .brand-mark { box-shadow: 0 0 24px #b7a3ff20; }
+    .card, .lobby-card, .player, .board-status {
+      border-color: color-mix(in srgb, var(--line) 72%, transparent);
+      box-shadow: 0 12px 36px #00000020, inset 0 1px #ffffff08;
+      backdrop-filter: blur(14px);
+    }
+    .card { border-radius: 17px; }
+    .lobby-card { border-radius: 18px; }
+    .icon-button, .subtle-button, .sound-toggle, .game-info-tab, .board-tools button {
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
+    }
+    .icon-button:hover, .subtle-button:hover, .sound-toggle:hover, .game-info-tab:hover, .board-tools button:hover {
+      transform: translateY(-1px); border-color: #a895e477;
+    }
+    .primary-button { box-shadow: 0 7px 22px color-mix(in srgb, var(--accent) 15%, transparent); }
+    .board-frame { border-color: #a895e433; box-shadow: 0 24px 75px #0008, 0 0 0 1px #ffffff0a, 0 0 42px #8b78c20c; }
+    .player.active-turn { border-color: color-mix(in srgb, var(--accent) 55%, #a895e4); }
+    .lobby h1 { text-wrap: balance; }
+    .lobby-dashboard { gap: 16px; }
+    .side-panel { gap: 12px; }
+    .toast { backdrop-filter: blur(18px); }
+    @media (max-width: 760px) {
+      .app { padding: 12px 12px 18px; }
+      header { margin-bottom: 14px; padding: 8px; }
+      .layout { gap: 14px; }
+      .card { padding: 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
   </style>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./nightfall-redesign.css?v=43">
