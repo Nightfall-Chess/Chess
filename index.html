@@ -1540,6 +1540,45 @@
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
 
+    /* Desktop game layout: reclaim unused space without shrinking the chessboard. */
+    @media (min-width: 1100px) {
+      :root { --board-size: min(660px, calc(100dvh - 300px), calc(100vw - 40px)); }
+      .app { width: 100%; max-width: 1680px; padding: 16px 28px 10px; }
+      .app > header { margin-bottom: 10px; }
+      #gameScreen.layout { width: 100%; max-width: 1580px; margin: 0 auto; grid-template-columns: minmax(560px, min(58vw, 820px)) minmax(390px, 1fr); gap: clamp(18px, 2vw, 34px); align-items: start; }
+      #gameScreen .play-area { min-width: 0; }
+      #gameScreen .player { min-height: 50px; padding: 6px 10px; }
+      #gameScreen .avatar { flex-basis: 34px; height: 34px; }
+      #gameScreen .board-frame { margin: 6px auto; padding: 7px; }
+      #gameScreen .board-status { min-height: 40px; margin-bottom: 4px; }
+      #gameScreen .board-help { min-height: 0; margin: 0 8px 4px; }
+      #gameScreen .side-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; align-items: start; gap: 12px; padding-top: 2px; }
+      #gameScreen .game-menu-head { grid-column: 1 / -1; margin: 0 0 1px; }
+      #gameScreen #newGameCard, #gameScreen .game-info-card { grid-column: 1 / -1; }
+      #gameScreen .card { padding: 13px; border-radius: 14px; }
+      #gameScreen .card-heading { margin-bottom: 9px; }
+      #gameScreen .field { margin-top: 9px; }
+      #gameScreen .primary-button { margin-top: 10px; min-height: 36px; }
+      #gameScreen .moves-list { max-height: 190px; }
+      #gameScreen .game-info-card { min-height: 0; }
+      #gameScreen .online-match-invite { margin: 6px 0; padding: 9px 12px; }
+      #gameScreen .online-match-invite strong { font-size: 15px; }
+    }
+    @media (min-width: 1100px) and (max-height: 820px) {
+      :root { --board-size: min(620px, calc(100dvh - 260px), calc(100vw - 40px)); }
+      #gameScreen .player { min-height: 44px; }
+      #gameScreen .avatar { flex-basis: 30px; height: 30px; }
+      #gameScreen .card { padding: 10px 12px; }
+      #gameScreen .field { margin-top: 7px; }
+      #gameScreen .moves-list { max-height: 150px; }
+    }
+    /* Chess-piece-inspired visual identities. */
+    html[data-theme="kings-legacy"] { --bg:#0b1223; --panel:#121d33; --panel-raised:#1b2943; --line:#34435f; --text:#f2eee2; --muted:#a7b2c7; --accent:#e2bd68; --accent-ink:#241b0c; --light-square:#eee3c9; --dark-square:#8b7854; }
+    html[data-theme="queens-gambit"] { --bg:#100d1d; --panel:#1a1630; --panel-raised:#262044; --line:#40365e; --text:#f2edff; --muted:#aaa1c4; --accent:#c2a0ff; --accent-ink:#211334; --light-square:#e9e1f4; --dark-square:#9180ad; }
+    html[data-theme="knights-shadow"] { --bg:#09131d; --panel:#111e2b; --panel-raised:#1a2b3b; --line:#30495d; --text:#eaf3fa; --muted:#9eb1c2; --accent:#80b9df; --accent-ink:#10202b; --light-square:#dce8ef; --dark-square:#71899b; }
+    html[data-theme="rook-fortress"] { --bg:#141312; --panel:#201e1b; --panel-raised:#2b2823; --line:#484038; --text:#f0e9df; --muted:#b1a79a; --accent:#c69b70; --accent-ink:#24180e; --light-square:#e6d9c3; --dark-square:#8b7866; }
+    html[data-theme="bishops-path"] { --bg:#071512; --panel:#10221e; --panel-raised:#19332c; --line:#2d5146; --text:#e9f5ef; --muted:#9bb9ad; --accent:#78c6a4; --accent-ink:#10251d; --light-square:#e5e9d8; --dark-square:#77917d; }
+    html[data-theme="pawns-journey"] { --bg:#19130f; --panel:#261d17; --panel-raised:#35281e; --line:#594535; --text:#f5ecdc; --muted:#bca991; --accent:#d6b77c; --accent-ink:#2a1d10; --light-square:#f0e2c8; --dark-square:#a17d59; }
   </style>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./nightfall-redesign.css?v=43">
@@ -2234,14 +2273,20 @@
       const pieceAssetThemes=["3d_chesskid","3d_plastic","3d_staunton","3d_wood","8_bit","8qetl","alpha","bases","book","bubblegum","ca09k","cases","classic","club","condal","dash","ejgfv","game_room","glass","gothic","graffiti","icy_sea","light","lolz","luca","marble","maya","metal","modern","nature","neo_wood","neon","newspaper","ocean","sky","space","tigers","tournament","vintage","wood"];
       const boardThemeValues=new Set(["sage","arctic","walnut",...boardAssetThemes.map(theme=>`chess-${theme}`)]);
       const pieceThemeValues=new Set(["symbols","solid","outline",...pieceAssetThemes.map(theme=>`set-${theme}`)]);
-      const siteThemeValues=new Set(["default","night-sky","midnight","royal","emerald","aurora"]);
+      const siteThemeValues=new Set(["default","night-sky","midnight","royal","emerald","aurora","kings-legacy","queens-gambit","knights-shadow","rook-fortress","bishops-path","pawns-journey"]);
       const siteThemeProfiles={
         default:{name:"Default",faName:"پیش‌فرض",description:"Classic dark navy",faDescription:"سرمه‌ای تیرهٔ کلاسیک",previewBg:"#090b13",accent:"#b7a3ff",secondary:"#8eb6ff",pitch:1},
         "night-sky":{name:"Night Sky",faName:"آسمان شب",description:"Elegant icy blue",faDescription:"آبی یخی و آرام",previewBg:"#edf5fb",accent:"#4f91c9",secondary:"#83bce6",pitch:1.04},
         midnight:{name:"Midnight",faName:"نیمه‌شب",description:"Deep black and silver",faDescription:"مشکی عمیق با نقره‌ای",previewBg:"#070809",accent:"#c7ccd2",secondary:"#777f87",pitch:.82},
         royal:{name:"Royal",faName:"سلطنتی",description:"Royal blue and gold",faDescription:"آبی سلطنتی و طلایی",previewBg:"#07132f",accent:"#d8b85c",secondary:"#5379bb",pitch:1.12},
         emerald:{name:"Emerald",faName:"زمردی",description:"Dark green refinement",faDescription:"سبز تیرهٔ ظریف",previewBg:"#071510",accent:"#73c69a",secondary:"#49a9a1",pitch:.94},
-        aurora:{name:"Aurora",faName:"شفق قطبی",description:"Atmospheric northern lights",faDescription:"گرادیان شفق قطبی",previewBg:"#151934",accent:"#86d5c7",secondary:"#9b8ce8",pitch:1.08}
+        aurora:{name:"Aurora",faName:"شفق قطبی",description:"Atmospheric northern lights",faDescription:"گرادیان شفق قطبی",previewBg:"#151934",accent:"#86d5c7",secondary:"#9b8ce8",pitch:1.08},
+        "kings-legacy":{name:"King's Legacy",faName:"میراث شاه",description:"Crown gold, royal navy and marble",faDescription:"طلایی تاج، سرمه‌ای سلطنتی و مرمر",previewBg:"#101a32",accent:"#e2bd68",secondary:"#8ea9d8",pitch:1.08},
+        "queens-gambit":{name:"Queen's Gambit",faName:"گامبی وزیر",description:"Amethyst violet with refined silver",faDescription:"بنفش آمیتیست با نقره‌ای ظریف",previewBg:"#171329",accent:"#c2a0ff",secondary:"#a9a7d8",pitch:1.04},
+        "knights-shadow":{name:"Knight's Shadow",faName:"سایهٔ اسب",description:"Steel blue and midnight graphite",faDescription:"آبی فولادی و زغالی نیمه‌شب",previewBg:"#0d1722",accent:"#80b9df",secondary:"#718ba7",pitch:.94},
+        "rook-fortress":{name:"Rook Fortress",faName:"دژ رخ",description:"Stone, iron and fortress bronze",faDescription:"سنگ، آهن و برنز دژ",previewBg:"#191817",accent:"#c69b70",secondary:"#9babb4",pitch:.9},
+        "bishops-path":{name:"Bishop's Path",faName:"مسیر فیل",description:"Deep emerald and warm ivory",faDescription:"زمردی عمیق و عاجی گرم",previewBg:"#0c1b19",accent:"#78c6a4",secondary:"#d0c49c",pitch:1},
+        "pawns-journey":{name:"Pawn's Journey",faName:"سفر پیاده",description:"Warm parchment and hopeful jade",faDescription:"کاغذ کهنهٔ گرم و یشمی روشن",previewBg:"#211b17",accent:"#d6b77c",secondary:"#8fc5a0",pitch:1.02}
       };
       function themeLabel(theme) {
         return theme.replace(/_/g," ").replace(/\b[a-z]/g,letter=>letter.toUpperCase());
