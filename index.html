@@ -7721,7 +7721,7 @@
         const ownColor=onlineMyColor||room.myColor||humanColor;
         if(ownColor==="w"||ownColor==="b")onlineMyColor=ownColor;
         const isFirstJoinNotice=ownColor==="w"&&Array.isArray(room.players)&&room.players.length===2&&onlineJoinNoticeRoomId!==room.id;
-        onlineRoomId=room.id;mode="online";humanColor=onlineMyColor;orientation="w";onlineAnnotations=Array.isArray(room.annotations)?room.annotations:[];onlinePlayers=room.players||[];updateOnlineMatchInvite(room);
+        onlineRoomId=room.id;mode="online";humanColor=ownColor;orientation=ownColor;onlineMyColor=ownColor;onlineAnnotations=Array.isArray(room.annotations)?room.annotations:[];onlinePlayers=room.players||[];updateOnlineMatchInvite(room);
         cancelAIRequest();stopClock();clockOn=false;clocks={w:0,b:0};resultRecorded=false;lastGameResult="";
         analysisGeneration++;assistanceGeneration++;moveSuggestion=null;puzzleMode=false;
         $("onlineScreen").hidden=true;$("lobby").hidden=true;$("trainingScreen").hidden=true;$("settingsScreen").hidden=true;$("gameScreen").hidden=false;
