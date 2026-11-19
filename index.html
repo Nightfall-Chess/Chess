@@ -1546,15 +1546,23 @@
       .app { width: 100%; max-width: 1680px; padding: 16px 28px 10px; }
       .app > header { margin-bottom: 10px; }
       #gameScreen.layout { width: 100%; max-width: 1580px; margin: 0 auto; grid-template-columns: minmax(560px, min(58vw, 820px)) minmax(390px, 1fr); gap: clamp(18px, 2vw, 34px); align-items: start; }
-      #gameScreen .play-area { min-width: 0; }
+      #gameScreen .play-area, #gameScreen .side-panel { display: contents; }
+      #gameScreen #topPlayer { grid-column: 1; grid-row: 1; }
+      #gameScreen .board-frame { grid-column: 1; grid-row: 2; }
+      #gameScreen .board-status { grid-column: 1; grid-row: 3; }
+      #gameScreen .board-help { grid-column: 1; grid-row: 4; }
+      #gameScreen #bottomPlayer { grid-column: 1; grid-row: 5; }
+      #gameScreen .game-menu-head { grid-column: 2; grid-row: 1; }
+      #gameScreen #newGameCard, #gameScreen .online-match-invite { grid-column: 2; grid-row: 2; }
+      #gameScreen .game-info-card { grid-column: 2; grid-row: 3; }
+      #gameScreen #onlineEndgameCard, #gameScreen .note-card { grid-column: 2; grid-row: 4; }
+      #gameScreen #puzzleGameCard { grid-column: 2; grid-row: 5; }
       #gameScreen .player { min-height: 50px; padding: 6px 10px; }
       #gameScreen .avatar { flex-basis: 34px; height: 34px; }
       #gameScreen .board-frame { margin: 6px auto; padding: 7px; }
       #gameScreen .board-status { min-height: 40px; margin-bottom: 4px; }
       #gameScreen .board-help { min-height: 0; margin: 0 8px 4px; }
-      #gameScreen .side-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; align-items: start; gap: 12px; padding-top: 2px; }
-      #gameScreen .game-menu-head { grid-column: 1 / -1; margin: 0 0 1px; }
-      #gameScreen #newGameCard, #gameScreen .game-info-card { grid-column: 1 / -1; }
+      #gameScreen .game-menu-head { margin: 0 0 1px; padding: 4px 2px; }
       #gameScreen .card { padding: 13px; border-radius: 14px; }
       #gameScreen .card-heading { margin-bottom: 9px; }
       #gameScreen .field { margin-top: 9px; }
