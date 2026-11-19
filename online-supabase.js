@@ -44,12 +44,13 @@ async function initialize() {
     snapshot: roomId => invoke("snapshot", { roomId }),
     move: payload => invoke("move", payload),
     resign: roomId => invoke("resign", { roomId }),
-    async subscribe(roomId, onChange, onStatus = () => {}) {
+    async subscribe(roomId, onChange, onStatus = () => {}, onAnnotations = () => {}) {
       const channel = supabase.channel(`online:${roomId}`, {
         config: { private: true }
       });
       channel.on("broadcast", { event: "state" }, () => onChange())
-        .on("broadcast", { event: "joined" }, () => onChange());
+        .on("broadcast", { event: "joined" }, () => onChange())
+        .on("broadcast", { event: "annotations" }, message => onAnnotations(message.payload?.annotations || []));
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error("Timed out connecting to the online game.")), 15000);
         channel.subscribe((status, err) => {
@@ -67,7 +68,8 @@ async function initialize() {
         throw err;
       });
       return {
-        unsubscribe: () => supabase.removeChannel(channel)
+        unsubscribe: () => supabase.removeChannel(channel),
+        sendAnnotations: annotations => channel.send({ type: "broadcast", event: "annotations", payload: { annotations } })
       };
     }
   };
