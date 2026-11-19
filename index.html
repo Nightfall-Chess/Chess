@@ -7384,7 +7384,7 @@
 
       async function ensureOnlineApi() {
         if(!onlineApi) {
-          onlineApi=import("./online-supabase.js?v=online-authoritative-snapshot-20261117")
+          onlineApi=import("./online-supabase.js?v=online-arrows-20261119")
             .catch(error=>{
               console.warn("GitHub Pages module load failed; using CDN fallback:",error);
               return import("https://cdn.jsdelivr.net/gh/Nightfall-Chess/Chess@main/online-supabase.js");
@@ -7570,6 +7570,7 @@
       function applyOnlineSnapshot(room) {
         if(!room)return;
         if(Array.isArray(room.annotations))onlineAnnotations=room.annotations.filter(item=>item&&/^[a-h][1-8]$/.test(item.from)&&/^[a-h][1-8]$/.test(item.to));
+        if(mode==="online")renderOnlineAnnotations();
         if(room.startedAt)gameStartedAt=new Date(room.startedAt);
         const nextVersion=Number(room.version)||0;
         if(nextVersion<onlineVersion)return;
