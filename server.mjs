@@ -392,6 +392,9 @@ function handleMessage(client, message) {
       move = null;
     }
     if (!move) return reject(client, "That move is illegal.");
+    // Teaching arrows belong to the current position and disappear atomically
+    // with the accepted move for both players.
+    room.annotations = [];
     if (room.timeControlSeconds > 0) {
       room.clocks[player.color] = remaining;
       room.turnStartedAt = Date.now();
