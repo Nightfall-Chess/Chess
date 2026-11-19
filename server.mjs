@@ -249,7 +249,8 @@ function roomSnapshot(room) {
     timeControlSeconds: room.timeControlSeconds,
     startedAt: room.startedAt ? new Date(room.startedAt).toISOString() : "",
     result: room.result,
-    rematchRequests: (room.rematchRequests || []).map(color => ({ color, name: room.players[color === "w" ? 0 : 1]?.name || (color === "w" ? "White" : "Black") }))
+    rematchRequests: (room.rematchRequests || []).map(color => ({ color, name: room.players[color === "w" ? 0 : 1]?.name || (color === "w" ? "White" : "Black") })),
+    annotations: room.annotations || []
   };
 }
 
@@ -321,6 +322,7 @@ function handleMessage(client, message) {
       turnStartedAt: 0,
       result: "",
       rematchRequests: [],
+      annotations: [],
       createdAt: Date.now()
     };
     const player = joinPlayer(room, hostColor, sanitizeName(message.name), client);
@@ -363,6 +365,13 @@ function handleMessage(client, message) {
   const room = client.room;
   const player = client.player;
   if (!room || !player || player.client !== client) return reject(client, "Join or create a room first.");
+  if (message.type === "annotations") {
+    const annotations=Array.isArray(message.annotations)?message.annotations.slice(0,24):[];
+    if(annotations.some(item=>!item||!/^[a-h][1-8]$/.test(String(item.from||""))||!/^[a-h][1-8]$/.test(String(item.to||""))))return reject(client,"Invalid board annotation.");
+    room.annotations=annotations.map(item=>({from:String(item.from),to:String(item.to)}));
+    broadcastRoom(room);
+    return;
+  }
   if (message.type === "move") {
     if (room.status !== "playing") return reject(client, "The game is not active.");
     if (room.game.turn() !== player.color) return reject(client, "It is not your turn.");
