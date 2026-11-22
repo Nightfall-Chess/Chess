@@ -9004,7 +9004,6 @@
         try { saveSelfHostedServerAddress(); }
         catch(error) { showToast(isPersian?"آدرس سرور معتبر نیست: "+error.message:"Invalid server address: "+error.message); }
       });
-      $("openSelfHostedSiteButton").addEventListener("click",openSelfHostedSite);
       $("onlineTransport").addEventListener("change",updateOnlineTransport);
       updateOnlineTransport();
       $("createRoomButton").addEventListener("click",createRoom);
