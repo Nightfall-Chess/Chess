@@ -30,6 +30,10 @@ Or double-click `start-chess.cmd` in File Explorer. Then open <http://127.0.0.1:
 
 The Online screen defaults to **Self-hosted WebSocket**. This mode uses the Node server in this repository and does not require Supabase. The server assigns White to the room creator and Black to the first guest, rejects a third player, validates every move with `chess.js`, owns both clocks, and broadcasts authoritative positions. A per-seat resume token is saved in that browser so a player can reconnect to the same room. Rooms are retained for 24 hours after every player disconnects.
 
+When the Node server is running, it serves the complete Nightfall website and the WebSocket endpoint from the same origin. On a device connected to the same Tailscale network, open `http://100.97.55.99:4173/` to use the server-hosted site directly; there is no need to open a separate server dashboard or enter a second website. From the GitHub Pages build, **Open Nightfall on my server** switches to this server-hosted copy. Self-hosted invite links also open this copy and automatically join the room. If the Tailscale address changes, update the server URL in the Online screen. Devices outside the tailnet need a secure tunnel URL instead.
+
+The server health endpoint is available at `/api/health` and returns a small readiness response without exposing room data.
+
 The normal Windows launch is:
 
 ```powershell
