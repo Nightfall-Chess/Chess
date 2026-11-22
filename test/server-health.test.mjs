@@ -17,8 +17,12 @@ test("self-hosted server serves the site and exposes a health check", async t =>
     env: { ...process.env, PORT: String(port), HOST: "127.0.0.1" },
     stdio: "ignore"
   });
-  t.after(() => {
-    if (child.exitCode === null) child.kill();
+  t.after(async () => {
+    if (child.exitCode === null && child.signalCode === null) {
+      const exited = once(child, "exit");
+      child.kill();
+      await exited;
+    }
   });
 
   const base = `http://127.0.0.1:${port}`;
