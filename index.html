@@ -7647,8 +7647,7 @@
           try { candidate=localStorage.getItem(SELF_HOSTED_SERVER_STORAGE_KEY)||""; } catch {}
         }
         if(!candidate) {
-          const localHost=["localhost","127.0.0.1","::1"].includes(location.hostname);
-          if(localHost&&(location.port==="5500"||location.port==="5501"))candidate=location.protocol+"//"+location.hostname+":4173";
+          if(location.port==="5500"||location.port==="5501")candidate=location.protocol+"//"+location.hostname+":4173";
           else if(location.hostname.endsWith(".github.io"))candidate=DEFAULT_SELF_HOSTED_SERVER_URL;
           else candidate=location.origin;
         }
