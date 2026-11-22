@@ -7594,7 +7594,8 @@
       function inviteUrl() {
         if(!roomInviteCode)throw new Error("Create a room before sharing an invite.");
         const params=new URLSearchParams({room:roomInviteCode});
-        const invite=$("onlineTransport").value==="self-hosted"?selfHostedSiteAddress():new URL(location.href);
+        const invite=new URL(location.href);
+        if($("onlineTransport").value==="self-hosted")params.set("ws",selfHostedSiteAddress().href);
         invite.hash=params.toString();
         return invite.href;
       }
