@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
-import { once } from "node:events";\nimport { fileURLToPath } from "node:url";
+import { once } from "node:events";
+import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 
 test("self-hosted server serves the site and exposes a health check", async t => {
