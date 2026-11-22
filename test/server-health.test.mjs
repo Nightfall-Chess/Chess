@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
-import { once } from "node:events";
+import { once } from "node:events";\nimport { fileURLToPath } from "node:url";
 import { test } from "node:test";
 
 test("self-hosted server serves the site and exposes a health check", async t => {
@@ -11,8 +11,8 @@ test("self-hosted server serves the site and exposes a health check", async t =>
   const port = probe.address().port;
   await new Promise(resolve => probe.close(resolve));
 
-  const child = spawn(process.execPath, [new URL("../server.mjs", import.meta.url).pathname], {
-    cwd: new URL("..", import.meta.url),
+  const child = spawn(process.execPath, [fileURLToPath(new URL("../server.mjs", import.meta.url))], {
+    cwd: fileURLToPath(new URL("..", import.meta.url)),
     env: { ...process.env, PORT: String(port), HOST: "127.0.0.1" },
     stdio: "ignore"
   });
