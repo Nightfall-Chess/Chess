@@ -1778,6 +1778,156 @@
   }
 </style>
 
+
+  <style id="nightfall-chesscom-match-redesign">
+    @media (min-width: 821px) {
+      body:has(#gameScreen:not([hidden])) { overflow: hidden !important; }
+      .app:has(#gameScreen:not([hidden])) {
+        width: min(100%, 1720px); max-width: 1720px; height: 100dvh; min-height: 0;
+        padding: 10px clamp(14px, 2vw, 30px) 8px; margin: 0 auto;
+        overflow: hidden; display: flex; flex-direction: column;
+      }
+      .app:has(#gameScreen:not([hidden])) > header {
+        flex: 0 0 auto; min-height: 48px; margin: 0 0 9px; padding: 5px 10px;
+      }
+      .app:has(#gameScreen:not([hidden])) > header .brand-mark { width: 38px; height: 38px; }
+      .app:has(#gameScreen:not([hidden])) > header .header-actions { gap: 7px; }
+      #gameScreen.layout {
+        --nightfall-board-size: min(74dvh, calc(100dvh - 220px), 760px, calc(100vw - 500px));
+        display: grid; grid-template-columns: minmax(0, 1fr) minmax(330px, 390px);
+        align-items: stretch; justify-content: stretch; gap: clamp(16px, 2vw, 28px);
+        width: 100%; max-width: none; height: auto; min-height: 0;
+        flex: 1 1 auto; margin: 0; overflow: hidden;
+      }
+      #gameScreen .play-area {
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        width: 100%; min-width: 0; min-height: 0; margin: 0; gap: 0;
+      }
+      #gameScreen .player {
+        width: min(100%, var(--nightfall-board-size)); min-height: 48px;
+        padding: 5px 13px; border: 1px solid var(--line);
+        border-radius: 12px; background: linear-gradient(110deg, #ffffff12, #ffffff05);
+        box-shadow: 0 7px 22px #0002; flex: 0 0 auto;
+      }
+      #gameScreen .player.active-turn {
+        border-color: color-mix(in srgb, var(--accent) 62%, transparent);
+        background: linear-gradient(105deg, color-mix(in srgb, var(--accent) 13%, var(--panel)), var(--panel));
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent), 0 8px 26px #0003;
+      }
+      #gameScreen .player-info { min-width: 0; }
+      #gameScreen .player-name { font-size: 14px; font-weight: 750; }
+      #gameScreen .player-detail { font-size: 11px; }
+      #gameScreen .avatar { width: 36px; height: 36px; flex-basis: 36px; border-radius: 10px; }
+      #gameScreen .clock {
+        min-width: 94px; padding: 7px 13px; border: 1px solid #ffffff16;
+        border-radius: 9px; background: #0b1220; color: var(--text);
+        font-size: 23px; font-weight: 800; letter-spacing: .02em;
+        font-variant-numeric: tabular-nums;
+      }
+      #gameScreen .clock.active {
+        border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+        background: color-mix(in srgb, var(--accent) 15%, #0b1220);
+        color: #fff;
+        box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 16%, transparent);
+      }
+      #gameScreen .board-frame {
+        box-sizing: border-box; width: min(100%, var(--nightfall-board-size));
+        max-width: 100%; max-height: min(74dvh, 760px); aspect-ratio: 1;
+        margin: 8px auto; padding: 7px; flex: 0 1 auto;
+        border: 1px solid #ffffff20; border-radius: 13px;
+        background: linear-gradient(145deg, #ffffff16, #ffffff05);
+        box-shadow: 0 22px 65px #0007, 0 0 0 1px #ffffff08, 0 0 38px color-mix(in srgb, var(--accent) 10%, transparent);
+      }
+      #gameScreen .board { width: 100%; height: 100%; border-radius: 6px; }
+      #gameScreen .board .square { min-width: 0; }
+      #gameScreen .board-status {
+        width: min(100%, var(--nightfall-board-size)); min-height: 40px;
+        margin: 0 auto 5px; padding: 5px 9px; border: 1px solid var(--line);
+        border-radius: 10px; background: color-mix(in srgb, var(--panel) 88%, transparent);
+        box-shadow: 0 6px 18px #0002; flex: 0 0 auto;
+      }
+      #gameScreen .status-copy { font-size: 12px; font-weight: 650; }
+      #gameScreen .board-tools { gap: 5px; }
+      #gameScreen .board-tools button { min-width: 32px; min-height: 30px; border-radius: 8px; }
+      #gameScreen .board-help {
+        width: min(100%, var(--nightfall-board-size)); min-height: 16px;
+        margin: 0 auto 3px; font-size: 10px; text-align: center; flex: 0 0 auto;
+      }
+      #gameScreen .side-panel {
+        position: static; inset: auto; transform: none; visibility: visible;
+        display: flex; flex-direction: column; align-items: stretch; gap: 10px;
+        width: 100%; max-width: none; height: 100%; min-height: 0; max-height: none;
+        padding: 0 2px 2px 0; overflow: hidden;
+        border: 1px solid #ffffff12; border-radius: 16px;
+        background: linear-gradient(160deg, color-mix(in srgb, var(--panel) 94%, #344768), color-mix(in srgb, var(--panel) 98%, #080d19));
+        box-shadow: 0 16px 48px #0003;
+      }
+      #gameScreen .game-menu-head {
+        display: flex; align-items: center; justify-content: space-between;
+        min-height: 48px; margin: 0; padding: 8px 14px;
+        border-bottom: 1px solid #ffffff12; font-size: 14px;
+      }
+      #gameScreen .side-panel > * { box-sizing: border-box; width: 100%; max-width: 100%; margin: 0; }
+      #gameScreen .side-panel > .card { padding: 13px; border-radius: 11px; }
+      #gameScreen #newGameCard { display: none !important; }
+      #gameScreen .room-code.online-match-invite {
+        display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: nowrap; gap: 10px; min-height: 68px; padding: 11px 14px;
+        border: 0; border-bottom: 1px solid #ffffff12; border-radius: 0;
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+      #gameScreen .room-code.online-match-invite[hidden] { display: none !important; }
+      #gameScreen .room-code.online-match-invite strong { display: block; font-size: 19px; letter-spacing: .14em; }
+      #gameScreen .online-endgame-card { flex: 0 0 auto; }
+      #gameScreen .game-info-card {
+        display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto;
+        overflow: hidden; border: 0; background: transparent; box-shadow: none;
+      }
+      #gameScreen .game-info-tabs {
+        display: flex; flex: 0 0 auto; gap: 7px; padding: 4px;
+        border: 1px solid #ffffff12; border-radius: 10px; background: #080f1d66;
+      }
+      #gameScreen .game-info-tab {
+        flex: 1; min-height: 38px; border-radius: 8px; font-size: 13px; font-weight: 700;
+      }
+      #gameScreen #movesPanel, #gameScreen #strategyPanel {
+        display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; overflow: hidden;
+      }
+      #gameScreen #movesPanel[hidden], #gameScreen #strategyPanel[hidden] { display: none !important; }
+      #gameScreen .moves-list {
+        display: grid; align-content: start; grid-template-columns: 1fr 1fr;
+        gap: 5px 8px; min-height: 0; max-height: none; flex: 1 1 auto;
+        padding: 10px 4px; overflow: auto; overscroll-behavior: contain;
+        font-size: 13px; scrollbar-width: thin;
+      }
+      #gameScreen .moves-list > * { min-height: 32px; }
+      #gameScreen .strategy-copy { font-size: 12px; line-height: 1.65; }
+      #gameScreen .report-pieces { gap: 6px; }
+      #gameScreen .site-footer { display: none !important; }
+      #gameScreen .game-menu-backdrop { display: none !important; }
+    }
+    @media (min-width: 821px) and (max-height: 800px) {
+      #gameScreen.layout { --nightfall-board-size: min(68dvh, calc(100dvh - 205px), 650px, calc(100vw - 480px)); }
+      #gameScreen .player { min-height: 42px; }
+      #gameScreen .clock { font-size: 20px; padding: 5px 10px; }
+      #gameScreen .board-frame { margin: 5px auto; padding: 5px; }
+      #gameScreen .board-status { min-height: 34px; }
+      #gameScreen .side-panel { gap: 6px; }
+      #gameScreen .game-menu-head { min-height: 38px; }
+      #gameScreen .side-panel > .card { padding: 9px; }
+      #gameScreen .moves-list { padding: 6px 3px; }
+    }
+    @media (min-width: 821px) and (max-width: 1120px) {
+      #gameScreen.layout { grid-template-columns: minmax(0, 1fr) 310px; gap: 12px; --nightfall-board-size: min(68dvh, calc(100dvh - 220px), 600px, calc(100vw - 390px)); }
+      #gameScreen .side-panel { border-radius: 12px; }
+    }
+    @media (max-width: 820px) {
+      .app:has(#gameScreen:not([hidden])) { height: auto; min-height: 100dvh; overflow: visible; }
+      #gameScreen.layout { display: block; height: auto; min-height: 0; overflow: visible; }
+      #gameScreen .side-panel { position: fixed; }
+      #gameScreen #newGameCard { display: block !important; }
+    }
+  </style>
   <link rel="stylesheet" href="./orbit-chat.css">
 </head>
 <body>
