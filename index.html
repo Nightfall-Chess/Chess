@@ -7663,6 +7663,7 @@
           else if(location.hostname.endsWith(".github.io"))candidate=DEFAULT_SELF_HOSTED_SERVER_URL;
           else candidate=location.origin;
         }
+        if(!candidate)throw new Error("GitHub Pages is HTTPS. Enter your server's secure HTTPS tunnel address here; the private ws:// address cannot connect from this page.");
         const url=new URL(candidate,location.href);
         if(url.protocol==="ws:")url.protocol="http:";
         else if(url.protocol==="wss:")url.protocol="https:";
