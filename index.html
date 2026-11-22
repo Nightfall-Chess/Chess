@@ -930,18 +930,30 @@
     .gameplay-option { display: flex; align-items: center; gap: 9px; min-height: 38px; padding: 7px 9px; border: 1px solid #ffffff12; border-radius: 9px; background: #ffffff06; color: #cbd4c8; font-size: 12px; cursor: pointer; }
     .gameplay-option input { width: 15px; height: 15px; accent-color: var(--accent); }
     .online-screen { width: min(1120px, 100%); margin: auto; }
-    .online-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; margin: 10px 0 24px; }
-    .online-head h1 { margin: 8px 0; font-size: clamp(30px, 4vw, 42px); letter-spacing: -.04em; }
+    .online-head { display: flex; align-items: center; justify-content: space-between; gap: 22px; margin: 10px 0 18px; padding: clamp(22px, 3vw, 34px); border: 1px solid #ffffff16; border-radius: 22px; background: radial-gradient(circle at 90% 0%, #a78bfa20, transparent 38%), linear-gradient(135deg, #1b2940, #141c2d 70%); box-shadow: 0 18px 50px #0002; }
+    .online-head h1 { margin: 7px 0 9px; font-size: clamp(30px, 4vw, 42px); letter-spacing: -.04em; }
     .online-intro, .online-note { color: var(--muted); line-height: 1.65; }
-    .online-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-    .online-card { min-width: 0; padding: clamp(20px, 3vw, 30px); }
-    .online-connection-card { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 14px; margin-bottom: 18px; }
+    .online-head > div:last-child { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+    .online-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .online-card { min-width: 0; padding: clamp(20px, 2.5vw, 28px); border-radius: 18px; background: linear-gradient(145deg, #1a263b, #141d30); box-shadow: 0 12px 34px #0002; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+    .online-card:hover { transform: translateY(-2px); border-color: #9a8bfa55; box-shadow: 0 18px 42px #0003; }
+    .online-connection-card { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(180px, .8fr) minmax(180px, .8fr); align-items: end; gap: 16px; margin-bottom: 14px; border-radius: 18px; background: linear-gradient(145deg, #1a263b, #141d30); }
     .online-connection-card .field { min-width: 0; margin-top: 0; }
-    .online-connection-card small { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; }
+    .online-connection-card #selfHostedServerField { grid-column: span 2; }
+    .online-connection-card small { display: block; margin-top: 8px; color: #aeb9cd; font-size: 11px; line-height: 1.55; }
     .online-grid > .online-card:last-child { grid-column: 1 / -1; }
     .online-card h2 { margin: 0 0 8px; font-size: 19px; }
-    .online-card p { margin: 0 0 18px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .online-card p { margin: 0 0 18px; color: #aeb9cd; font-size: 13px; line-height: 1.65; }
     .online-card .field { margin-top: 14px; }
+    .online-connection-card input, .online-card input { min-height: 44px; border: 1px solid #ffffff25; border-radius: 11px; background: #0d1525; }
+    .online-connection-card select, .online-card select { min-height: 44px; border: 1px solid #ffffff20; border-radius: 11px; background: #0d1525; }
+    .online-card .primary-button { min-height: 44px; border-radius: 11px; background: linear-gradient(110deg, #b79cff, #8db7ff); color: #11172a; box-shadow: 0 8px 22px #9e8bff25; }
+    .online-card .subtle-button { min-height: 40px; border-radius: 10px; }
+    .online-availability { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border: 1px solid #ffffff1c; border-radius: 999px; background: #0d152580; color: #c5d5c3; font-size: 12px; }
+    .online-availability[data-state="error"] { color: #ffaaa0; border-color: #f3837655; }
+    .online-availability[data-state="ready"] { color: #bde8b7; border-color: #8bd58b55; }
+    .online-availability[data-state="error"]::before { background: #f38376; }
+    .online-availability[data-state="ready"]::before { background: #83d78c; }
     .room-code { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 17px 0; padding: 13px 15px; border: 1px dashed #c4f58a70; border-radius: 11px; background: #c4f58a0c; }
     .room-code strong { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: clamp(19px, 3vw, 26px); letter-spacing: .16em; }
     .online-match-invite { align-items: center; flex-wrap: wrap; margin: 10px 0; }
@@ -1962,7 +1974,7 @@
       </div>
       <section class="card online-card online-connection-card">
         <div class="field"><label class="field-label" for="onlineTransport">Connection mode</label><select id="onlineTransport"><option value="self-hosted" selected>Self-hosted WebSocket (this server)</option><option value="supabase">Supabase rooms</option></select></div>
-        <div class="field" id="selfHostedServerField"><label class="field-label" for="selfHostedServerUrl">WebSocket server URL</label><input id="selfHostedServerUrl" type="url" autocomplete="url" placeholder="Auto: this website's server"><button class="subtle-button server-site-button" id="openSelfHostedSiteButton" type="button">Open Nightfall on my server</button><small>Use your Tailscale address for devices on your private network, or a secure tunnel URL for friends outside it. The site and game connection will use the same server.</small></div>
+        <div class="field" id="selfHostedServerField"><label class="field-label" for="selfHostedServerUrl">Secure game server URL</label><input id="selfHostedServerUrl" type="url" autocomplete="url" placeholder="https://your-secure-tunnel.example.com"><small>Keep this page open at nightfall-chess.github.io. Paste your Cloudflare Tunnel or Tailscale HTTPS address here; Nightfall will connect securely using WSS. A plain ws:// address cannot be used from this HTTPS page.</small></div>
         <div class="field" id="onlineTimeControlField"><label class="field-label" for="onlineTimeControl">Clock</label><select id="onlineTimeControl"><option value="180">3 minutes</option><option value="300" selected>5 minutes</option><option value="600">10 minutes</option><option value="0">No clock</option></select></div>
         <div class="field" id="onlineRoomColorField"><label class="field-label" for="onlineRoomColor">Your color when creating a room</label><select id="onlineRoomColor"><option value="random" selected>Random</option><option value="w">White</option><option value="b">Black</option></select><small id="onlineRoomColorNote">Your opponent automatically gets the opposite color.</small></div>
       </section>
@@ -7640,7 +7652,7 @@
         return onlineApi;
       }
       const SELF_HOSTED_SERVER_STORAGE_KEY="nightfall-self-hosted-server-v1";
-      const DEFAULT_SELF_HOSTED_SERVER_URL="http://100.97.55.99:4173";
+      const DEFAULT_SELF_HOSTED_SERVER_URL="";
       function selfHostedSiteAddress() {
         let candidate=$("selfHostedServerUrl").value.trim();
         if(!candidate) {
@@ -7738,8 +7750,13 @@
         clearTimeout(selfHostedRetryTimer);selfHostedRetryTimer=0;
         if(selfHostedSocket?.readyState===WebSocket.OPEN)selfHostedSocket.close(1000,"Replacing room connection");
         const generation=++selfHostedSocketGeneration;
-        const endpoint=request.url||selfHostedServerAddress();
+        let endpoint=request.url||selfHostedServerAddress();
         $("selfHostedServerUrl").value=request.url||$("selfHostedServerUrl").value;
+        if(location.protocol==="https:"&&endpoint.startsWith("ws://")) {
+          const error=new Error("This page uses HTTPS, so the game server must use a secure WSS tunnel URL (https://...). The private ws://100.97.55.99 address is blocked by the browser.");
+          setSelfHostedConnectionStatus(isPersian?"برای این سایت HTTPS، نشانی امن تونل (https://) لازم است؛ ws:// مسدود می‌شود.":"HTTPS requires a secure WSS tunnel URL (https://...). Plain ws:// is blocked.",true);
+          throw error;
+        }
         setSelfHostedConnectionStatus(isPersian?"در حال اتصال به سرور بازی…":"Connecting to the game server…");
         return new Promise((resolve,reject)=>{
           const timeout=setTimeout(()=>{
