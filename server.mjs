@@ -54,7 +54,7 @@ const server = createServer((request, response) => {
     response.writeHead(400).end("Invalid request URL");
     return;
   }
-  if (pathname === "/api/puzzles/status" || pathname === "/api/puzzles") {
+  if (pathname === "/api/health") {\n    if (request.method !== "GET" && request.method !== "HEAD") {\n      response.writeHead(405, { Allow: "GET, HEAD" }).end("Method not allowed");\n      return;\n    }\n    const payload = JSON.stringify({ ok: true, service: "nightfall-chess", sitePath: "/", websocketPath: "/ws/online" });\n    response.writeHead(200, {\n      "Content-Type": "application/json; charset=utf-8",\n      "Content-Length": Buffer.byteLength(payload),\n      "Cache-Control": "no-store",\n      "X-Content-Type-Options": "nosniff"\n    });\n    if (request.method === "HEAD") response.end();\n    else response.end(payload);\n    return;\n  }\n  if (pathname === "/api/puzzles/status" || pathname === "/api/puzzles") {
     const corsHeaders = getPuzzleCorsHeaders(request);
     if (request.method === "OPTIONS") {
       if (!corsHeaders["Access-Control-Allow-Origin"]) {
