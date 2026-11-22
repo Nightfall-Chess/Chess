@@ -54,6 +54,22 @@ const server = createServer((request, response) => {
     response.writeHead(400).end("Invalid request URL");
     return;
   }
+  if (pathname === "/api/health") {
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      response.writeHead(405, { Allow: "GET, HEAD" }).end("Method not allowed");
+      return;
+    }
+    const payload = JSON.stringify({ ok: true, service: "nightfall-chess", sitePath: "/", websocketPath: "/ws/online" });
+    response.writeHead(200, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": Buffer.byteLength(payload),
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff"
+    });
+    if (request.method === "HEAD") response.end();
+    else response.end(payload);
+    return;
+  }
   if (pathname === "/api/puzzles/status" || pathname === "/api/puzzles") {
     const corsHeaders = getPuzzleCorsHeaders(request);
     if (request.method === "OPTIONS") {

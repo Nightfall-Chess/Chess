@@ -122,6 +122,7 @@
     .segmented { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: #131615; }
     .segment { min-height: 34px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; }
     .segment.active { background: #2a302b; color: var(--text); box-shadow: 0 1px 3px #0005; }
+    .server-site-button { width: 100%; margin-top: 8px; }
     .field { margin-top: 16px; }
     .field-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
     .field-label { color: #d6dbd5; font-size: 11px; }
@@ -1961,7 +1962,7 @@
       </div>
       <section class="card online-card online-connection-card">
         <div class="field"><label class="field-label" for="onlineTransport">Connection mode</label><select id="onlineTransport"><option value="self-hosted" selected>Self-hosted WebSocket (this server)</option><option value="supabase">Supabase rooms</option></select></div>
-        <div class="field" id="selfHostedServerField"><label class="field-label" for="selfHostedServerUrl">WebSocket server URL</label><input id="selfHostedServerUrl" type="url" autocomplete="url" placeholder="Auto: this website's server"><small>Use the Cloudflare Tunnel URL for games outside your network.</small></div>
+        <div class="field" id="selfHostedServerField"><label class="field-label" for="selfHostedServerUrl">WebSocket server URL</label><input id="selfHostedServerUrl" type="url" autocomplete="url" placeholder="Auto: this website's server"><button class="subtle-button server-site-button" id="openSelfHostedSiteButton" type="button">Open Nightfall on my server</button><small>Use your Tailscale address for devices on your private network, or a secure tunnel URL for friends outside it. The site and game connection will use the same server.</small></div>
         <div class="field" id="onlineTimeControlField"><label class="field-label" for="onlineTimeControl">Clock</label><select id="onlineTimeControl"><option value="180">3 minutes</option><option value="300" selected>5 minutes</option><option value="600">10 minutes</option><option value="0">No clock</option></select></div>
         <div class="field" id="onlineRoomColorField"><label class="field-label" for="onlineRoomColor">Your color when creating a room</label><select id="onlineRoomColor"><option value="random" selected>Random</option><option value="w">White</option><option value="b">Black</option></select><small id="onlineRoomColorNote">Your opponent automatically gets the opposite color.</small></div>
       </section>
@@ -2576,7 +2577,9 @@
       const faText = {
         "Created by Love 😇":"ساخته‌شده با عشق 😇",
         "All rights reserved © Orbit Studios.":"تمام حقوق برای Orbit Studios محفوظ است.",
-        "Nightfall Chess":"شطرنج شبانه","A quieter kind of competition":"رقابتی آرام و هوشمندانه",
+        "Nightfall Chess":"شطرنج شبانه",
+        "Open Nightfall on my server":"باز کردن شطرنج شبانه روی سرور من",
+        "Use your Tailscale address for devices on your private network, or a secure tunnel URL for friends outside it. The site and game connection will use the same server.":"برای دستگاه‌های متصل به شبکهٔ خصوصی از نشانی Tailscale و برای دوستان خارج از آن از نشانی تونل امن استفاده کنید. سایت و اتصال بازی از یک سرور استفاده می‌کنند.","A quieter kind of competition":"رقابتی آرام و هوشمندانه",
         "MOONLIT STUDY · NIGHTFALL CHESS":"مطالعه زیر نور ماه · شطرنج شبانه","Your next move awaits.":"حرکت بعدی در انتظار شماست.",
         "A quieter kind of competition. Settle in, find your rhythm, and let the game unfold.":"رقابتی آرام و هوشمندانه. آسوده بنشینید، ریتم خود را پیدا کنید و بگذارید بازی پیش برود.",
         "Play now":"شروع بازی","Explore the Academy":"ورود به آکادمی","Play against AI":"بازی با هوش مصنوعی",
@@ -6613,17 +6616,19 @@
         $("lobby").hidden=true;$("gameScreen").hidden=true;$("trainingScreen").hidden=true;$("classroomScreen").hidden=true;$("settingsScreen").hidden=true;$("onlineScreen").hidden=false;
         $("newGameTop").hidden=true;$("flipButton").hidden=true;
         const params=new URLSearchParams(location.hash.slice(1)),invite=params.get("room"),sharedServer=params.get("ws");
-        if(sharedServer) {
-          $("onlineTransport").value="self-hosted";
-          $("selfHostedServerUrl").value=sharedServer;
-          updateOnlineTransport();
+        if(sharedServer) { $("onlineTransport").value="self-hosted";$("selfHostedServerUrl").value=sharedServer;updateOnlineTransport(); }
+        if(!$("selfHostedServerUrl").value.trim()) {
+          try { $("selfHostedServerUrl").value=selfHostedSiteAddress().href; }
+          catch(error) { console.warn("Could not resolve the self-hosted server address:",error); }
         }
         if(invite&&/^[A-Z0-9]{4,12}$/i.test(invite))$("joinRoomCode").value=invite.toUpperCase();
         const saved=loadSelfHostedSession();
-        if($("onlineTransport").value==="self-hosted"&&saved&&(!invite||invite.toUpperCase()===saved.code)) {
-          selfHostedSession=saved;
-          $("selfHostedServerUrl").value=saved.url;
+        const canResume=Boolean(saved&&(!invite||invite.toUpperCase()===saved.code));
+        if($("onlineTransport").value==="self-hosted"&&canResume) {
+          selfHostedSession=saved;$("selfHostedServerUrl").value=saved.url;
           void connectSelfHosted({type:"resume",...saved}).catch(error=>console.warn("Could not resume the saved online game:",error));
+        } else if(invite&&/^[A-Z0-9]{4,12}$/i.test(invite)) {
+          window.setTimeout(()=>void joinRoom(),0);
         }
       }
       async function closeOnline() {
@@ -7576,9 +7581,8 @@
       }
       function inviteUrl() {
         if(!roomInviteCode)throw new Error("Create a room before sharing an invite.");
-        const invite=new URL(location.href);
         const params=new URLSearchParams({room:roomInviteCode});
-        if($("onlineTransport").value==="self-hosted")params.set("ws",selfHostedServerAddress());
+        const invite=$("onlineTransport").value==="self-hosted"?selfHostedSiteAddress():new URL(location.href);
         invite.hash=params.toString();
         return invite.href;
       }
@@ -7635,21 +7639,49 @@
         }
         return onlineApi;
       }
-      function selfHostedServerAddress() {
-        const configured=$("selfHostedServerUrl").value.trim();
-        let url;
-        if(configured) {
-          url=new URL(configured);
-          if(url.protocol==="http:")url.protocol="ws:";
-          else if(url.protocol==="https:")url.protocol="wss:";
-          if(url.protocol!=="ws:"&&url.protocol!=="wss:")throw new Error("Use a ws:// or wss:// server URL.");
-          url.pathname="/ws/online";url.search="";url.hash="";
-        } else {
-          const protocol=location.protocol==="https:"?"wss:":"ws:";
-          const hostname=location.hostname||"127.0.0.1";
-          const port=location.port==="5500"||location.port==="5501"?"4173":location.port;
-          url=new URL(`${protocol}//${hostname}${port?`:${port}`:""}/ws/online`);
+      const SELF_HOSTED_SERVER_STORAGE_KEY="nightfall-self-hosted-server-v1";
+      const DEFAULT_SELF_HOSTED_SERVER_URL="http://100.97.55.99:4173";
+      function selfHostedSiteAddress() {
+        let candidate=$("selfHostedServerUrl").value.trim();
+        if(!candidate) {
+          try { candidate=localStorage.getItem(SELF_HOSTED_SERVER_STORAGE_KEY)||""; } catch {}
         }
+        if(!candidate) {
+          if(location.port==="5500"||location.port==="5501")candidate=location.protocol+"//"+location.hostname+":4173";
+          else if(location.hostname.endsWith(".github.io"))candidate=DEFAULT_SELF_HOSTED_SERVER_URL;
+          else candidate=location.origin;
+        }
+        const url=new URL(candidate,location.href);
+        if(url.protocol==="ws:")url.protocol="http:";
+        else if(url.protocol==="wss:")url.protocol="https:";
+        if(url.protocol!=="http:"&&url.protocol!=="https:")throw new Error("Use an HTTP(S) server address, such as http://100.97.55.99:4173.");
+        url.pathname="/";url.search="";url.hash="";
+        return url;
+      }
+      function saveSelfHostedServerAddress() {
+        const address=selfHostedSiteAddress().href;
+        $("selfHostedServerUrl").value=address;
+        try { localStorage.setItem(SELF_HOSTED_SERVER_STORAGE_KEY,address); }
+        catch(error) { console.warn("Could not save the self-hosted server address:",error); }
+        return address;
+      }
+      function openSelfHostedSite() {
+        try {
+          const target=selfHostedSiteAddress();
+          saveSelfHostedServerAddress();
+          if(target.origin===location.origin) {
+            showToast(isPersian?"همین حالا روی سرور خودتان هستید.":"You are already using the server-hosted site.");
+            return;
+          }
+          location.assign(target.href);
+        } catch(error) {
+          showToast(isPersian?"آدرس سرور معتبر نیست: "+error.message:"Invalid server address: "+error.message);
+        }
+      }
+      function selfHostedServerAddress() {
+        const url=selfHostedSiteAddress();
+        url.protocol=url.protocol==="https:"?"wss:":"ws:";
+        url.pathname="/ws/online";url.search="";url.hash="";
         return url.href;
       }
       function saveSelfHostedSession(session) {
@@ -8950,6 +8982,11 @@
       });
       $("onlineTop").addEventListener("click",openOnline);
       $("onlineBack").addEventListener("click",closeOnline);
+      $("selfHostedServerUrl").addEventListener("change",()=>{
+        try { saveSelfHostedServerAddress(); }
+        catch(error) { showToast(isPersian?"آدرس سرور معتبر نیست: "+error.message:"Invalid server address: "+error.message); }
+      });
+      $("openSelfHostedSiteButton").addEventListener("click",openSelfHostedSite);
       $("onlineTransport").addEventListener("change",updateOnlineTransport);
       updateOnlineTransport();
       $("createRoomButton").addEventListener("click",createRoom);
@@ -9204,6 +9241,8 @@
       catch(error){showToast(`Language preference could not be loaded: ${error.message}`);}
       setLanguage(savedLanguage,false);
       const classroomInvite=new URLSearchParams(location.hash.slice(1)).get("classroom")||new URLSearchParams(location.search).get("classroom");
+      const onlineInvite=new URLSearchParams(location.hash.slice(1)).get("room");
+      if(onlineInvite&&/^[A-Z0-9]{4,12}$/i.test(onlineInvite))openOnline();
       if(classroomInvite&&CLASSROOM_ROOM_ID_PATTERN.test(classroomInvite))openClassroom();
     })();
   </script>
