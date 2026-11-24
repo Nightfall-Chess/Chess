@@ -185,8 +185,9 @@ function isAllowedOnlineOrigin(request) {
   try {
     const url = new URL(origin);
     const hostname = url.hostname.toLowerCase();
+    const requestHost = String(request.headers.host || "").toLowerCase();
     return (url.protocol === "http:" && ["localhost", "127.0.0.1", "::1"].includes(hostname))
-      || (url.protocol === "http:" && origin === `http://${request.headers.host}`);
+      || (["http:", "https:"].includes(url.protocol) && url.host.toLowerCase() === requestHost);
   } catch {
     return false;
   }
